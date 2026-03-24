@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  --color-rust: #B33A2D;
+  --color-ink: #1A1A1A;
+  --color-paper: #F2F2F2;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+
+  h1, h2, h3 {
+    @apply font-display font-black tracking-tighter uppercase;
+  }
+}
+
+@layer utilities {
+  .nav-link-active {
+    @apply text-rust;
+  }
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  .text-shadow-glow {
+    text-shadow: 0 0 10px rgba(179, 58, 45, 0.5);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #F2F2F2;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #B33A2D;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #8E2E24;
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Space+Grotesk:wght@700;900&display=swap');
