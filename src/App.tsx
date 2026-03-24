@@ -206,8 +206,9 @@ const ProjectCard = ({ title, tag, desc, bgImage, onClick }: { title: string; ta
   </motion.div>
 );
 
+// 恢复卡片高度到 h-80
 const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode }) => (
-  <motion.div whileHover={{ y: -5 }} className={`${bgColor} rounded-[2rem] p-6 flex flex-col h-[280px] relative overflow-hidden group border border-ink/5 shadow-sm hover:shadow-md transition-all`}>
+  <motion.div whileHover={{ y: -5 }} className={`${bgColor} rounded-[2rem] p-6 flex flex-col h-80 relative overflow-hidden group border border-ink/5 shadow-sm hover:shadow-md transition-all`}>
     <div className="z-10 relative">
       <span className="text-[9px] font-black uppercase tracking-widest text-ink/60 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-4 inline-block">{tag}</span>
       <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight">{title}</h3>
@@ -219,16 +220,39 @@ const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: 
   </motion.div>
 );
 
-const ChatMockup = () => (
-  <div className="w-[85%] h-[120%] bg-white rounded-t-3xl shadow-xl border border-ink/10 flex flex-col overflow-hidden translate-y-4 group-hover:translate-y-2 transition-transform duration-500">
-    <div className="bg-ink/5 px-4 py-2 border-b border-ink/5 flex gap-1.5"><div className="w-2 h-2 rounded-full bg-rust/40" /><div className="w-2 h-2 rounded-full bg-ink/10" /></div>
-    <div className="p-4 space-y-3 flex-1 text-[9px] font-medium text-ink/70">
-      <div className="bg-ink/5 p-2.5 rounded-xl rounded-tl-none">选择人设定位：<br/>a.专家 b.搞笑 c.鸡汤 d.干货</div>
-      <div className="bg-rust/10 text-rust p-2.5 rounded-xl rounded-tr-none ml-auto w-fit">选 a.专家</div>
-      <div className="bg-ink/5 p-2.5 rounded-xl rounded-tl-none">选择内容风格：<br/>a.vlog b.图文 c.短视频</div>
+// 恢复对话框的动态打字动效
+const ChatMockup = () => {
+  const [messages, setMessages] = useState<{role: 'ai' | 'user', text: string}[]>([]);
+  const fullChat = [
+    { role: 'ai', text: "你好！我是起号助手。" },
+    { role: 'user', text: "我想做 AI 摄影账号" },
+    { role: 'ai', text: "建议从提示词拆解切入。" },
+  ];
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setMessages(prev => [...fullChat.slice(0, (i % fullChat.length) + 1)]);
+      i++;
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="w-[85%] h-[120%] bg-white rounded-t-3xl shadow-xl border border-ink/10 flex flex-col overflow-hidden translate-y-4 group-hover:translate-y-2 transition-transform duration-500">
+      <div className="bg-ink/5 px-4 py-2 border-b border-ink/5 flex gap-1.5"><div className="w-2 h-2 rounded-full bg-rust/40" /><div className="w-2 h-2 rounded-full bg-ink/10" /></div>
+      <div className="p-4 space-y-3 flex-1 text-[9px] font-medium text-ink/70">
+        <AnimatePresence>
+          {messages.map((m, idx) => (
+            <motion.div key={idx} initial={{ opacity: 0, x: m.role === 'ai' ? -10 : 10 }} animate={{ opacity: 1, x: 0 }} className={`flex ${m.role === 'ai' ? '' : 'justify-end'}`}>
+              <div className={`p-2.5 rounded-xl max-w-[85%] leading-snug ${m.role === 'ai' ? 'bg-ink/5 rounded-tl-none' : 'bg-rust/10 text-rust rounded-tr-none'}`}>{m.text}</div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [selectedQ, setSelectedQ] = useState<number | null>(null);
@@ -464,11 +488,13 @@ export default function App() {
           <SectionHeader zh="AI 实验室" en="AI Lab" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <AILabCard tag="AI Agent" title="起号助手agent" desc="基于大语言模型开发的自媒体助手，能够自动生成账号定位与内容规划。" bgColor="bg-[#F3F4F6]" mockup={<ChatMockup />} />
+            {/* 注意这里加上了 mix-blend-multiply 来去除白色背景 */}
             <AILabCard tag="AI Product" title="AI陪伴玩具" desc="结合多模态交互技术，为婴幼儿提供情感陪伴与早教互动，解决陪伴缺失问题。" bgColor="bg-[#EEF2FF]" mockup={
-              <motion.img src="/ai-wanju-2.jpg" animate={{ y: [-10, 10, -10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="w-[80%] h-full object-contain object-bottom drop-shadow-2xl" alt="AI Toy" />
+              <motion.img src="/ai-wanju-2.jpg" animate={{ y: [-10, 10, -10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="w-[80%] h-full object-contain object-bottom mix-blend-multiply drop-shadow-2xl" alt="AI Toy" />
             } />
+            {/* 这个也是 */}
             <AILabCard tag="Live Stream" title="AI虚拟形象直播" desc="重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。" bgColor="bg-[#FEF2F2]" mockup={
-              <motion.img src="/ai-zhibo-3.jpg" animate={{ y: [-8, 8, -8] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }} className="w-[90%] h-full object-contain object-bottom drop-shadow-xl" alt="AI Live" />
+              <motion.img src="/ai-zhibo-3.jpg" animate={{ y: [-8, 8, -8] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }} className="w-[90%] h-full object-contain object-bottom mix-blend-multiply drop-shadow-xl" alt="AI Live" />
             } />
           </div>
         </section>
@@ -483,7 +509,7 @@ export default function App() {
 
           <div className="w-full flex flex-col md:flex-row justify-between items-center gap-8">
             <div>
-              <h2 className="text-3xl font-black mb-2 tracking-tighter">wenying.website</h2>
+              <h2 className="text-3xl font-black mb-2 tracking-tighter">朱闻樱 / JODIEZHU</h2>
               <p className="text-ink/40 font-mono text-[10px] uppercase tracking-[0.2em]">Open for New Opportunities & Collaborations © 2026</p>
             </div>
             <div className="flex items-center gap-4">
@@ -499,13 +525,13 @@ export default function App() {
 
       </main>
 
+      {/* 重构的提问分身按钮：去除文字，缩小为圆形，头像下移一半露出脸 */}
       <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
-        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setIsFaqOpen(!isFaqOpen)} className="h-14 pl-6 pr-2 bg-rust/90 backdrop-blur-md rounded-full flex items-center gap-3 text-white shadow-[0_10px_30px_rgba(179,58,45,0.4)] relative group border border-white/20">
-          <span className="text-[11px] font-bold tracking-widest uppercase relative z-10">提问分身</span>
-          <div className="w-10 h-10 rounded-full relative z-10 overflow-hidden border-2 border-white/50">
-            {isFaqOpen ? <div className="w-full h-full bg-white/20 flex items-center justify-center"><X size={18} /></div> : (
+        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsFaqOpen(!isFaqOpen)} className="w-14 h-14 bg-rust/90 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-[0_10px_30px_rgba(179,58,45,0.4)] relative group border border-white/20 p-1">
+          <div className="w-full h-full rounded-full relative z-10 overflow-hidden border border-white/50 bg-white">
+            {isFaqOpen ? <div className="w-full h-full bg-rust/20 flex items-center justify-center"><X size={18} /></div> : (
               <>
-                <img src="/fenshen-4.jpg" className="w-full h-full object-cover" alt="Avatar" />
+                <img src="/fenshen-4.jpg" className="w-full h-full object-cover scale-125 translate-y-1.5" alt="Avatar" />
                 <motion.div animate={{ opacity: [0, 0.4, 0] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-white" />
               </>
             )}
