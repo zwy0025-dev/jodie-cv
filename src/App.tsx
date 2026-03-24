@@ -1,4 +1,3 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -78,16 +77,6 @@ const NavItem = ({ zh, en, href }: { zh: string; en: string; href: string }) => 
   </motion.a>
 );
 
-const FloatingLabel = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (
-  <motion.div
-    animate={{ y: [0, -10, 0] }}
-    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay }}
-    className="bg-ink/80 backdrop-blur-sm px-4 py-2 rounded-full border border-rust/30 shadow-lg"
-  >
-    <span className="text-rust font-bold text-xs tracking-widest">{children}</span>
-  </motion.div>
-);
-
 const BreathingTag = ({ children }: { children: string }) => (
   <motion.span
     animate={{ 
@@ -135,6 +124,38 @@ const CharacterPop = ({ text, className = "" }: { text: string; className?: stri
   );
 };
 
+// --- 重构的立体图钉便签组件 ---
+const PushPin = ({ colorClass = "bg-rust" }) => (
+  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center drop-shadow-md">
+    {/* 钉子头部 */}
+    <div className={`w-5 h-5 rounded-full ${colorClass} shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.3),0_2px_4px_rgba(0,0,0,0.3)] relative`}>
+      <div className="absolute top-1 left-1 w-2 h-2 bg-white/50 rounded-full blur-[1px]" />
+    </div>
+    {/* 钉子针脚 */}
+    <div className="w-1.5 h-2.5 bg-gradient-to-b from-gray-300 to-gray-500 shadow-sm" />
+    <div className="w-0.5 h-1.5 bg-gray-600" />
+  </div>
+);
+
+const StickySkillCard = ({ title, dataDesc, icon: Icon, rotation, pinColor }: { title: string, dataDesc: React.ReactNode, icon: any, rotation: string, pinColor: string }) => (
+  <motion.div
+    whileHover={{ scale: 1.05, zIndex: 10 }}
+    className={`relative bg-white p-6 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-ink/5 ${rotation} transition-transform duration-300`}
+  >
+    <PushPin colorClass={pinColor} />
+    <div className="mb-4 text-rust flex justify-center opacity-80">
+      <Icon size={28} strokeWidth={1.5} />
+    </div>
+    <h3 className="text-center font-bold text-sm mb-3 text-ink tracking-tight">
+      {title}
+    </h3>
+    <div className="text-[11px] text-ink/60 leading-relaxed text-center font-medium">
+      {dataDesc}
+    </div>
+  </motion.div>
+);
+
+// --- 重构的时间轴工作经历组件 ---
 const TimelineItem = ({ 
   date, 
   title, 
@@ -156,64 +177,86 @@ const TimelineItem = ({
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
-      className="mb-10 last:mb-0 group"
+      className="relative pl-8 mb-12 group last:mb-0"
     >
-      <div className="text-ink font-bold text-sm mb-1">{date}</div>
-      <div className="flex flex-wrap items-center gap-3 mb-2">
-        <h4 className="text-sm font-bold tracking-tight">
-          {title} <span className="text-ink/20 mx-1">—</span> <span className="text-rust">{company}</span>
+      {/* Timeline Line & Dot */}
+      <div className="absolute left-[5px] top-2 bottom-[-3rem] w-px bg-rust/20 group-last:bg-transparent transition-colors duration-500 group-hover:bg-rust/50" />
+      <div className="absolute left-0 top-1.5 w-[11px] h-[11px] rounded-full bg-paper border-[2.5px] border-rust shadow-[0_0_0_4px_rgba(179,58,45,0.1)] group-hover:scale-125 group-hover:bg-rust transition-all duration-300 z-10" />
+
+      <div className="text-rust font-bold text-[11px] tracking-widest mb-1.5 uppercase">{date}</div>
+      <div className="flex flex-wrap items-center gap-4 mb-2">
+        <h4 className="text-base font-black tracking-tight text-ink">
+          {title} <span className="text-ink/20 mx-1 font-normal">—</span> <span className="text-rust/80">{company}</span>
         </h4>
         {details && (
-          <button 
+          <motion.button 
+            animate={{ 
+              boxShadow: ["0px 0px 0px 0px rgba(179,58,45,0)", "0px 0px 0px 6px rgba(179,58,45,0.15)", "0px 0px 0px 0px rgba(179,58,45,0)"] 
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-[9px] font-bold bg-rust/5 text-rust px-4 py-1.5 rounded-full border border-rust/20 hover:bg-rust hover:text-white transition-all flex items-center gap-1.5 shadow-sm"
+            className="text-[10px] font-bold bg-rust/5 text-rust px-4 py-1.5 rounded-full border border-rust/20 hover:bg-rust hover:text-white transition-colors flex items-center gap-1.5 z-10 relative cursor-pointer"
           >
-            了解经历 {isExpanded ? <ChevronDown size={10} className="rotate-180 transition-transform" /> : <ChevronDown size={10} className="transition-transform" />}
-          </button>
+            了解经历 {isExpanded ? <ChevronDown size={12} className="rotate-180 transition-transform" /> : <ChevronDown size={12} className="transition-transform" />}
+          </motion.button>
         )}
       </div>
-      <p className="text-xs text-ink/50 leading-relaxed max-w-xl">{desc}</p>
+      <p className="text-xs text-ink/60 leading-relaxed max-w-xl font-medium">{desc}</p>
       
       {details && (
         <AnimatePresence>
           {isExpanded && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
+              initial={{ height: 0, opacity: 0, marginTop: 0 }}
+              animate={{ height: 'auto', opacity: 1, marginTop: '1.5rem' }}
+              exit={{ height: 0, opacity: 0, marginTop: 0 }}
               className="overflow-hidden"
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 p-6 bg-white rounded-3xl border border-ink/5 shadow-sm">
-                <div>
-                  <h5 className="text-[10px] font-black uppercase tracking-widest text-rust mb-4 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-rust rounded-full" /> 工作内容
+              {/* 重构的详情卡片：立体深浅对比 */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* 卡片 1：工作内容 (浅色基础背景) */}
+                <div className="bg-white p-5 rounded-2xl border border-ink/5 shadow-sm hover:shadow-md transition-shadow">
+                  <h5 className="text-[10px] font-black uppercase tracking-widest text-ink/40 mb-4 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-ink/20 rounded-full" /> 工作内容
                   </h5>
-                  <ul className="space-y-2">
+                  <ul className="space-y-2.5">
                     {details.content.map((item, i) => (
-                      <li key={i} className="text-xs text-ink/70 leading-relaxed">• {item}</li>
+                      <li key={i} className="text-[11px] text-ink/70 leading-relaxed relative pl-3">
+                        <span className="absolute left-0 top-1.5 w-1 h-1 bg-ink/20 rounded-full" />
+                        {item}
+                      </li>
                     ))}
                   </ul>
                 </div>
-                <div>
-                  <h5 className="text-[10px] font-black uppercase tracking-widest text-rust mb-4 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-rust rounded-full" /> 核心项目
+                {/* 卡片 2：核心项目 (品牌色浅色背景) */}
+                <div className="bg-rust/[0.03] p-5 rounded-2xl border border-rust/10 shadow-sm hover:shadow-md transition-shadow">
+                  <h5 className="text-[10px] font-black uppercase tracking-widest text-rust/60 mb-4 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-rust/40 rounded-full" /> 核心项目
                   </h5>
-                  <ul className="space-y-2">
+                  <ul className="space-y-2.5">
                     {details.projects.map((item, i) => (
-                      <li key={i} className="text-xs text-ink/70 leading-relaxed">• {item}</li>
+                      <li key={i} className="text-[11px] text-rust/80 leading-relaxed relative pl-3 font-medium">
+                        <span className="absolute left-0 top-1.5 w-1 h-1 bg-rust/40 rounded-full" />
+                        {item}
+                      </li>
                     ))}
                   </ul>
                 </div>
-                <div>
-                  <h5 className="text-[10px] font-black uppercase tracking-widest text-rust mb-4 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-rust rounded-full" /> 突出成果
+                {/* 卡片 3：突出成果 (高亮深色背景，突出数据) */}
+                <div className="bg-rust p-5 rounded-2xl shadow-lg hover:-translate-y-1 transition-transform">
+                  <h5 className="text-[10px] font-black uppercase tracking-widest text-white/80 mb-4 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" /> 突出成果
                   </h5>
-                  <ul className="space-y-2">
+                  <ul className="space-y-2.5">
                     {details.results.map((item, i) => (
-                      <li key={i} className="text-xs text-ink/70 leading-relaxed">• {item}</li>
+                      <li key={i} className="text-[11px] text-white leading-relaxed relative pl-3 font-medium">
+                        <span className="absolute left-0 top-1.5 w-1 h-1 bg-white/50 rounded-full" />
+                        {/* 简单正则加粗数字部分，凸显业绩 */}
+                        <span dangerouslySetInnerHTML={{ __html: item.replace(/(\d+[%+万亿]*)/g, '<strong class="text-white font-black text-xs bg-white/20 px-1 rounded mx-0.5">$1</strong>') }} />
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -361,7 +404,6 @@ const NomiMockup = () => (
       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
       className="relative z-10 w-28 h-28 bg-ink rounded-full flex items-center justify-center shadow-2xl border-[5px] border-white"
     >
-      {/* Nomi Face Mockup */}
       <div className="w-20 h-20 rounded-full bg-rust/10 flex items-center justify-center overflow-hidden">
         <div className="relative">
           <div className="flex gap-5">
@@ -383,7 +425,6 @@ const NomiMockup = () => (
           />
         </div>
       </div>
-      {/* Voice waves */}
       <div className="absolute -bottom-5 flex gap-1">
         {[1, 2, 3, 4, 5, 6].map(i => (
           <motion.div
@@ -412,7 +453,6 @@ const LiveMockup = () => (
       />
       <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-transparent" />
       
-      {/* Live UI Overlay */}
       <div className="absolute top-7 left-4 flex items-center gap-2">
         <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md border border-white/30 overflow-hidden">
           <img src="https://picsum.photos/seed/avatar/100/100" className="w-full h-full object-cover" alt="" />
@@ -438,26 +478,6 @@ const LiveMockup = () => (
       </div>
     </div>
   </div>
-);
-
-const CompetencyBlock = ({ title, icon: Icon }: { title: string; icon: any }) => (
-  <motion.div
-    whileHover={{ y: -5, scale: 1.02 }}
-    className="glass aspect-square flex flex-col items-center justify-center p-6 relative group overflow-hidden cursor-default border-ink/5 transition-all"
-  >
-    <div className="absolute inset-0 bg-rust/0 group-hover:bg-rust/5 transition-colors" />
-    <div className="absolute -right-4 -bottom-4 w-12 h-12 bg-rust/5 rounded-full blur-xl group-hover:bg-rust/20 transition-all" />
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.5 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      className="mb-3 text-rust relative z-10"
-    >
-      <Icon size={32} strokeWidth={1.5} />
-    </motion.div>
-    <span className="text-center font-display font-bold text-[10px] uppercase tracking-widest group-hover:text-rust transition-colors px-2 relative z-10">
-      {title}
-    </span>
-  </motion.div>
 );
 
 const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
@@ -646,9 +666,9 @@ export default function App() {
         
         {/* 1. About Me (The Identity) */}
         <section id="about" className="relative min-h-screen pt-20 pb-40 overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start relative">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center relative">
             
-            {/* Left Top: Red Text & Breathing Tags */}
+            {/* Left: Content */}
             <div className="md:col-span-7 pt-12 md:sticky md:top-32">
               <div className="mb-8">
                 <CharacterPop 
@@ -691,23 +711,21 @@ export default function App() {
               </div>
             </div>
 
-            {/* Right Top: Large Vertical Block with Photo */}
-            <div className="md:col-span-5 flex justify-end relative">
+            {/* Right: Enlarged, Clean Profile Photo */}
+            <div className="md:col-span-5 flex justify-center md:justify-end relative">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative w-full max-w-[140px] aspect-[3/4] bg-rust overflow-hidden shadow-2xl"
+                className="relative w-full max-w-[280px] aspect-[3/4] rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-4 border-white"
               >
-                {/* 已经将图片路径替换为你根目录下的 /me.jpg */}
+                {/* 已经去除红色滤镜和灰色模式，还原真实照片色彩，并放大了尺寸 */}
                 <img 
                   src="https://github.com/zwy0025-dev/jodie-cv/blob/main/me.jpg?raw=true" 
                   alt="Jodie Zhu" 
-                  className="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all duration-700 grayscale hover:grayscale-0"
+                  className="w-full h-full object-cover"
                 />
-                {/* Decorative overlay */}
-                <div className="absolute inset-0 border-[12px] border-rust/20 pointer-events-none" />
               </motion.div>
             </div>
 
@@ -737,24 +755,65 @@ export default function App() {
           </div>
         </section>
 
-        {/* 2. Core Competency (The Competency) */}
+        {/* 2. Core Competency (便签看板设计) */}
         <section id="skills" className="mb-40">
-          <SectionHeader zh="核心技能" en="Core Skills" />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <CompetencyBlock title="业务破局与增长运营" icon={TrendingUp} />
-            <CompetencyBlock title="ToB/C产品运营经验" icon={Cpu} />
-            <CompetencyBlock title="商业思考与用户洞察" icon={Lightbulb} />
-            <CompetencyBlock title="AI应用与创新" icon={Rocket} />
+          <SectionHeader zh="核心数据与能力" en="Core Competencies" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-6">
+            <StickySkillCard 
+              title="业务破局与增长运营" 
+              icon={TrendingUp} 
+              pinColor="bg-rust"
+              rotation="rotate-[-2deg]"
+              dataDesc={
+                <>
+                  3年推动携程直播GMV从1000万增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>。优化注册转化节点，将小程序注册率飙升至<strong className="text-rust font-black text-sm mx-0.5">80%</strong>。
+                </>
+              }
+            />
+            <StickySkillCard 
+              title="ToB/C复杂系统运营" 
+              icon={Cpu} 
+              pinColor="bg-blue-500"
+              rotation="rotate-[3deg] translate-y-4"
+              dataDesc={
+                <>
+                  主导饿了么下沉市场智能调度系统，覆盖率提升至<strong className="text-rust font-black text-sm mx-0.5">98%</strong>。协同全国1800城代理商，配送时长缩短<strong className="text-rust font-black text-sm mx-0.5">4分钟</strong>。
+                </>
+              }
+            />
+            <StickySkillCard 
+              title="商业思考与0-1建设" 
+              icon={Lightbulb} 
+              pinColor="bg-purple-500"
+              rotation="rotate-[-1deg] translate-y-2"
+              dataDesc={
+                <>
+                  从0到1搭建艺术品电商及商家直播生态。重构创业品牌商业模型，完成<strong className="text-rust font-black text-sm mx-0.5">3万字</strong>深度商业计划书并对接资本。
+                </>
+              }
+            />
+            <StickySkillCard 
+              title="AI 应用与创新赋能" 
+              icon={Rocket} 
+              pinColor="bg-amber-500"
+              rotation="rotate-[2deg] translate-y-6"
+              dataDesc={
+                <>
+                  深度参与 AIGC 产品架构设计，赋能内容产出提效<strong className="text-rust font-black text-sm mx-0.5">300%</strong>。打造24小时虚拟形象直播间，显著降低企业成本。
+                </>
+              }
+            />
           </div>
         </section>
 
-        {/* 3. Experience & Education (The Timeline) */}
+        {/* 3. Experience & Education (带时间轴体验) */}
         <section id="experience" className="mb-40">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
             {/* Experience Column */}
             <div>
               <SectionHeader zh="工作经历" en="Work Experience" />
-              <div className="space-y-4">
+              <div className="relative">
                 <TimelineItem 
                   date="2025.10 - 至今"
                   title="创业项目"
@@ -849,7 +908,7 @@ export default function App() {
             {/* Education Column */}
             <div>
               <SectionHeader zh="教育背景" en="Education Background" />
-              <div className="space-y-4">
+              <div className="relative">
                 <TimelineItem 
                   date="2024.09 - 2027.03"
                   title="工商管理(MBA)"
@@ -874,7 +933,7 @@ export default function App() {
             <ProjectCard 
               title="下沉市场外卖配送提效"
               tag="智能系统覆盖与调优"
-              desc="主导饿了么下沉市场智能调度系统覆盖率从30%提升至98%，对结算法团队优化算法，帮助全国1800个城市代理商实现降本增效（配送时长缩短4分钟，骑手背单能力提升2 单/人）。。"
+              desc="主导饿了么下沉市场智能调度系统覆盖率从30%提升至98%，对结算法团队优化算法，帮助全国1800个城市代理商实现降本增效（配送时长缩短4分钟，骑手背单能力提升2 单/人）。"
             />
             <ProjectCard 
               title="一条艺术电商平台"
