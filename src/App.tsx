@@ -363,7 +363,7 @@ export default function App() {
               <span className="w-4 h-px bg-rust" />
             </div>
             
-            <CharacterPop text="复合型运营专家\n& AI应用体验官" className="text-4xl md:text-6xl font-black leading-[1.1] tracking-tighter text-ink mb-6" />
+            <CharacterPop text={"复合型运营专家\n& AI应用体验官"} className="text-4xl md:text-6xl font-black leading-[1.1] tracking-tighter text-ink mb-6" />
             
             <p className="text-xs md:text-sm text-ink/60 font-medium mb-10 max-w-xl mx-auto leading-relaxed">
               9年互联网运营和产品经验，1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及内容生成的商业化机会
