@@ -14,12 +14,15 @@ import {
   X, 
   ChevronRight,
   Menu,
-  ArrowUpRight, 
   Mail,
   QrCode,
   ChevronDown,
-  AlignLeft
+  AlignLeft,
+  ArrowUpRight
 } from 'lucide-react';
+
+// 关键修复：直接导入 src 目录下的图片，确保 Vite 打包时能找到它！
+import meImage from './me.jpg';
 
 // --- 通用组件 ---
 
@@ -80,21 +83,6 @@ const CharacterPop = ({ text, className = "" }: { text: string; className?: stri
     </div>
   );
 };
-
-// --- 重构：IM 聊天气泡评价组件 ---
-const IMBubbles = () => (
-  <div className="flex flex-col gap-3 my-8 w-full max-w-sm">
-    <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.3}} className="bg-white px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-sm border border-ink/5 w-fit">
-      <span className="text-xs text-ink/80 font-medium">共事过最强的创新业务先锋 🚀</span>
-    </motion.div>
-    <motion.div initial={{opacity:0, x:20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.9}} className="bg-rust/10 px-4 py-2.5 rounded-2xl rounded-tr-sm shadow-sm self-end w-fit">
-      <span className="text-xs text-rust font-bold">绝对的 0-1 项目建设者 💪</span>
-    </motion.div>
-    <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 1.5}} className="bg-white px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-sm border border-ink/5 w-fit">
-      <span className="text-xs text-ink/80 font-medium">AI 应用的资深体验官，眼光特准 ✨</span>
-    </motion.div>
-  </div>
-);
 
 // --- 重构：核心能力规整卡片 & 动态折线图 ---
 const GrowthChart = () => (
@@ -369,10 +357,11 @@ export default function App() {
               <span>Hi, my name is Jodie and I am a</span>
             </div>
             
-            <CharacterPop text="复合型运营专家\n& AI应用探索者" className="text-4xl md:text-6xl font-black leading-[1.1] tracking-tighter text-ink mb-6" />
+            {/* 关键修复：换行符解析修复 */}
+            <CharacterPop text={'复合型运营专家\n& AI应用探索者'} className="text-4xl md:text-6xl font-black leading-[1.1] tracking-tighter text-ink mb-6" />
             
-            <p className="text-xs md:text-sm text-ink/60 font-medium mb-10 max-w-xl mx-auto leading-relaxed">
-              9年互联网大厂经验 / 复旦大学 MBA<br/>专注于商业逻辑与 AIGC 技术的深度融合
+            <p className="text-xs md:text-sm text-ink/60 font-medium mb-10 max-w-2xl mx-auto leading-relaxed">
+              9年互联网运营和产品经验，1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景的深度融合方案，探索AI Agent、自动化工作流及内容生成的商业化机会。
             </p>
 
             {/* 匹配参考图的两个操作按钮 */}
@@ -386,29 +375,40 @@ export default function App() {
             </div>
           </div>
 
-          {/* 底部人物照片 & 环绕气泡 */}
-          <div className="relative w-full max-w-4xl mx-auto flex justify-center items-end h-[350px] md:h-[450px] mt-auto">
+          {/* 底部人物照片 & 环绕气泡群 */}
+          <div className="relative w-full max-w-5xl mx-auto flex justify-center items-end h-[350px] md:h-[450px] mt-auto">
             
-            {/* 左侧气泡 */}
-            <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.3}} className="absolute left-0 md:left-12 top-1/4 bg-white px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-lg border border-ink/5 z-20 max-w-[150px] md:max-w-xs">
+            {/* 气泡 1：左上 */}
+            <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.3}} className="absolute left-0 md:left-8 top-[15%] bg-white px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-lg border border-ink/5 z-20 max-w-[140px] md:max-w-[200px]">
               <span className="text-[10px] md:text-xs text-ink/80 font-bold">共事过最强的创新业务先锋 🚀</span>
             </motion.div>
+
+            {/* 气泡 2：左下 (新增) */}
+            <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.6}} className="absolute left-6 md:left-24 bottom-[30%] bg-rust/10 px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-sm z-20 max-w-[140px] md:max-w-[180px]">
+              <span className="text-[10px] md:text-xs text-rust font-bold">10年运营经验 💼</span>
+            </motion.div>
             
-            <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 1.5}} className="absolute left-8 md:left-32 bottom-1/4 bg-white px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-lg border border-ink/5 z-20 max-w-[150px] md:max-w-xs hidden md:block">
-              <span className="text-[10px] md:text-xs text-ink/80 font-bold">AI 应用的资深体验官 ✨</span>
+            {/* 气泡 3：右上 (新增) */}
+            <motion.div initial={{opacity:0, x:20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.9}} className="absolute right-4 md:right-24 top-[20%] bg-white px-4 py-2.5 rounded-2xl rounded-br-sm shadow-lg border border-ink/5 z-20 max-w-[140px] md:max-w-[180px]">
+              <span className="text-[10px] md:text-xs text-ink/80 font-bold">复旦MBAer 🎓</span>
             </motion.div>
 
-            {/* 右侧气泡 */}
-            <motion.div initial={{opacity:0, x:20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.9}} className="absolute right-0 md:right-12 top-1/3 bg-rust px-4 py-2.5 rounded-2xl rounded-br-sm shadow-lg z-20 max-w-[150px] md:max-w-xs">
+            {/* 气泡 4：右中 */}
+            <motion.div initial={{opacity:0, x:20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 1.2}} className="absolute right-0 md:right-8 top-[50%] bg-rust px-4 py-2.5 rounded-2xl rounded-tr-sm shadow-lg z-20 max-w-[140px] md:max-w-[200px]">
               <span className="text-[10px] md:text-xs text-white font-bold">绝对的 0-1 项目建设者 💪</span>
             </motion.div>
 
-            {/* 人物图片 */}
+            {/* 气泡 5：最左下角隐藏在大屏 */}
+            <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{delay: 1.5}} className="absolute left-2 md:left-12 bottom-[10%] bg-white px-4 py-2.5 rounded-2xl rounded-tr-sm shadow-md border border-ink/5 z-20 max-w-[150px] md:max-w-xs hidden md:block">
+              <span className="text-[10px] md:text-xs text-ink/80 font-bold">AI 应用的资深体验官 ✨</span>
+            </motion.div>
+
+            {/* 人物图片 - 直接使用刚刚 import 进来的 meImage */}
             <motion.img 
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, type: "spring", damping: 20 }}
-              src="/me.jpg" 
+              src={meImage} 
               alt="Jodie Zhu" 
               className="relative z-10 h-full w-auto object-contain object-bottom mix-blend-darken grayscale-[0.2] hover:grayscale-0 transition-all duration-700 pointer-events-none" 
             />
