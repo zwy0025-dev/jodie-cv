@@ -21,8 +21,8 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 
-// 关键修复：直接导入 src 目录下的图片，确保 Vite 打包时能找到它！
-import meImage from './me.jpg';
+// 关键修复：加了一个点，变成了 '../me.jpg'，让代码去外层根目录拿照片
+import meImage from '../me.jpg';
 
 // --- 通用组件 ---
 
@@ -334,7 +334,7 @@ export default function App() {
         </AnimatePresence>
       </nav>
 
-      {/* 主内容区，缩减两边边距，居中对齐 */}
+      {/* 主内容区 */}
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
         {/* 1. About Me (Bazil 杂志封面重构版) */}
@@ -357,7 +357,6 @@ export default function App() {
               <span>Hi, my name is Jodie and I am a</span>
             </div>
             
-            {/* 关键修复：换行符解析修复 */}
             <CharacterPop text={'复合型运营专家\n& AI应用探索者'} className="text-4xl md:text-6xl font-black leading-[1.1] tracking-tighter text-ink mb-6" />
             
             <p className="text-xs md:text-sm text-ink/60 font-medium mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -383,12 +382,12 @@ export default function App() {
               <span className="text-[10px] md:text-xs text-ink/80 font-bold">共事过最强的创新业务先锋 🚀</span>
             </motion.div>
 
-            {/* 气泡 2：左下 (新增) */}
+            {/* 气泡 2：左下 */}
             <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.6}} className="absolute left-6 md:left-24 bottom-[30%] bg-rust/10 px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-sm z-20 max-w-[140px] md:max-w-[180px]">
               <span className="text-[10px] md:text-xs text-rust font-bold">10年运营经验 💼</span>
             </motion.div>
             
-            {/* 气泡 3：右上 (新增) */}
+            {/* 气泡 3：右上 */}
             <motion.div initial={{opacity:0, x:20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.9}} className="absolute right-4 md:right-24 top-[20%] bg-white px-4 py-2.5 rounded-2xl rounded-br-sm shadow-lg border border-ink/5 z-20 max-w-[140px] md:max-w-[180px]">
               <span className="text-[10px] md:text-xs text-ink/80 font-bold">复旦MBAer 🎓</span>
             </motion.div>
