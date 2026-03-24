@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -701,7 +702,7 @@ export default function App() {
               >
                 {/* 已经将图片路径替换为你根目录下的 /me.jpg */}
                 <img 
-                  src="/me.jpg" 
+                  src="https://github.com/zwy0025-dev/jodie-cv/blob/main/me.jpg?raw=true" 
                   alt="Jodie Zhu" 
                   className="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all duration-700 grayscale hover:grayscale-0"
                 />
