@@ -80,6 +80,21 @@ const CharacterPop = ({ text, className = "" }: { text: string; className?: stri
   );
 };
 
+// --- 重构：IM 聊天气泡评价组件 ---
+const IMBubbles = () => (
+  <div className="flex flex-col gap-3 my-8 w-full max-w-sm">
+    <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.3}} className="bg-white px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-sm border border-ink/5 w-fit">
+      <span className="text-xs text-ink/80 font-medium">共事过最强的创新业务先锋 🚀</span>
+    </motion.div>
+    <motion.div initial={{opacity:0, x:20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.9}} className="bg-rust/10 px-4 py-2.5 rounded-2xl rounded-tr-sm shadow-sm self-end w-fit">
+      <span className="text-xs text-rust font-bold">绝对的 0-1 项目建设者 💪</span>
+    </motion.div>
+    <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 1.5}} className="bg-white px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-sm border border-ink/5 w-fit">
+      <span className="text-xs text-ink/80 font-medium">AI 应用的资深体验官，眼光特准 ✨</span>
+    </motion.div>
+  </div>
+);
+
 // --- 重构：核心能力规整卡片 & 动态折线图 ---
 const GrowthChart = () => (
   <div className="w-full h-16 mt-3 relative">
@@ -330,13 +345,12 @@ export default function App() {
         </AnimatePresence>
       </nav>
 
-      {/* 主内容区，缩减两边边距，居中对齐 */}
+      {/* 主内容区 */}
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        {/* 1. About Me (Bazil 杂志封面重构版) */}
+        {/* 1. About Me */}
         <section id="about" className="relative min-h-[90vh] flex flex-col items-center justify-end pt-16 pb-0 overflow-hidden mb-24">
           
-          {/* 超大号底层背景文字 */}
           <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-full text-center z-0 pointer-events-none select-none flex flex-col items-center">
             <h1 className="text-[14vw] md:text-[9vw] font-black text-ink/[0.03] tracking-tighter leading-none whitespace-nowrap">
               OPERATIONS
@@ -346,7 +360,6 @@ export default function App() {
             </h1>
           </div>
 
-          {/* 前景文本介绍 & 按钮 */}
           <div className="relative z-10 flex flex-col items-center w-full max-w-3xl mx-auto px-4 text-center mt-8">
             <div className="text-ink/50 font-bold tracking-widest uppercase text-[10px] md:text-xs mb-4 flex items-center justify-center gap-2">
               <AlignLeft size={14} className="text-rust" /> 
@@ -359,7 +372,6 @@ export default function App() {
               9年互联网大厂经验 / 复旦大学 MBA<br/>专注于商业逻辑与 AIGC 技术的深度融合
             </p>
 
-            {/* 匹配参考图的两个操作按钮 */}
             <div className="flex flex-col sm:flex-row items-center gap-4 z-30 mb-8 md:mb-12 w-full justify-center">
               <a href="mailto:zwy0025@gmail.com" className="bg-ink text-white px-8 py-3.5 rounded-lg font-bold text-[11px] tracking-[0.2em] uppercase hover:bg-rust transition-colors w-full sm:w-48 text-center shadow-xl">
                 发送邮件
@@ -370,24 +382,20 @@ export default function App() {
             </div>
           </div>
 
-          {/* 底部人物照片 & 环绕气泡 */}
           <div className="relative w-full max-w-4xl mx-auto flex justify-center items-end h-[350px] md:h-[450px] mt-auto">
             
-            {/* 左侧气泡 */}
             <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.3}} className="absolute left-0 md:left-12 top-1/4 bg-white px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-lg border border-ink/5 z-20 max-w-[150px] md:max-w-xs">
-              <span className="text-[10px] md:text-xs text-ink/80 font-bold">共事过最强的创新业务先锋 🚀</span>
+              <span className="text-[10px] md:text-xs text-ink/80 font-bold">创新业务先锋 🚀</span>
             </motion.div>
             
             <motion.div initial={{opacity:0, x:-20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 1.5}} className="absolute left-8 md:left-32 bottom-1/4 bg-white px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-lg border border-ink/5 z-20 max-w-[150px] md:max-w-xs hidden md:block">
-              <span className="text-[10px] md:text-xs text-ink/80 font-bold">AI 应用的资深体验官 ✨</span>
+              <span className="text-[10px] md:text-xs text-ink/80 font-bold">AI应用的资深体验官 ✨</span>
             </motion.div>
 
-            {/* 右侧气泡 */}
             <motion.div initial={{opacity:0, x:20, y:10}} whileInView={{opacity:1, x:0, y:0}} viewport={{once:true}} transition={{delay: 0.9}} className="absolute right-0 md:right-12 top-1/3 bg-rust px-4 py-2.5 rounded-2xl rounded-br-sm shadow-lg z-20 max-w-[150px] md:max-w-xs">
-              <span className="text-[10px] md:text-xs text-white font-bold">绝对的 0-1 项目建设者 💪</span>
+              <span className="text-[10px] md:text-xs text-white font-bold">0-1的项目建设者 💪</span>
             </motion.div>
 
-            {/* 人物图片 (使用 mix-blend-darken 去除白底) */}
             <motion.img 
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -396,7 +404,6 @@ export default function App() {
               alt="Jodie Zhu" 
               className="relative z-10 h-full w-auto object-contain object-bottom mix-blend-darken grayscale-[0.2] hover:grayscale-0 transition-all duration-700 pointer-events-none" 
             />
-            {/* 底部遮罩平滑过渡 */}
             <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8F9FB] to-transparent z-20 pointer-events-none" />
           </div>
         </section>
@@ -409,22 +416,22 @@ export default function App() {
               title="业务破局与增长运营" 
               icon={TrendingUp} 
               showChart={true}
-              dataDesc={<>3年推动携程直播GMV增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>。
+              dataDesc={<span>3年推动携程直播GMV增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>。
             />
             <SkillCard 
               title="ToB/C产品运营" 
               icon={Cpu} 
-              dataDesc={<>主导饿了么下沉市场智能调度系统，覆盖率提升至<strong className="text-rust font-black text-sm mx-0.5">98%</strong>。协同全国1800城代理商，配送时长缩短<strong className="text-rust font-black text-sm mx-0.5">4分钟</strong>。</>}
+              dataDesc={<span>主导饿了么下沉市场智能调度系统，覆盖率提升至<strong className="text-rust font-black text-sm mx-0.5">98%</strong>。协同全国1800城代理商，配送时长缩短<strong className="text-rust font-black text-sm mx-0.5">4分钟</strong>。</span>}
             />
             <SkillCard 
               title="商业思考与用户洞察" 
               icon={Lightbulb} 
-              dataDesc={<>从0到1搭建艺术品电商及商家直播生态。重构创业品牌商业模型，完成<strong className="text-rust font-black text-sm mx-0.5">3万字</strong>深度商业计划书并对接资本。</>}
+              dataDesc={<span>从0到1搭建艺术品电商及商家直播生态。重构创业品牌商业模型，完成<strong className="text-rust font-black text-sm mx-0.5">3万字</strong>深度商业计划书并对接资本。</span>}
             />
             <SkillCard 
-              title="AI 应用与创新赋能" 
+              title="AI应用与创新" 
               icon={Rocket} 
-              dataDesc={<>深度参与 AIGC 产品架构设计，赋能内容产出提效<strong className="text-rust font-black text-sm mx-0.5">300%</strong>。打造24小时虚拟形象直播间，显著降低企业成本。</>}
+              dataDesc={<span>深度参与 AIGC 产品架构设计，赋能内容产出提效<strong className="text-rust font-black text-sm mx-0.5">300%</strong>。打造24小时虚拟形象直播间，显著降低企业成本。</span>}
             />
           </div>
         </section>
@@ -435,10 +442,10 @@ export default function App() {
             <div>
               <SectionHeader zh="工作经历" en="Work Experience" />
               <div className="relative">
-                <TimelineItem date="2025.10 - 至今" title="创业项目" company="Koma Bistro / 予童科技" desc="BP撰写与融资 / 线上培训课程体系搭建与AI产品孵化" details={{content: ["深度参与 AIGC 产品架构设计与市场增长策略","重构品牌商业模型，对接优质资本资源","负责核心团队融资洽谈与合作伙伴关系维护"], projects: ["予童科技：AIGC 赋能内容生产流程优化","Koma Bistro：品牌商业模型重构与融资 BP"], results: ["内容产出提效 300%","成功对接多家优质资本资源","完成 3 万字深度商业计划书"]}} />
-                <TimelineItem date="2021.07 - 2025.07" title="运营经理" company="Ctrip 携程" desc="0-1搭建商家直播生态体系，3年推动GMV从1000万增至10亿+。" details={{content: ["从 0 到 1 搭建商家直播生态体系","制定直播间运营标准与流量分发策略","负责直播业务的整体增长与商业化变现"], projects: ["携程直播青训营：孵化 0 基础团队","携程 AI 直播：真人+AI 24小时客服直播间"], results: ["3 年推动 GMV 从 1000 万增至 10 亿+","直播间转化率提升 70%+","孵化团队 1 个月直播 GMV 破百万"]}} />
-                <TimelineItem date="2020.05 - 2021.07" title="产品运营" company="Yitiao 一条" desc="0-1艺术电商平台搭建。优化用户注册转化节点，将小程序注册率提升至80%。" details={{content: ["负责艺术电商平台的产品运营与用户增长","优化用户注册与交易转化路径","打通拍卖+直播的闭环交易链路"], projects: ["一条艺术品电商平台：小程序注册转化优化","拍卖+直播交易链路整合"], results: ["小程序注册率从 30% 提升至 80%","成功上线艺术品拍卖直播功能","显著提升高客单价商品转化效率"]}} />
-                <TimelineItem date="2016.09 - 2020.04" title="产品运营" company="Ele.me 饿了么" desc="主导下沉市场智能调度系统覆盖率从30%提升至98%。" details={{content: ["负责下沉市场物流调度系统的产品运营","协调全国 1800 个城市代理商的系统落地","通过数据分析优化配送效率与成本控制"], projects: ["下沉市场智能调度系统覆盖提升项目","代理商降本增效专项行动"], results: ["系统覆盖率从 30% 提升至 98%","帮助全国代理商显著降低运营成本","配送效率提升 25% 以上"]}} />
+                <TimelineItem date="2025.10 - 至今" title="创业伙伴" company="Koma Bistro & 予童科技" desc="BP撰写与融资 / 线上培训课程体系搭建与AI产品孵化" details={{content: ["深度参与 AIGC 产品架构设计与市场增长策略","重构品牌商业模型，对接优质资本资源","负责核心团队融资洽谈与合作伙伴关系维护"], projects: ["予童科技：AIGC 赋能内容生产流程优化","Koma Bistro：品牌商业模型重构与融资 BP"], results: ["内容产出提效 300%","成功对接多家优质资本资源","完成 3 万字深度商业计划书"]}} />
+                <TimelineItem date="2021.07 - 2025.07" title="直播运营经理" company="Ctrip 携程" desc="0-1搭建商家直播生态体系，3年推动GMV从1000万增至10亿+。" details={{content: ["从 0 到 1 搭建商家直播生态体系","制定直播间运营标准与流量分发策略","负责直播业务的整体增长与商业化变现"], projects: ["携程直播青训营：孵化 0 基础团队","携程 AI 直播：真人+AI 24小时客服直播间"], results: ["3 年推动 GMV 从 1000 万增至 10 亿+","直播间转化率提升 70%+","孵化团队 1 个月直播 GMV 破百万"]}} />
+                <TimelineItem date="2020.05 - 2021.07" title="平台产品运营" company="Yitiao 一条" desc="0-1艺术电商平台搭建。优化用户注册转化节点，将小程序注册率提升至80%。" details={{content: ["负责艺术电商平台的产品运营与用户增长","优化用户注册与交易转化路径","打通拍卖+直播的闭环交易链路"], projects: ["一条艺术品电商平台：小程序注册转化优化","拍卖+直播交易链路整合"], results: ["小程序注册率从 30% 提升至 80%","成功上线艺术品拍卖直播功能","显著提升高客单价商品转化效率"]}} />
+                <TimelineItem date="2016.09 - 2020.04" title="高级产品运营专员" company="Ele.me 饿了么" desc="主导下沉市场智能调度系统覆盖率从30%提升至98%。" details={{content: ["负责下沉市场物流调度系统的产品运营","协调全国 1800 个城市代理商的系统落地","通过数据分析优化配送效率与成本控制"], projects: ["下沉市场智能调度系统覆盖提升项目","代理商降本增效专项行动"], results: ["系统覆盖率从 30% 提升至 98%","帮助全国代理商显著降低运营成本","配送效率提升 25% 以上"]}} />
               </div>
             </div>
             <div>
