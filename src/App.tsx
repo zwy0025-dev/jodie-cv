@@ -339,10 +339,12 @@ export default function App() {
       </div>
 
       <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-[#F8F9FB]/90 backdrop-blur-md border-b border-ink/5 py-2' : 'py-6'}`}>
-        <div className="max-w-5xl mx-auto px-6 flex justify-between items-center">
+        <div className="max-w-5xl mx-auto px-6 flex justify-between items-center relative z-50 bg-transparent">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="font-display font-black text-2xl tracking-tighter">
             wenying<span className="text-rust">.website</span>
           </motion.div>
+          
+          {/* PC端菜单 */}
           <div className="hidden md:flex items-center gap-2">
             <NavItem zh="关于我" en="About Me" href="#about" icon={User} />
             <NavItem zh="核心技能" en="Core Skills" href="#skills" icon={Star} />
@@ -350,10 +352,43 @@ export default function App() {
             <NavItem zh="项目经历" en="Projects" href="#projects" icon={Folder} />
             <NavItem zh="AI 实验室" en="AI Lab" href="#ai-lab" icon={Sparkles} />
           </div>
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-ink hover:text-rust transition-colors">
+          
+          {/* 移动端汉堡按钮 */}
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-ink hover:text-rust transition-colors relative z-50">
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
+
+        {/* 新增移动端下拉菜单面板 */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: -20 }} 
+              className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border-b border-ink/10 shadow-2xl md:hidden flex flex-col py-2 px-6 z-40"
+            >
+              {[
+                { zh: "关于我", en: "About Me", href: "#about", icon: User },
+                { zh: "核心技能", en: "Core Skills", href: "#skills", icon: Star },
+                { zh: "个人经历", en: "Experience", href: "#experience", icon: Briefcase },
+                { zh: "项目经历", en: "Projects", href: "#projects", icon: Folder },
+                { zh: "AI 实验室", en: "AI Lab", href: "#ai-lab", icon: Sparkles }
+              ].map((link, idx) => (
+                <a 
+                  key={idx} 
+                  href={link.href} 
+                  onClick={() => setIsMobileMenuOpen(false)} // 点击后自动收起菜单
+                  className="flex items-center gap-4 text-ink/80 hover:text-rust font-bold text-sm py-4 border-b border-ink/5 last:border-0 group"
+                >
+                  <link.icon size={18} className="text-rust/70 group-hover:text-rust transition-colors" />
+                  <span>{link.zh}</span>
+                  <span className="text-[10px] text-ink/30 uppercase tracking-widest ml-auto">{link.en}</span>
+                </a>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       <motion.div style={{ y: parallaxY }} className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
