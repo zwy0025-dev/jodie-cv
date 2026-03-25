@@ -449,7 +449,7 @@ export default function App() {
             <p className="text-xs text-ink/60 font-medium leading-relaxed mb-6">
               9年互联网运营和产品经验、1年创业项目经验。
               深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。
-              持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及内容生成的商业化机会。
+              持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及人机协同的商业化机会。
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -467,24 +467,24 @@ export default function App() {
           <SectionHeader zh="核心技能" en="Core Skills" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-2">
             <SkillCard 
-              title="业务破局与增长运营" 
+              title="平台增长运营经验" 
               icon={TrendingUp} 
               dataDesc={<>3年内推动携程直播平台规模1000万增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>，6个月内推动视频号矩阵直播<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</>}
             />
             <SkillCard 
-              title="ToB/C产品运营" 
+              title="中后台产品运营" 
               icon={Cpu} 
-              dataDesc={<>中后台产品运营及推广培训经验，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队协同经验</strong>。</>}
+              dataDesc={>复杂系统推广培训经验，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长跨部门协同与商务谈判、资源整合</strong>。</>}
             />
             <SkillCard 
-              title="商业思考与用户洞察" 
+              title="业务赋能与项目落地经验" 
               icon={Lightbulb} 
-              dataDesc={<><strong className="text-ink font-bold">多次0-1创新项目落地经验</strong>，服务过下沉市场用户与高净值用户群体。</>}
+              dataDesc={<><strong className="text-ink font-bold">多次0-1项目落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→规模化增长的全链路操盘能力，擅长业务痛点诊断和赋能</>}
             />
             <SkillCard 
-              title="AI 应用与创新赋能" 
+              title="复合运营背景与商业思维" 
               icon={Rocket} 
-              dataDesc={<>深度参与 AIGC 产品工具设计，基于业务痛点<strong className="text-ink font-bold">独立创建主播陪练Agent</strong>。</>}
+              dataDesc={<>服务过多家互联网企业，参与初创企业运营，能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出内容营销策略和行业解决方案</strong>。</>}
             />
           </div>
         </section>
