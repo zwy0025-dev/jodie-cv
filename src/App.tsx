@@ -72,24 +72,27 @@ const CharacterPop = ({ text, className = "" }: { text: string; className?: stri
   );
 };
 
+// 呼吸标签组件
 const BreathingTag = ({ text, delay, className }: { text: string, delay: number, className?: string }) => (
   <motion.div
     animate={{ scale: [1, 1.1, 1] }}
     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: delay }}
-    className={`absolute z-20 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-white flex items-center gap-1.5 whitespace-nowrap ${className}`}
+    className={`absolute z-20 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.08)] border border-white flex items-center gap-1.5 whitespace-nowrap ${className}`}
   >
     <div className="w-1.5 h-1.5 rounded-full bg-rust/80" />
     <span className="font-bold text-[10px] text-ink/80">{text}</span>
   </motion.div>
 );
 
+// --- 重构：核心技能组件 (右下角放大的背景 Icon) ---
 const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: React.ReactNode, icon: any }) => (
-  <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-2xl shadow-sm border border-ink/5 hover:shadow-xl transition-all flex flex-col relative overflow-hidden">
-    <svg className="absolute bottom-0 right-0 w-full h-[60%] text-rust opacity-[0.06] pointer-events-none" viewBox="0 0 100 40" preserveAspectRatio="none">
-      <path d="M0,40 C20,35 40,25 60,20 C80,15 90,10 100,0 L100,40 Z" fill="currentColor" />
-      <path d="M0,40 C20,35 40,25 60,20 C80,15 90,10 100,0" fill="none" stroke="currentColor" strokeWidth="2" />
-      <circle cx="100" cy="0" r="3" fill="currentColor" />
-    </svg>
+  <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-2xl shadow-sm border border-ink/5 hover:shadow-xl transition-all flex flex-col relative overflow-hidden h-full group">
+    
+    {/* 右下角超大号半透明背景 Icon */}
+    <div className="absolute -bottom-6 -right-6 text-rust opacity-[0.04] pointer-events-none group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500">
+      <Icon size={140} strokeWidth={1.5} />
+    </div>
+    
     <div className="mb-4 text-rust flex items-center justify-between opacity-90 relative z-10">
       <Icon size={24} strokeWidth={2} />
       <div className="w-8 h-1 bg-rust/10 rounded-full" />
@@ -150,15 +153,18 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
     {project && (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-ink/70 backdrop-blur-md" />
-        <motion.div initial={{ scale: 0.95, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 30 }} className={`relative w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] bg-white`}>
+        <motion.div initial={{ scale: 0.95, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 30 }} className="relative w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] bg-white">
           
-          <div className={`${project.bgColor} p-8 relative overflow-hidden flex-shrink-0`}>
-            <button onClick={onClose} className="absolute top-4 right-4 text-ink/40 hover:text-ink bg-white/50 p-2 rounded-full backdrop-blur-md transition-colors"><X size={20} /></button>
-            <div className="relative z-10 mt-6">
-              <span className="text-ink/80 text-[10px] font-black uppercase tracking-widest bg-white/50 px-3 py-1 rounded-full border border-white/50 mb-3 inline-block">{project.tag}</span>
-              <h3 className="text-2xl md:text-3xl font-black text-ink tracking-tight">{project.title}</h3>
+          <div className="h-48 md:h-64 relative w-full flex-shrink-0 bg-ink">
+            <img src={project.bgImage} alt={project.title} className="w-full h-full object-cover opacity-80" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent" />
+            <button onClick={onClose} className="absolute top-4 right-4 text-white/70 hover:text-white bg-black/20 p-2 rounded-full backdrop-blur-md transition-colors"><X size={20} /></button>
+            <div className="absolute bottom-6 left-6 right-6">
+              <span className="text-white/90 text-[10px] font-black uppercase tracking-widest bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 mb-3 inline-block flex items-center gap-1.5 w-fit">
+                <project.icon size={12} /> {project.tag}
+              </span>
+              <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">{project.title}</h3>
             </div>
-            <project.icon className="absolute -bottom-8 -right-8 w-48 h-48 text-black/[0.03] rotate-12 pointer-events-none" />
           </div>
 
           <div className="p-6 md:p-8 overflow-y-auto">
@@ -177,36 +183,54 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
   </AnimatePresence>
 );
 
+// --- 重构：图3风格的项目展示卡片 (图片渐变到底部文字区) ---
 const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }) => (
-  <motion.div onClick={onClick} whileHover={{ y: -8 }} className={`relative h-64 rounded-[2rem] p-8 flex flex-col justify-between cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all ${project.bgColor} overflow-hidden`}>
-    <project.icon className="absolute -bottom-10 -right-10 w-48 h-48 text-black/[0.03] group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
-    <div className="relative z-10">
-      <div className="mb-4">
-        <span className="text-ink/80 text-[10px] font-black uppercase tracking-[0.1em] bg-white/50 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/50 shadow-sm">
-          {project.tag}
+  <motion.div 
+    onClick={onClick} 
+    whileHover={{ y: -8 }} 
+    className="relative rounded-[2rem] flex flex-col cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all bg-white overflow-hidden h-[400px] group"
+  >
+    {/* 顶部图片与渐变遮罩 */}
+    <div className="relative h-[60%] w-full flex-shrink-0 overflow-hidden bg-ink/5">
+      <img 
+        src={project.bgImage} 
+        alt={project.title} 
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+      />
+      {/* 底部平滑过渡到白色的渐变 */}
+      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/10 to-transparent" />
+      
+      {/* 左上角悬浮 Tag */}
+      <div className="absolute top-5 left-5">
+        <span className="text-white text-[10px] font-bold uppercase tracking-wider bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 flex items-center gap-1.5 shadow-sm">
+          <project.icon size={12} className="text-rust/80" /> {project.tag}
         </span>
       </div>
-      <h3 className="text-xl font-bold mb-2 tracking-tight text-ink leading-tight">{project.title}</h3>
-      <p className="text-xs text-ink/60 leading-relaxed font-medium line-clamp-3">{project.desc}</p>
     </div>
     
-    <div className="mt-4 relative z-10 self-start">
-      <motion.div whileHover={{ x: 3 }} className="flex items-center gap-2 bg-white/80 text-ink px-4 py-2 rounded-full text-[10px] font-bold tracking-widest shadow-sm">
-        <span>查看详情</span>
-        <ArrowUpRight size={14} className="opacity-80" />
-      </motion.div>
+    {/* 底部文字内容区 */}
+    <div className="p-6 pt-0 flex flex-col flex-1 z-10 bg-white">
+      <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight">{project.title}</h3>
+      <p className="text-[11px] text-ink/50 leading-relaxed font-medium line-clamp-3 mb-4">{project.desc}</p>
+      
+      {/* 操作按钮 */}
+      <div className="mt-auto flex items-center gap-3">
+        <motion.div whileHover={{ scale: 1.05 }} className="bg-ink text-white px-5 py-2.5 rounded-xl text-[10px] font-bold tracking-widest shadow-md">
+          了解详情
+        </motion.div>
+        <div className="bg-white border border-ink/10 text-ink px-4 py-2.5 rounded-xl text-[10px] font-bold tracking-widest hover:border-rust hover:text-rust transition-colors shadow-sm">
+          Watch Demo
+        </div>
+      </div>
     </div>
   </motion.div>
 );
 
-// --- AI Lab 卡片外层包装 ---
 const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode }) => (
   <motion.div whileHover={{ y: -5 }} className={`${bgColor} rounded-[2rem] p-6 flex flex-col min-h-[180px] relative group border border-ink/5 shadow-sm hover:shadow-md transition-all mt-8 md:mt-10`}>
-    {/* Mockup 定位于右上角并超出卡片边界 */}
     <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">
       {mockup}
     </div>
-    
     <div className="z-10 relative max-w-[65%]">
       <span className="text-[9px] font-black uppercase tracking-widest text-ink/50 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-3 inline-block">{tag}</span>
       <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight">{title}</h3>
@@ -215,7 +239,7 @@ const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: 
   </motion.div>
 );
 
-// --- 终极解法：支持短视频的组件 (带完美降级图片) ---
+// 视频 Mockup (AI Lab 使用)
 const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: string, fallbackImg: string, rotateClass?: string }) => (
   <div className={`w-full h-full rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] border-[4px] border-white/90 bg-white ${rotateClass} transition-transform duration-500`}>
     <video 
@@ -227,11 +251,9 @@ const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: stri
       playsInline
       className="w-full h-full object-cover"
     />
-    {/* 给视频上方加一层极其轻微的高光反射，增加3D玻璃感 */}
     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 pointer-events-none" />
   </div>
 );
-
 
 const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [selectedQ, setSelectedQ] = useState<number | null>(null);
@@ -299,20 +321,20 @@ export default function App() {
 
   const projectsData = [
     {
-      title: "饿了么下沉市场外卖配送提效", tag: "系统推广", 
-      bgColor: "bg-[#e8f5e9]", icon: MapPin,
+      title: "饿了么下沉市场外卖配送提效", tag: "系统调优", 
+      bgImage: "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?q=80&w=800&auto=format&fit=crop", icon: MapPin,
       desc: "主导饿了么下沉市场智能调度系统覆盖率从30%提升至98%，提升平台整体配送效率和履约质量。",
       detail: "该项目为公司战略级项目，作为业务方主导，产研和算法团队紧密配合，通过系统赋能与宣讲培训，帮助全国 1800 个城市代理商实现降本增效。"
     },
     {
       title: "一条艺术电商平台", tag: "电商运营", 
-      bgColor: "bg-[#ede7f6]", icon: Palette,
+      bgImage: "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?q=80&w=800&auto=format&fit=crop", icon: Palette,
       desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系，降低消费者线上购买门槛。",
       detail: "负责艺术电商平台产品运营，运营艺术品线上展厅、直播、拍卖、线上销售板块的产品规划与内容生态建设；同艺术品BD、内容编辑团队共同搭建从艺术家到艺术作品的完整基础知识体系，降低艺术品消费者线上购买门槛。"
     },
     {
       title: "携程直播青训营", tag: "校企合作", 
-      bgColor: "bg-[#e3f2fd]", icon: Video,
+      bgImage: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=800&auto=format&fit=crop", icon: Video,
       desc: "通过搭建视频号直播矩阵，6个月实现项目收入从0到4000万的突破，累计孵化200+学员，获集团Superhero称号。",
       detail: "负责该项目前期的孵化与规模建设，主导校企合作方案、商务拓展、学员培训、运营策略等全链路落地。具备单场百万直播GMV操盘及个人直播带货能力。"
     }
@@ -351,30 +373,35 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
+        {/* 1. About Me (完全透明人物融合 & 紧凑防截断呼吸标签) */}
         <section id="about" className="relative min-h-[85vh] flex items-center justify-center pt-8 pb-12 overflow-hidden mb-12">
           <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
-            <div className="lg:col-span-5 relative flex justify-center items-center h-[400px] md:h-[500px]">
+            <div className="lg:col-span-5 relative flex justify-center items-center h-[350px] md:h-[450px]">
               
-              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] left-[-10%]" />
-              <BreathingTag text="复旦MBAer 🎓" delay={1.5} className="top-[5%] right-[0%]" />
-              <BreathingTag text="做过主播，累计带货300万+ 💰" delay={0.8} className="top-[45%] left-[-25%]" />
-              <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[35%] right-[-15%]" />
-              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="bottom-[25%] left-[-15%]" />
-              <BreathingTag text="创作过百万播放短视频内容 🎬" delay={1.8} className="bottom-[25%] right-[-30%]" />
-              <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[5%] left-[5%]" />
-              <BreathingTag text="校企合作直播培训讲师 🏫" delay={2.5} className="top-[-5%] right-[20%]" />
+              {/* 精确向内收拢的 8 个标签，防止左侧截断 */}
+              <div className="absolute inset-0 max-w-sm mx-auto pointer-events-none">
+                <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] left-[5%] md:-left-4" />
+                <BreathingTag text="复旦MBAer 🎓" delay={1.5} className="top-[5%] right-[0%] md:-right-4" />
+                <BreathingTag text="做过主播，累计带货300万+ 💰" delay={0.8} className="top-[45%] -left-[2%] md:-left-10" />
+                <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[35%] right-[-2%] md:-right-10" />
+                <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="bottom-[25%] left-[0%] md:-left-6" />
+                <BreathingTag text="创作过百万播放短视频内容 🎬" delay={1.8} className="bottom-[25%] right-[0%] md:-right-6" />
+                <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[5%] left-[20%]" />
+                <BreathingTag text="校企合作直播培训讲师 🏫" delay={2.5} className="top-[-5%] right-[20%]" />
+              </div>
 
+              {/* 彻底去除背景的纯透明人像 (使用 touxiang-1.png) */}
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8 }}
-                className="relative w-56 md:w-64 aspect-[3/4] z-10"
+                className="relative w-48 md:w-56 aspect-[3/4] z-10"
               >
                 <img 
                   src="/touxiang-1.png" 
                   alt="Jodie Zhu" 
-                  className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)]" 
+                  className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)] pointer-events-none" 
                 />
               </motion.div>
 
@@ -405,6 +432,7 @@ export default function App() {
           </div>
         </section>
 
+        {/* 2. 核心技能 (带右下角放大 Icon 纹理背景) */}
         <section id="skills" className="mb-24">
           <SectionHeader zh="核心技能" en="Core Skills" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-2">
@@ -452,6 +480,7 @@ export default function App() {
           </div>
         </section>
 
+        {/* 3. 项目经历：严格参考图3 (图片渐变到底部文字展示) */}
         <section id="projects" className="mb-24">
           <SectionHeader zh="项目经历" en="Project Experience" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -462,12 +491,11 @@ export default function App() {
           <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
         </section>
         
-        {/* AI Lab 终极视频组件注入：采用短视频占位 */}
+        {/* 4. AI Lab 视频占位 (维持上个版本配置不变，严格限定视频框溢出效果) */}
         <section id="ai-lab" className="mb-24">
           <SectionHeader zh="AI 实验室" en="AI Lab" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-8">
             
-            {/* 卡片 1：起号助手视频 */}
             <AILabCard 
               tag="AI Agent" title="起号助手agent" bgColor="bg-[#F3F4F6]"
               desc="基于大语言模型开发的自媒体助手，能够自动生成账号定位与内容规划。" 
@@ -480,7 +508,6 @@ export default function App() {
               } 
             />
 
-            {/* 卡片 2：陪伴玩具视频 */}
             <AILabCard 
               tag="AI Product" title="AI陪伴玩具" bgColor="bg-[#EEF2FF]"
               desc="结合多模态交互技术，为婴幼儿提供情感陪伴与早教互动，解决陪伴缺失问题。" 
@@ -493,7 +520,6 @@ export default function App() {
               } 
             />
 
-            {/* 卡片 3：虚拟形象直播视频 */}
             <AILabCard 
               tag="Live Stream" title="AI虚拟形象直播" bgColor="bg-[#FEF2F2]"
               desc="重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。" 
