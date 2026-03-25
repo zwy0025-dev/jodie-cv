@@ -8,7 +8,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { 
   TrendingUp, Cpu, Lightbulb, Rocket, MessageCircle, X, ChevronRight,
   Menu, Mail, QrCode, ChevronDown, User, Star, Briefcase, Folder, Sparkles, ArrowUpRight,
-  MapPin, Palette, Video, Bot
+  MapPin, Palette, Video
 } from 'lucide-react';
 
 // --- 通用组件 ---
@@ -48,12 +48,35 @@ const NavItem = ({ zh, en, href, icon: Icon }: { zh: string; en: string; href: s
   </motion.a>
 );
 
-// 忽大忽小的呼吸标签
-const BreathingTag = ({ text, delay }: { text: string, delay: number }) => (
+const CharacterPop = ({ text, className = "" }: { text: string; className?: string }) => {
+  return (
+    <div className={`flex flex-wrap justify-center ${className}`}>
+      {text.split('\n').map((line, lineIdx) => (
+        <React.Fragment key={lineIdx}>
+          {lineIdx > 0 && <div className="basis-full h-0" />}
+          {line.trim().split('').map((char, i) => (
+            <motion.span
+              key={`${lineIdx}-${i}`}
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ type: "spring", damping: 15, stiffness: 100, delay: (lineIdx * 20 + i) * 0.02 }}
+              className="inline-block"
+            >
+              {char === ' ' ? '\u00A0' : char}
+            </motion.span>
+          ))}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+};
+
+const BreathingTag = ({ text, delay, className }: { text: string, delay: number, className?: string }) => (
   <motion.div
     animate={{ scale: [1, 1.1, 1] }}
     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: delay }}
-    className="absolute z-20 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.08)] border border-white flex items-center gap-1.5 whitespace-nowrap"
+    className={`absolute z-20 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-white flex items-center gap-1.5 whitespace-nowrap ${className}`}
   >
     <div className="w-1.5 h-1.5 rounded-full bg-rust/80" />
     <span className="font-bold text-[10px] text-ink/80">{text}</span>
@@ -61,13 +84,18 @@ const BreathingTag = ({ text, delay }: { text: string, delay: number }) => (
 );
 
 const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: React.ReactNode, icon: any }) => (
-  <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-2xl shadow-sm border border-ink/5 hover:shadow-xl transition-all flex flex-col">
-    <div className="mb-4 text-rust flex items-center justify-between opacity-90">
+  <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-2xl shadow-sm border border-ink/5 hover:shadow-xl transition-all flex flex-col relative overflow-hidden">
+    <svg className="absolute bottom-0 right-0 w-full h-[60%] text-rust opacity-[0.06] pointer-events-none" viewBox="0 0 100 40" preserveAspectRatio="none">
+      <path d="M0,40 C20,35 40,25 60,20 C80,15 90,10 100,0 L100,40 Z" fill="currentColor" />
+      <path d="M0,40 C20,35 40,25 60,20 C80,15 90,10 100,0" fill="none" stroke="currentColor" strokeWidth="2" />
+      <circle cx="100" cy="0" r="3" fill="currentColor" />
+    </svg>
+    <div className="mb-4 text-rust flex items-center justify-between opacity-90 relative z-10">
       <Icon size={24} strokeWidth={2} />
       <div className="w-8 h-1 bg-rust/10 rounded-full" />
     </div>
-    <h3 className="font-bold text-sm mb-3 text-ink tracking-tight">{title}</h3>
-    <div className="text-xs text-ink/60 leading-relaxed font-medium">
+    <h3 className="font-bold text-sm mb-3 text-ink tracking-tight relative z-10">{title}</h3>
+    <div className="text-xs text-ink/60 leading-relaxed font-medium relative z-10">
       {dataDesc}
     </div>
   </motion.div>
@@ -117,7 +145,6 @@ const TimelineItem = ({ date, title, company, desc, details }: { date: string; t
   );
 };
 
-// 弹窗组件
 const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void }) => (
   <AnimatePresence>
     {project && (
@@ -150,7 +177,6 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
   </AnimatePresence>
 );
 
-// 纯色纯净版项目卡片
 const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }) => (
   <motion.div onClick={onClick} whileHover={{ y: -8 }} className={`relative h-64 rounded-[2rem] p-8 flex flex-col justify-between cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all ${project.bgColor} overflow-hidden`}>
     <project.icon className="absolute -bottom-10 -right-10 w-48 h-48 text-black/[0.03] group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
@@ -173,18 +199,37 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
   </motion.div>
 );
 
-// 缩小版的 AI Lab 卡片
-const AILabCard = ({ title, tag, desc, mockup }: { title: string; tag: string; desc: string; mockup: React.ReactNode }) => (
-  <motion.div whileHover={{ y: -5 }} className="bg-white rounded-[2rem] p-6 flex flex-col h-[280px] md:h-[260px] relative overflow-hidden group border border-ink/5 shadow-sm hover:shadow-xl transition-all">
-    <div className="z-10 relative">
-      <span className="text-[9px] font-black uppercase tracking-widest text-ink/60 bg-ink/5 px-2.5 py-1 rounded-full border border-ink/10 mb-4 inline-block">{tag}</span>
-      <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight">{title}</h3>
-      <p className="text-[10px] text-ink/60 leading-relaxed font-medium line-clamp-2 max-w-[90%]">{desc}</p>
-    </div>
-    <div className="absolute inset-x-0 bottom-0 h-[55%] flex items-end justify-center pointer-events-none">
+// --- AI Lab 卡片外层包装 ---
+const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode }) => (
+  <motion.div whileHover={{ y: -5 }} className={`${bgColor} rounded-[2rem] p-6 flex flex-col min-h-[180px] relative group border border-ink/5 shadow-sm hover:shadow-md transition-all mt-8 md:mt-10`}>
+    {/* Mockup 定位于右上角并超出卡片边界 */}
+    <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">
       {mockup}
     </div>
+    
+    <div className="z-10 relative max-w-[65%]">
+      <span className="text-[9px] font-black uppercase tracking-widest text-ink/50 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-3 inline-block">{tag}</span>
+      <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight">{title}</h3>
+      <p className="text-[10px] text-ink/60 leading-relaxed font-medium line-clamp-3">{desc}</p>
+    </div>
   </motion.div>
+);
+
+// --- 终极解法：支持短视频的组件 (带完美降级图片) ---
+const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: string, fallbackImg: string, rotateClass?: string }) => (
+  <div className={`w-full h-full rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] border-[4px] border-white/90 bg-white ${rotateClass} transition-transform duration-500`}>
+    <video 
+      src={src}
+      poster={fallbackImg}
+      autoPlay
+      loop
+      muted
+      playsInline
+      className="w-full h-full object-cover"
+    />
+    {/* 给视频上方加一层极其轻微的高光反射，增加3D玻璃感 */}
+    <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 pointer-events-none" />
+  </div>
 );
 
 
@@ -306,38 +351,36 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        {/* 1. About Me (完全还原 PRD 左右布局) */}
         <section id="about" className="relative min-h-[85vh] flex items-center justify-center pt-8 pb-12 overflow-hidden mb-12">
           <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
-            {/* 左侧：缩小的头像与呼吸标签 */}
-            <div className="lg:col-span-5 relative flex justify-center items-center h-[350px] md:h-[450px]">
+            <div className="lg:col-span-5 relative flex justify-center items-center h-[400px] md:h-[500px]">
               
-              <BreathingTag text="复旦MBA 🎓" delay={0.5} />
-              <BreathingTag text="业务先锋 🚀" delay={1.2} />
-              <BreathingTag text="10年运营经验 💼" delay={2} />
-              <BreathingTag text="AI应用探索者 ✨" delay={0} />
-              
-              {/* 头像容器 - 白色相框质感，即使是带格子的jpg放进去也不会突兀 */}
+              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] left-[-10%]" />
+              <BreathingTag text="复旦MBAer 🎓" delay={1.5} className="top-[5%] right-[0%]" />
+              <BreathingTag text="做过主播，累计带货300万+ 💰" delay={0.8} className="top-[45%] left-[-25%]" />
+              <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[35%] right-[-15%]" />
+              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="bottom-[25%] left-[-15%]" />
+              <BreathingTag text="创作过百万播放短视频内容 🎬" delay={1.8} className="bottom-[25%] right-[-30%]" />
+              <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[5%] left-[5%]" />
+              <BreathingTag text="校企合作直播培训讲师 🏫" delay={2.5} className="top-[-5%] right-[20%]" />
+
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8 }}
-                className="relative w-48 md:w-56 aspect-[3/4] bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-8 border-white overflow-hidden z-10"
+                className="relative w-56 md:w-64 aspect-[3/4] z-10"
               >
                 <img 
                   src="/touxiang-1.png" 
                   alt="Jodie Zhu" 
-                  className="w-full h-full object-cover bg-[#f0f0f0]" 
-                  onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop'; }}
+                  className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)]" 
                 />
               </motion.div>
 
-              {/* 装饰性背景光晕 */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-rust/10 rounded-full blur-[60px] pointer-events-none" />
             </div>
 
-            {/* 右侧：文字介绍与按钮 */}
             <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left z-10">
               <h1 className="text-5xl md:text-7xl font-black text-ink tracking-tighter leading-[1.1] mb-4">
                 Hi, I'm Jodie<br/>朱闻樱
@@ -409,7 +452,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* 项目经历：严格无图，纯色淡雅底 + Icon 点缀 */}
         <section id="projects" className="mb-24">
           <SectionHeader zh="项目经历" en="Project Experience" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -420,50 +462,47 @@ export default function App() {
           <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
         </section>
         
-        {/* AI Lab：高度压缩，全部使用高级网图代替假透明图 */}
+        {/* AI Lab 终极视频组件注入：采用短视频占位 */}
         <section id="ai-lab" className="mb-24">
           <SectionHeader zh="AI 实验室" en="AI Lab" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-8">
             
-            {/* 卡片 1：起号助手 (毛玻璃特效) */}
+            {/* 卡片 1：起号助手视频 */}
             <AILabCard 
-              tag="AI Agent" title="起号助手agent" 
+              tag="AI Agent" title="起号助手agent" bgColor="bg-[#F3F4F6]"
               desc="基于大语言模型开发的自媒体助手，能够自动生成账号定位与内容规划。" 
               mockup={
-                <div className="relative w-full h-[180px] rounded-t-3xl overflow-hidden mt-auto mx-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)] group-hover:translate-y-2 transition-transform duration-500">
-                  <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="Agent" />
-                  <div className="absolute inset-4 bg-white/30 backdrop-blur-md border border-white/50 rounded-2xl p-4 flex flex-col justify-center">
-                    <div className="bg-rust text-white text-[10px] font-bold px-3 py-1.5 rounded-full self-start mb-2 shadow-sm">AI 助手已就绪</div>
-                    <p className="text-xs font-bold text-ink/80 leading-tight">请选择您的人设定位：<br/>a.专家 b.干货 c.搞笑</p>
-                  </div>
-                </div>
+                <VideoMockup 
+                  src="/video-agent.mp4" 
+                  fallbackImg="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=400&auto=format&fit=crop"
+                  rotateClass="-rotate-3"
+                />
               } 
             />
 
-            {/* 卡片 2：陪伴玩具 (可爱网图) */}
+            {/* 卡片 2：陪伴玩具视频 */}
             <AILabCard 
-              tag="AI Product" title="AI陪伴玩具" 
+              tag="AI Product" title="AI陪伴玩具" bgColor="bg-[#EEF2FF]"
               desc="结合多模态交互技术，为婴幼儿提供情感陪伴与早教互动，解决陪伴缺失问题。" 
               mockup={
-                <div className="w-[90%] h-[160px] mt-auto rounded-t-3xl overflow-hidden relative shadow-lg group-hover:scale-105 transition-transform duration-500">
-                  <img src="https://images.unsplash.com/photo-1535378273068-9bb67d5beacd?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="AI Toy" />
-                  <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-ink/80">交互模式开启</div>
-                </div>
+                <VideoMockup 
+                  src="/video-toy.mp4" 
+                  fallbackImg="https://images.unsplash.com/photo-1535378273068-9bb67d5beacd?q=80&w=400&auto=format&fit=crop"
+                  rotateClass="rotate-2"
+                />
               } 
             />
 
-            {/* 卡片 3：虚拟形象 (3D科技网图) */}
+            {/* 卡片 3：虚拟形象直播视频 */}
             <AILabCard 
-              tag="Live Stream" title="AI虚拟形象直播" 
+              tag="Live Stream" title="AI虚拟形象直播" bgColor="bg-[#FEF2F2]"
               desc="重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。" 
               mockup={
-                <div className="w-[85%] h-[180px] mt-auto rounded-t-[2.5rem] border-4 border-white overflow-hidden relative shadow-xl group-hover:rotate-2 transition-transform duration-500">
-                  <img src="https://images.unsplash.com/photo-1617802690992-15d93263d3a9?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="Virtual Anchor" />
-                  <div className="absolute top-3 left-3 bg-rust px-2 py-0.5 rounded text-[9px] font-black text-white tracking-widest shadow-sm">LIVE</div>
-                  <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
-                    <div className="space-y-1.5"><div className="w-16 h-1.5 bg-white/50 rounded-full" /><div className="w-20 h-1.5 bg-white/50 rounded-full" /></div>
-                  </div>
-                </div>
+                <VideoMockup 
+                  src="/video-live.mp4" 
+                  fallbackImg="https://images.unsplash.com/photo-1617802690992-15d93263d3a9?q=80&w=400&auto=format&fit=crop"
+                  rotateClass="rotate-3"
+                />
               } 
             />
 
