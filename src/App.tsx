@@ -250,9 +250,9 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   const [selectedQ, setSelectedQ] = useState<number | null>(null);
   const [typingText, setTypingText] = useState("");
   const faqs = [
-    { q: "离职原因？", a: "寻求更广阔的 AI 应用落地场景，将 9 年运营经验与 AIGC 技术深度结合，创造指数级增长。" },
-    { q: "期望薪资？", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的薪资方案，具体可面议。" },
-    { q: "为何选你？", a: "我既有大厂 10 亿规模的操盘视野，又有 0-1 创业的实战韧性。我是懂业务的 AI 实践者，能直接为业务结果负责。" }
+    { q: "离职原因", a: "寻求更广阔的 AI 应用落地场景，将 9 年运营经验与 AIGC 技术深度结合，创造指数级增长。" },
+    { q: "求职期望", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的合作方案，薪资可面议。" },
+    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" }
   ];
   useEffect(() => {
     if (selectedQ !== null) {
@@ -372,7 +372,7 @@ export default function App() {
             
             <div className="absolute inset-0 w-full h-full pointer-events-none z-20">
               <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] left-[8%] md:left-[15%]" />
-              <BreathingTag text="复旦MBAer 🎓" delay={1.5} className="top-[5%] right-[5%] md:right-[15%]" />
+              <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[5%] right-[5%] md:right-[15%]" />
               
               {/* 主播标签移至右下角，层级抬高以遮挡人物身体 */}
               <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="bottom-[15%] right-[0%] md:right-[10%] z-30" />
@@ -380,7 +380,6 @@ export default function App() {
               <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[35%] right-[2%] md:right-[5%]" />
               <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="bottom-[25%] left-[8%] md:left-[15%]" />
               <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[5%] left-[10%] md:left-[20%]" />
-              <BreathingTag text="校企合作直播培训讲师 🏫" delay={2.5} className="top-[0%] left-[30%] md:left-[45%]" />
             </div>
 
             {/* 人物形象进一步缩小 */}
@@ -397,7 +396,7 @@ export default function App() {
               />
               
               <h1 className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[200%] text-center text-5xl md:text-6xl font-black text-rust tracking-tighter drop-shadow-md z-30 pointer-events-none">
-                JODIE ZHU
+                ZHU WENYING
               </h1>
             </motion.div>
 
@@ -406,10 +405,12 @@ export default function App() {
 
           <div className="relative z-10 flex flex-col items-center text-center mt-6 px-4 max-w-2xl">
             <p className="text-xs md:text-sm font-bold text-ink/80 tracking-widest uppercase mb-3">
-              复合型运营专家 / AI应用体验官
+               上海 / 复旦大学MBA / 复合型运营专家
             </p>
             <p className="text-xs text-ink/60 font-medium leading-relaxed mb-6">
-              9年互联网运营和产品经验，1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及内容生成的商业化机会。
+              9年互联网运营和产品经验、1年创业项目经验。
+              深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。
+              持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及内容生成的商业化机会。
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -455,8 +456,8 @@ export default function App() {
             <div>
               <SectionHeader zh="工作经历" en="Work Experience" />
               <div className="relative">
-                <TimelineItem date="2025.10 - 至今" title="创业项目" company="Koma Bistro / 予童科技" desc="BP撰写与融资 / 线上培训课程体系搭建与AI产品孵化" details={{content: ["深度参与 AIGC 产品架构设计与市场增长策略","重构品牌商业模型，对接优质资本资源","负责核心团队融资洽谈与合作伙伴关系维护"], projects: ["予童科技：AIGC 赋能内容生产流程优化","Koma Bistro：品牌商业模型重构与融资 BP"], results: ["内容产出提效 300%","成功对接多家优质资本资源","完成 3 万字深度商业计划书"]}} />
-                <TimelineItem date="2021.07 - 2025.07" title="运营经理" company="Ctrip 携程" desc="0-1搭建商家直播生态体系，3年推动GMV从1000万增至10亿+。" details={{content: ["从 0 到 1 搭建商家直播生态体系","制定直播间运营标准与流量分发策略","负责直播业务的整体增长与商业化变现"], projects: ["携程直播青训营：孵化 0 基础团队","携程 AI 直播：真人+AI 24小时客服直播间"], results: ["3 年推动 GMV 从 1000 万增至 10 亿+","直播间转化率提升 70%+","孵化团队 1 个月直播 GMV 破百万"]}} />
+                <TimelineItem date="2025.10 - 至今" title="餐厅合伙人/企业顾问" company="和牛定食餐厅/予童科技" desc="BP撰写与融资 / 线上培训课程体系搭建、婴幼儿家庭AI服务产品孵化" 
+                <TimelineItem date="2021.07 - 2025.07" title="运营经理" company="Ctrip 携程" desc="从0-1搭建携程商家直播生态体系，3年推动平台直播GMV从1000万增至10亿+。" details={{content: ["从 0 到 1 搭建商家直播生态体系","制定直播间运营标准与流量分发策略","负责直播业务的整体增长与商业化变现"], projects: ["携程直播青训营：孵化 0 基础团队","携程 AI 直播：真人+AI 24小时客服直播间"], results: ["3 年推动 GMV 从 1000 万增至 10 亿+","直播间转化率提升 70%+","孵化团队 1 个月直播 GMV 破百万"]}} />
                 <TimelineItem date="2020.05 - 2021.07" title="产品运营" company="Yitiao 一条" desc="0-1艺术电商平台搭建。优化用户注册转化节点，将小程序注册率提升至80%。" details={{content: ["负责艺术电商平台的产品运营与用户增长","优化用户注册与交易转化路径","打通拍卖+直播的闭环交易链路"], projects: ["一条艺术品电商平台：小程序注册转化优化","拍卖+直播交易链路整合"], results: ["小程序注册率从 30% 提升至 80%","成功上线艺术品拍卖直播功能","显著提升高客单价商品转化效率"]}} />
                 <TimelineItem date="2016.09 - 2020.04" title="产品运营" company="Ele.me 饿了么" desc="主导下沉市场智能调度系统覆盖率从30%提升至98%。" details={{content: ["负责下沉市场物流调度系统的产品运营","协调全国 1800 个城市代理商的系统落地","通过数据分析优化配送效率与成本控制"], projects: ["下沉市场智能调度系统覆盖提升项目","代理商降本增效专项行动"], results: ["系统覆盖率从 30% 提升至 98%","帮助全国代理商显著降低运营成本","配送效率提升 25% 以上"]}} />
               </div>
@@ -485,13 +486,13 @@ export default function App() {
           <SectionHeader zh="AI 实验室" en="AI Lab" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-8">
             <AILabCard 
-              tag="AI Agent" title="起号助手agent" bgColor="bg-[#F3F4F6]"
-              desc="基于大语言模型开发的自媒体助手，能够自动生成账号定位与内容规划。" 
+              tag="AI Agent" title="自媒体起号助手" bgColor="bg-[#F3F4F6]"
+              desc="基于大语言模型开发的自媒体起号助手，帮助新手完成前期账号诊断与内容规划。" 
               mockup={<VideoMockup src="/video-agent.mp4" fallbackImg="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=400&auto=format&fit=crop" rotateClass="-rotate-3" />} 
             />
             <AILabCard 
-              tag="AI Product" title="AI陪伴玩具" bgColor="bg-[#EEF2FF]"
-              desc="结合多模态交互技术，为婴幼儿提供情感陪伴与早教互动，解决陪伴缺失问题。" 
+              tag="AI Product" title="婴幼儿AI服务产品" bgColor="bg-[#EEF2FF]"
+              desc="结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。" 
               mockup={<VideoMockup src="/video-toy.mp4" fallbackImg="https://images.unsplash.com/photo-1535378273068-9bb67d5beacd?q=80&w=400&auto=format&fit=crop" rotateClass="rotate-2" />} 
             />
             <AILabCard 
