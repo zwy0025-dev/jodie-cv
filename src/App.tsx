@@ -85,11 +85,9 @@ const BreathingTag = ({ text, delay, className }: { text: string, delay: number,
 
 const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: React.ReactNode, icon: any }) => (
   <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-2xl shadow-sm border border-ink/5 hover:shadow-xl transition-all flex flex-col relative overflow-hidden h-full group">
-    
     <div className="absolute -bottom-6 -right-6 text-rust opacity-[0.04] pointer-events-none group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500">
       <Icon size={140} strokeWidth={1.5} />
     </div>
-    
     <div className="mb-4 text-rust flex items-center justify-between opacity-90 relative z-10">
       <Icon size={24} strokeWidth={2} />
       <div className="w-8 h-1 bg-rust/10 rounded-full" />
@@ -178,14 +176,12 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
   </AnimatePresence>
 );
 
-// --- 修改点3：项目卡片优化（保持图片展示空间，压缩下方文字区域高度，纯文字链接） ---
 const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }) => (
   <motion.div 
     onClick={onClick} 
     whileHover={{ y: -8 }} 
     className="relative rounded-[1.5rem] flex flex-col cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all bg-white overflow-hidden h-[260px] group"
   >
-    {/* 图片区域 (140px，保持足够展示面) */}
     <div className="relative h-[140px] w-full flex-shrink-0 overflow-hidden bg-ink/5">
       <img 
         src={project.bgImage} 
@@ -201,7 +197,6 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
       </div>
     </div>
     
-    {/* 文字区域极度压缩留白，去掉背景/边框的按钮，改为文字链接 */}
     <div className="p-4 pt-3 flex flex-col flex-1 z-10 bg-white">
       <h3 className="text-base font-bold mb-1.5 tracking-tight text-ink leading-tight">{project.title}</h3>
       <p className="text-[11px] text-ink/50 leading-relaxed font-medium line-clamp-2 mb-2">{project.desc}</p>
@@ -254,6 +249,7 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
     { q: "求职期望", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的合作方案，薪资可面议。" },
     { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" }
   ];
+
   useEffect(() => {
     if (selectedQ !== null) {
       setTypingText(""); let i = 0; const fullText = faqs[selectedQ].a;
@@ -261,6 +257,7 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
       return () => clearInterval(interval);
     }
   }, [selectedQ]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -299,7 +296,7 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const containerRef = useRef(null);
-  
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -364,8 +361,6 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        {/* --- 修改点1 & 2：人物缩小展示，主播标签遮挡右下角身体 --- */}
-        {/* 全局 margin-bottom 从 24 统一缩减到了 12 */}
         <section id="about" className="relative min-h-[75vh] flex flex-col items-center justify-center pt-16 pb-8 overflow-hidden mb-12">
           
           <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
@@ -373,16 +368,12 @@ export default function App() {
             <div className="absolute inset-0 w-full h-full pointer-events-none z-20">
               <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] left-[8%] md:left-[15%]" />
               <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[5%] right-[5%] md:right-[15%]" />
-              
-              {/* 主播标签移至右下角，层级抬高以遮挡人物身体 */}
               <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="bottom-[15%] right-[0%] md:right-[10%] z-30" />
-              
               <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[35%] right-[2%] md:right-[5%]" />
               <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="bottom-[25%] left-[8%] md:left-[15%]" />
               <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[5%] left-[10%] md:left-[20%]" />
             </div>
 
-            {/* 人物形象进一步缩小 */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -424,7 +415,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* 模块间距均修改为 mb-12 */}
         <section id="skills" className="mb-12">
           <SectionHeader zh="核心技能" en="Core Skills" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-2">
@@ -456,7 +446,8 @@ export default function App() {
             <div>
               <SectionHeader zh="工作经历" en="Work Experience" />
               <div className="relative">
-                <TimelineItem date="2025.10 - 至今" title="餐厅合伙人/企业顾问" company="和牛定食餐厅/予童科技" desc="BP撰写与融资 / 线上培训课程体系搭建、婴幼儿家庭AI服务产品孵化" 
+                {/* 修复点：末尾补上了 /> */}
+                <TimelineItem date="2025.10 - 至今" title="餐厅合伙人/企业顾问" company="和牛定食餐厅/予童科技" desc="BP撰写与融资 / 线上培训课程体系搭建、婴幼儿家庭AI服务产品孵化" />
                 <TimelineItem date="2021.07 - 2025.07" title="运营经理" company="Ctrip 携程" desc="从0-1搭建携程商家直播生态体系，3年推动平台直播GMV从1000万增至10亿+。" details={{content: ["从 0 到 1 搭建商家直播生态体系","制定直播间运营标准与流量分发策略","负责直播业务的整体增长与商业化变现"], projects: ["携程直播青训营：孵化 0 基础团队","携程 AI 直播：真人+AI 24小时客服直播间"], results: ["3 年推动 GMV 从 1000 万增至 10 亿+","直播间转化率提升 70%+","孵化团队 1 个月直播 GMV 破百万"]}} />
                 <TimelineItem date="2020.05 - 2021.07" title="产品运营" company="Yitiao 一条" desc="0-1艺术电商平台搭建。优化用户注册转化节点，将小程序注册率提升至80%。" details={{content: ["负责艺术电商平台的产品运营与用户增长","优化用户注册与交易转化路径","打通拍卖+直播的闭环交易链路"], projects: ["一条艺术品电商平台：小程序注册转化优化","拍卖+直播交易链路整合"], results: ["小程序注册率从 30% 提升至 80%","成功上线艺术品拍卖直播功能","显著提升高客单价商品转化效率"]}} />
                 <TimelineItem date="2016.09 - 2020.04" title="产品运营" company="Ele.me 饿了么" desc="主导下沉市场智能调度系统覆盖率从30%提升至98%。" details={{content: ["负责下沉市场物流调度系统的产品运营","协调全国 1800 个城市代理商的系统落地","通过数据分析优化配送效率与成本控制"], projects: ["下沉市场智能调度系统覆盖提升项目","代理商降本增效专项行动"], results: ["系统覆盖率从 30% 提升至 98%","帮助全国代理商显著降低运营成本","配送效率提升 25% 以上"]}} />
@@ -531,11 +522,11 @@ export default function App() {
 
       <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
         <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsFaqOpen(!isFaqOpen)} className="w-14 h-14 bg-rust/90 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-[0_10px_30px_rgba(179,58,45,0.4)] relative group border border-white/20 p-1">
-          <div className="w-full h-full rounded-full relative z-10 overflow-hidden border border-white/50 bg-white">
+          {/* 修复点：移除了这里的 bg-white 以防止白底透出 */}
+          <div className="w-full h-full rounded-full relative z-10 overflow-hidden border border-white/50">
             {isFaqOpen ? <div className="w-full h-full bg-rust/20 flex items-center justify-center"><X size={18} /></div> : (
               <>
                 <img src="/fenshen-4.jpg" className="w-full h-full object-cover scale-[1.3] translate-y-3" alt="Avatar" />
-                <motion.div animate={{ opacity: [0, 0.4, 0] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-white" />
               </>
             )}
           </div>
