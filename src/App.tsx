@@ -29,6 +29,7 @@ const WeChatModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
           <button onClick={onClose} className="absolute top-6 right-6 text-ink/40 hover:text-rust transition-colors"><X size={24} /></button>
           <h3 className="text-2xl font-black mb-6 tracking-tighter text-ink">扫码添加微信</h3>
           <div className="aspect-square bg-[#F8F9FB] p-2 rounded-2xl mb-6 shadow-inner border border-ink/5">
+            {/* 这里的二维码图片名已经是正确的 */}
             <img src="/erweima-5.jpg" alt="WeChat QR Code" className="w-full h-full object-contain rounded-xl" />
           </div>
           <p className="text-sm text-ink/60 font-medium">请使用微信扫描上方二维码</p>
@@ -226,20 +227,29 @@ const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: 
   </motion.div>
 );
 
-const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: string, fallbackImg: string, rotateClass?: string }) => (
-  <div className={`w-full h-full rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] border-[4px] border-white/90 bg-white ${rotateClass} transition-transform duration-500`}>
-    <video 
-      src={src}
-      poster={fallbackImg}
-      autoPlay
-      loop
-      muted
-      playsInline
-      className="w-full h-full object-cover"
-    />
-    <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 pointer-events-none" />
-  </div>
-);
+// 修复点：使 VideoMockup 兼容 GIF 格式播放
+const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: string, fallbackImg: string, rotateClass?: string }) => {
+  const isGif = src.toLowerCase().endsWith('.gif');
+  
+  return (
+    <div className={`w-full h-full rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] border-[4px] border-white/90 bg-white ${rotateClass} transition-transform duration-500`}>
+      {isGif ? (
+        <img src={src} alt="demo" className="w-full h-full object-cover" />
+      ) : (
+        <video 
+          src={src}
+          poster={fallbackImg}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 pointer-events-none" />
+    </div>
+  );
+};
 
 const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [selectedQ, setSelectedQ] = useState<number | null>(null);
@@ -295,7 +305,7 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
-  const [showUndergrad, setShowUndergrad] = useState(false); // 控制本科经历的折叠状态
+  const [showUndergrad, setShowUndergrad] = useState(false);
   
   const containerRef = useRef(null);
 
@@ -309,22 +319,23 @@ export default function App() {
   const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -150]);
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
+  // 修复点：更新项目经历的所有背景图片路径为本地你上传的文件
   const projectsData = [
     {
       title: "饿了么下沉市场外卖配送提效", tag: "系统调优", 
-      bgImage: "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?q=80&w=800&auto=format&fit=crop", icon: MapPin,
+      bgImage: "/taobaoshangou.jpg", icon: MapPin,
       desc: "主导饿了么下沉市场智能调度系统覆盖率从30%提升至98%，提升平台整体配送效率和履约质量。",
       detail: "该项目为公司战略级项目，作为业务方主导，产研和算法团队紧密配合，通过系统赋能与宣讲培训，帮助全国 1800 个城市代理商实现降本增效。"
     },
     {
       title: "一条艺术电商平台", tag: "电商运营", 
-      bgImage: "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?q=80&w=800&auto=format&fit=crop", icon: Palette,
+      bgImage: "/yitiao.JPG", icon: Palette, // 这里的 .JPG 大写保持一致，Linux 环境下区分大小写
       desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系，降低消费者线上购买门槛。",
       detail: "负责艺术电商平台产品运营，运营艺术品线上展厅、直播、拍卖、线上销售板块的产品规划与内容生态建设；同艺术品BD、内容编辑团队共同搭建从艺术家到艺术作品的完整基础知识体系，降低艺术品消费者线上购买门槛。"
     },
     {
       title: "携程直播青训营", tag: "校企合作", 
-      bgImage: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=800&auto=format&fit=crop", icon: Video,
+      bgImage: "/qingxunying.jpg", icon: Video,
       desc: "通过搭建视频号直播矩阵，6个月实现项目收入从0到4000万的突破，累计孵化200+学员，获集团Superhero称号。",
       detail: "负责该项目前期的孵化与规模建设，主导校企合作方案、商务拓展、学员培训、运营策略等全链路落地。具备单场百万直播GMV操盘及个人直播带货能力。"
     }
@@ -359,7 +370,7 @@ export default function App() {
           </button>
         </div>
 
-        {/* 新增移动端下拉菜单面板 */}
+        {/* 移动端下拉菜单面板 */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div 
@@ -378,7 +389,7 @@ export default function App() {
                 <a 
                   key={idx} 
                   href={link.href} 
-                  onClick={() => setIsMobileMenuOpen(false)} // 点击后自动收起菜单
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-4 text-ink/80 hover:text-rust font-bold text-sm py-4 border-b border-ink/5 last:border-0 group"
                 >
                   <link.icon size={18} className="text-rust/70 group-hover:text-rust transition-colors" />
@@ -545,20 +556,21 @@ export default function App() {
         <section id="ai-lab" className="mb-12">
           <SectionHeader zh="AI 实验室" en="AI Lab" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-8">
+            {/* 修复点：填入 Agent GIF 并使用本地玩具和直播视频文件 */}
             <AILabCard 
               tag="AI Agent" title="自媒体起号助手" bgColor="bg-[#F3F4F6]"
               desc="基于大语言模型开发的自媒体起号助手，帮助新手完成前期账号诊断与内容规划。" 
-              mockup={<VideoMockup src="/video-agent.mp4" fallbackImg="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=400&auto=format&fit=crop" rotateClass="-rotate-3" />} 
+              mockup={<VideoMockup src="https://media.giphy.com/media/L1R1tvI9svkIWwpVYr/giphy.gif" fallbackImg="" rotateClass="-rotate-3" />} 
             />
             <AILabCard 
               tag="AI Product" title="婴幼儿AI服务产品" bgColor="bg-[#EEF2FF]"
               desc="结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。" 
-              mockup={<VideoMockup src="/video-toy.mp4" fallbackImg="https://images.unsplash.com/photo-1535378273068-9bb67d5beacd?q=80&w=400&auto=format&fit=crop" rotateClass="rotate-2" />} 
+              mockup={<VideoMockup src="/aitoy.mp4" fallbackImg="/ai-wanju-2.jpg" rotateClass="rotate-2" />} 
             />
             <AILabCard 
               tag="Live Stream" title="AI虚拟形象直播" bgColor="bg-[#FEF2F2]"
               desc="重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。" 
-              mockup={<VideoMockup src="/video-live.mp4" fallbackImg="https://images.unsplash.com/photo-1617802690992-15d93263d3a9?q=80&w=400&auto=format&fit=crop" rotateClass="rotate-3" />} 
+              mockup={<VideoMockup src="/xiaozhang.mp4" fallbackImg="/ai-zhibo-3.jpg" rotateClass="rotate-3" />} 
             />
           </div>
         </section>
@@ -594,6 +606,7 @@ export default function App() {
           <div className="w-full h-full rounded-full relative z-10 overflow-hidden border border-white/50">
             {isFaqOpen ? <div className="w-full h-full bg-rust/20 flex items-center justify-center"><X size={18} /></div> : (
               <>
+                {/* 修复点：分身图也是对应的正确本地图片名 */}
                 <img src="/fenshen-4.jpg" className="w-full h-full object-cover scale-[1.3] translate-y-3" alt="Avatar" />
               </>
             )}
