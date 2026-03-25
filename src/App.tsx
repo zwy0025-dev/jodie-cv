@@ -85,9 +85,11 @@ const BreathingTag = ({ text, delay, className }: { text: string, delay: number,
 
 const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: React.ReactNode, icon: any }) => (
   <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-2xl shadow-sm border border-ink/5 hover:shadow-xl transition-all flex flex-col relative overflow-hidden h-full group">
+    
     <div className="absolute -bottom-6 -right-6 text-rust opacity-[0.04] pointer-events-none group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500">
       <Icon size={140} strokeWidth={1.5} />
     </div>
+    
     <div className="mb-4 text-rust flex items-center justify-between opacity-90 relative z-10">
       <Icon size={24} strokeWidth={2} />
       <div className="w-8 h-1 bg-rust/10 rounded-full" />
@@ -176,15 +178,15 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
   </AnimatePresence>
 );
 
-// --- 修改点3：项目卡片高度压缩，图片占1/3，文字紧凑，文本链接 ---
+// --- 修改点3：项目卡片优化（保持图片展示空间，压缩下方文字区域高度，纯文字链接） ---
 const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }) => (
   <motion.div 
     onClick={onClick} 
     whileHover={{ y: -8 }} 
-    className="relative rounded-3xl flex flex-col cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all bg-white overflow-hidden h-[290px] group"
+    className="relative rounded-[1.5rem] flex flex-col cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all bg-white overflow-hidden h-[260px] group"
   >
-    {/* 图片区域压缩为约 1/3 (100px 高度) */}
-    <div className="relative h-[100px] w-full flex-shrink-0 overflow-hidden bg-ink/5">
+    {/* 图片区域 (140px，保持足够展示面) */}
+    <div className="relative h-[140px] w-full flex-shrink-0 overflow-hidden bg-ink/5">
       <img 
         src={project.bgImage} 
         alt={project.title} 
@@ -199,17 +201,17 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
       </div>
     </div>
     
-    {/* 内容区域压缩留白，去掉 Watch Demo 按钮，改为轻量链接 */}
-    <div className="p-5 pt-3 flex flex-col flex-1 z-10 bg-white">
+    {/* 文字区域极度压缩留白，去掉背景/边框的按钮，改为文字链接 */}
+    <div className="p-4 pt-3 flex flex-col flex-1 z-10 bg-white">
       <h3 className="text-base font-bold mb-1.5 tracking-tight text-ink leading-tight">{project.title}</h3>
-      <p className="text-[11px] text-ink/50 leading-relaxed font-medium line-clamp-3 mb-2">{project.desc}</p>
+      <p className="text-[11px] text-ink/50 leading-relaxed font-medium line-clamp-2 mb-2">{project.desc}</p>
       
       <div className="mt-auto">
         <motion.span 
           whileHover={{ x: 5 }} 
           className="text-rust font-bold text-[11px] tracking-widest flex items-center gap-1"
         >
-          **了解详情 &rarr;**
+          了解详情 &rarr;
         </motion.span>
       </div>
     </div>
@@ -362,28 +364,31 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        {/* --- 修改点1：居中全透明人物首屏与极限防截断标签 --- */}
-        <section id="about" className="relative min-h-[85vh] flex flex-col items-center justify-center pt-20 pb-12 overflow-hidden mb-12">
+        {/* --- 修改点1 & 2：人物缩小展示，主播标签遮挡右下角身体 --- */}
+        {/* 全局 margin-bottom 从 24 统一缩减到了 12 */}
+        <section id="about" className="relative min-h-[75vh] flex flex-col items-center justify-center pt-16 pb-8 overflow-hidden mb-12">
           
           <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
             
-            {/* 绝对安全位置的呼吸标签，全部向中心点聚拢 */}
             <div className="absolute inset-0 w-full h-full pointer-events-none z-20">
               <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] left-[8%] md:left-[15%]" />
               <BreathingTag text="复旦MBAer 🎓" delay={1.5} className="top-[5%] right-[5%] md:right-[15%]" />
-              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="top-[40%] left-[2%] md:left-[5%]" />
+              
+              {/* 主播标签移至右下角，层级抬高以遮挡人物身体 */}
+              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="bottom-[15%] right-[0%] md:right-[10%] z-30" />
+              
               <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[35%] right-[2%] md:right-[5%]" />
               <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="bottom-[25%] left-[8%] md:left-[15%]" />
-              <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[25%] right-[8%] md:right-[15%]" />
+              <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[5%] left-[10%] md:left-[20%]" />
               <BreathingTag text="校企合作直播培训讲师 🏫" delay={2.5} className="top-[0%] left-[30%] md:left-[45%]" />
             </div>
 
-            {/* 居中的透明人物照片 (去除了白底和相框，直接渲染阴影) */}
+            {/* 人物形象进一步缩小 */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="relative w-48 md:w-60 aspect-[3/4] z-10 mb-6"
+              className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-4"
             >
               <img 
                 src="/touxiang-1.png" 
@@ -391,8 +396,7 @@ export default function App() {
                 className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)] pointer-events-none" 
               />
               
-              {/* 大字浮在人物下方 */}
-              <h1 className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[200%] text-center text-5xl md:text-6xl font-black text-rust tracking-tighter drop-shadow-md z-30">
+              <h1 className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[200%] text-center text-5xl md:text-6xl font-black text-rust tracking-tighter drop-shadow-md z-30 pointer-events-none">
                 JODIE ZHU
               </h1>
             </motion.div>
@@ -400,11 +404,11 @@ export default function App() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-rust/10 rounded-full blur-[60px] pointer-events-none z-0" />
           </div>
 
-          <div className="relative z-10 flex flex-col items-center text-center mt-8 px-4 max-w-2xl">
-            <p className="text-xs md:text-sm font-bold text-ink/80 tracking-widest uppercase mb-4">
+          <div className="relative z-10 flex flex-col items-center text-center mt-6 px-4 max-w-2xl">
+            <p className="text-xs md:text-sm font-bold text-ink/80 tracking-widest uppercase mb-3">
               复合型运营专家 / AI应用体验官
             </p>
-            <p className="text-xs text-ink/60 font-medium leading-relaxed mb-8">
+            <p className="text-xs text-ink/60 font-medium leading-relaxed mb-6">
               9年互联网运营和产品经验，1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及内容生成的商业化机会。
             </p>
 
@@ -419,7 +423,8 @@ export default function App() {
           </div>
         </section>
 
-        <section id="skills" className="mb-24">
+        {/* 模块间距均修改为 mb-12 */}
+        <section id="skills" className="mb-12">
           <SectionHeader zh="核心技能" en="Core Skills" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-2">
             <SkillCard 
@@ -445,7 +450,7 @@ export default function App() {
           </div>
         </section>
 
-        <section id="experience" className="mb-24">
+        <section id="experience" className="mb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             <div>
               <SectionHeader zh="工作经历" en="Work Experience" />
@@ -466,7 +471,7 @@ export default function App() {
           </div>
         </section>
 
-        <section id="projects" className="mb-24">
+        <section id="projects" className="mb-12">
           <SectionHeader zh="项目经历" en="Project Experience" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {projectsData.map((p, idx) => (
@@ -476,8 +481,7 @@ export default function App() {
           <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
         </section>
         
-        {/* --- 这里维持了上个版本你确认满意的短视频悬浮占位组件，完全未动 --- */}
-        <section id="ai-lab" className="mb-24">
+        <section id="ai-lab" className="mb-12">
           <SectionHeader zh="AI 实验室" en="AI Lab" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-8">
             <AILabCard 
