@@ -607,7 +607,7 @@ export default function App() {
             {isFaqOpen ? <div className="w-full h-full bg-rust/20 flex items-center justify-center"><X size={18} /></div> : (
               <>
                 {/* 修复点：分身图也是对应的正确本地图片名 */}
-                <img src="/fenshen-4.jpg" className="w-full h-full object-cover scale-[1.3] translate-y-2" alt="Avatar" />
+                <img src="/fenshen-4.jpg" className="w-full h-full object-cover scale-[1.3] translate-y-0" alt="Avatar" />
               </>
             )}
           </div>
