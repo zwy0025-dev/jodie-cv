@@ -8,7 +8,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { 
   TrendingUp, Cpu, Lightbulb, Rocket, MessageCircle, X, ChevronRight,
   Menu, Mail, QrCode, ChevronDown, User, Star, Briefcase, Folder, Sparkles, ArrowUpRight,
-  MapPin, Palette, Video
+  MapPin, Palette, Video, GraduationCap 
 } from 'lucide-react';
 
 // --- 通用组件 ---
@@ -295,6 +295,8 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [showUndergrad, setShowUndergrad] = useState(false); // 控制本科经历的折叠状态
+  
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -344,7 +346,7 @@ export default function App() {
           <div className="hidden md:flex items-center gap-2">
             <NavItem zh="关于我" en="About Me" href="#about" icon={User} />
             <NavItem zh="核心技能" en="Core Skills" href="#skills" icon={Star} />
-            <NavItem zh="工作经历" en="Experience" href="#experience" icon={Briefcase} />
+            <NavItem zh="个人经历" en="Experience" href="#experience" icon={Briefcase} />
             <NavItem zh="项目经历" en="Projects" href="#projects" icon={Folder} />
             <NavItem zh="AI 实验室" en="AI Lab" href="#ai-lab" icon={Sparkles} />
           </div>
@@ -442,22 +444,54 @@ export default function App() {
         </section>
 
         <section id="experience" className="mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+          <SectionHeader zh="个人经历" en="Personal Experience" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mt-4">
+            {/* 左列：工作经历 */}
             <div>
-              <SectionHeader zh="工作经历" en="Work Experience" />
+              <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <Briefcase size={14} className="text-rust"/> 工作经历
+              </h3>
               <div className="relative">
-                {/* 修复点：末尾补上了 /> */}
                 <TimelineItem date="2025.10 - 至今" title="餐厅合伙人/企业顾问" company="和牛定食餐厅/予童科技" desc="BP撰写与融资 / 线上培训课程体系搭建、婴幼儿家庭AI服务产品孵化" />
                 <TimelineItem date="2021.07 - 2025.07" title="运营经理" company="Ctrip 携程" desc="从0-1搭建携程商家直播生态体系，3年推动平台直播GMV从1000万增至10亿+。" details={{content: ["从 0 到 1 搭建商家直播生态体系","制定直播间运营标准与流量分发策略","负责直播业务的整体增长与商业化变现"], projects: ["携程直播青训营：孵化 0 基础团队","携程 AI 直播：真人+AI 24小时客服直播间"], results: ["3 年推动 GMV 从 1000 万增至 10 亿+","直播间转化率提升 70%+","孵化团队 1 个月直播 GMV 破百万"]}} />
                 <TimelineItem date="2020.05 - 2021.07" title="产品运营" company="Yitiao 一条" desc="0-1艺术电商平台搭建。优化用户注册转化节点，将小程序注册率提升至80%。" details={{content: ["负责艺术电商平台的产品运营与用户增长","优化用户注册与交易转化路径","打通拍卖+直播的闭环交易链路"], projects: ["一条艺术品电商平台：小程序注册转化优化","拍卖+直播交易链路整合"], results: ["小程序注册率从 30% 提升至 80%","成功上线艺术品拍卖直播功能","显著提升高客单价商品转化效率"]}} />
                 <TimelineItem date="2016.09 - 2020.04" title="产品运营" company="Ele.me 饿了么" desc="主导下沉市场智能调度系统覆盖率从30%提升至98%。" details={{content: ["负责下沉市场物流调度系统的产品运营","协调全国 1800 个城市代理商的系统落地","通过数据分析优化配送效率与成本控制"], projects: ["下沉市场智能调度系统覆盖提升项目","代理商降本增效专项行动"], results: ["系统覆盖率从 30% 提升至 98%","帮助全国代理商显著降低运营成本","配送效率提升 25% 以上"]}} />
               </div>
             </div>
+            
+            {/* 右列：教育经历 */}
             <div>
-              <SectionHeader zh="教育背景" en="Education Background" />
+              <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <GraduationCap size={14} className="text-rust"/> 教育经历
+              </h3>
               <div className="relative">
                 <TimelineItem date="2024.09 - 2027.03" title="工商管理(MBA)" company="复旦大学（硕士）" desc="专注于商业领导力与创新管理。参与 Esade University 交换项目：Leading Innovation。" />
-                <TimelineItem date="2012.09 - 2016.07" title="工业设计" company="嘉兴大学(本科)" desc="2016级优秀毕业生。培养了深厚的用户体验设计基础与产品思维。" />
+                
+                {/* 极度隐蔽的彩蛋开关：与时间线完美对齐的微小灰点 */}
+                <div 
+                  className="relative pl-[2.5px] -mt-6 mb-6 z-20 opacity-30 hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-2 w-fit group" 
+                  onClick={() => setShowUndergrad(!showUndergrad)}
+                  title=" "
+                >
+                  <div className={`w-[6px] h-[6px] rounded-full ${showUndergrad ? 'bg-rust' : 'bg-ink/40'} group-hover:bg-rust transition-colors`} />
+                  <span className="text-[10px] text-ink/40 tracking-widest uppercase scale-75 origin-left">
+                    {showUndergrad ? '' : '...'}
+                  </span>
+                </div>
+
+                <AnimatePresence>
+                  {showUndergrad && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }} 
+                      animate={{ height: 'auto', opacity: 1 }} 
+                      exit={{ height: 0, opacity: 0 }} 
+                      className="overflow-hidden"
+                    >
+                      <TimelineItem date="2012.09 - 2016.07" title="工业设计" company="嘉兴大学(本科)" desc="2016级优秀毕业生。培养了深厚的用户体验设计基础与产品思维。" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
@@ -522,7 +556,6 @@ export default function App() {
 
       <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
         <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsFaqOpen(!isFaqOpen)} className="w-14 h-14 bg-rust/90 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-[0_10px_30px_rgba(179,58,45,0.4)] relative group border border-white/20 p-1">
-          {/* 修复点：移除了这里的 bg-white 以防止白底透出 */}
           <div className="w-full h-full rounded-full relative z-10 overflow-hidden border border-white/50">
             {isFaqOpen ? <div className="w-full h-full bg-rust/20 flex items-center justify-center"><X size={18} /></div> : (
               <>
