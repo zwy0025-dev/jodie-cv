@@ -83,19 +83,15 @@ const BreathingTag = ({ text, delay, className }: { text: string, delay: number,
   </motion.div>
 );
 
-// --- 修改点2：核心技能的标题变为红色且突出 ---
 const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: React.ReactNode, icon: any }) => (
   <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-2xl shadow-sm border border-ink/5 hover:shadow-xl transition-all flex flex-col relative overflow-hidden h-full group">
-    
     <div className="absolute -bottom-6 -right-6 text-rust opacity-[0.04] pointer-events-none group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500">
       <Icon size={140} strokeWidth={1.5} />
     </div>
-    
     <div className="mb-4 text-rust flex items-center justify-between opacity-90 relative z-10">
       <Icon size={24} strokeWidth={2} />
       <div className="w-8 h-1 bg-rust/10 rounded-full" />
     </div>
-    {/* 强化了这里的样式：变成 text-rust (红色), 加粗, 稍微放大 */}
     <h3 className="font-black text-base text-rust tracking-tight relative z-10 mb-3">{title}</h3>
     <div className="text-xs text-ink/60 leading-relaxed font-medium relative z-10">
       {dataDesc}
@@ -153,7 +149,6 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-ink/70 backdrop-blur-md" />
         <motion.div initial={{ scale: 0.95, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 30 }} className="relative w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] bg-white">
-          
           <div className="h-48 md:h-64 relative w-full flex-shrink-0 bg-ink">
             <img src={project.bgImage} alt={project.title} className="w-full h-full object-cover opacity-80" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent" />
@@ -165,7 +160,6 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
               <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">{project.title}</h3>
             </div>
           </div>
-
           <div className="p-6 md:p-8 overflow-y-auto">
             <div className="mb-6">
               <h4 className="text-xs font-bold text-rust uppercase tracking-widest mb-2 flex items-center gap-2"><Star size={14}/> 项目简介</h4>
@@ -182,15 +176,15 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
   </AnimatePresence>
 );
 
-// --- 修改点3：项目卡片图片压缩到40%，改成文字链接，减小留白 ---
+// --- 修改点3：项目卡片高度压缩，图片占1/3，文字紧凑，文本链接 ---
 const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }) => (
   <motion.div 
     onClick={onClick} 
     whileHover={{ y: -8 }} 
-    className="relative rounded-[2rem] flex flex-col cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all bg-white overflow-hidden h-[340px] group"
+    className="relative rounded-3xl flex flex-col cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all bg-white overflow-hidden h-[290px] group"
   >
-    {/* 顶部图片区域压缩为 40% */}
-    <div className="relative h-[40%] w-full flex-shrink-0 overflow-hidden bg-ink/5">
+    {/* 图片区域压缩为约 1/3 (100px 高度) */}
+    <div className="relative h-[100px] w-full flex-shrink-0 overflow-hidden bg-ink/5">
       <img 
         src={project.bgImage} 
         alt={project.title} 
@@ -198,25 +192,24 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
       />
       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/10 to-transparent" />
       
-      <div className="absolute top-4 left-4">
-        <span className="text-white text-[10px] font-bold uppercase tracking-wider bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 flex items-center gap-1.5 shadow-sm">
-          <project.icon size={12} className="text-rust/80" /> {project.tag}
+      <div className="absolute top-3 left-4">
+        <span className="text-white text-[9px] font-bold uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/20 flex items-center gap-1.5 shadow-sm">
+          <project.icon size={10} className="text-rust/80" /> {project.tag}
         </span>
       </div>
     </div>
     
-    {/* 底部文字区域，减小 Padding 让排版更紧凑 */}
-    <div className="p-5 pt-0 flex flex-col flex-1 z-10 bg-white">
-      <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight mt-1">{project.title}</h3>
-      <p className="text-[11px] text-ink/50 leading-relaxed font-medium line-clamp-3 mb-4">{project.desc}</p>
+    {/* 内容区域压缩留白，去掉 Watch Demo 按钮，改为轻量链接 */}
+    <div className="p-5 pt-3 flex flex-col flex-1 z-10 bg-white">
+      <h3 className="text-base font-bold mb-1.5 tracking-tight text-ink leading-tight">{project.title}</h3>
+      <p className="text-[11px] text-ink/50 leading-relaxed font-medium line-clamp-3 mb-2">{project.desc}</p>
       
-      {/* 变成极简的文字链接样式 */}
-      <div className="mt-auto flex items-center">
+      <div className="mt-auto">
         <motion.span 
           whileHover={{ x: 5 }} 
-          className="text-rust font-bold text-[11px] tracking-widest flex items-center gap-1 uppercase"
+          className="text-rust font-bold text-[11px] tracking-widest flex items-center gap-1"
         >
-          了解详情 <ArrowUpRight size={12} className="opacity-80" />
+          **了解详情 &rarr;**
         </motion.span>
       </div>
     </div>
@@ -369,61 +362,60 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        {/* --- 修改点1：透明人像及防截断收紧的标签 --- */}
-        <section id="about" className="relative min-h-[85vh] flex items-center justify-center pt-8 pb-12 overflow-hidden mb-12">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        {/* --- 修改点1：居中全透明人物首屏与极限防截断标签 --- */}
+        <section id="about" className="relative min-h-[85vh] flex flex-col items-center justify-center pt-20 pb-12 overflow-hidden mb-12">
+          
+          <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
             
-            <div className="lg:col-span-5 relative flex justify-center items-center h-[350px] md:h-[450px]">
+            {/* 绝对安全位置的呼吸标签，全部向中心点聚拢 */}
+            <div className="absolute inset-0 w-full h-full pointer-events-none z-20">
+              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] left-[8%] md:left-[15%]" />
+              <BreathingTag text="复旦MBAer 🎓" delay={1.5} className="top-[5%] right-[5%] md:right-[15%]" />
+              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="top-[40%] left-[2%] md:left-[5%]" />
+              <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[35%] right-[2%] md:right-[5%]" />
+              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="bottom-[25%] left-[8%] md:left-[15%]" />
+              <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[25%] right-[8%] md:right-[15%]" />
+              <BreathingTag text="校企合作直播培训讲师 🏫" delay={2.5} className="top-[0%] left-[30%] md:left-[45%]" />
+            </div>
+
+            {/* 居中的透明人物照片 (去除了白底和相框，直接渲染阴影) */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="relative w-48 md:w-60 aspect-[3/4] z-10 mb-6"
+            >
+              <img 
+                src="/touxiang-1.png" 
+                alt="Jodie Zhu" 
+                className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)] pointer-events-none" 
+              />
               
-              {/* 标签收拢进安全区域，绝不截断 */}
-              <div className="absolute inset-0 max-w-sm mx-auto pointer-events-none">
-                <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[15%] left-[8%] md:left-2" />
-                <BreathingTag text="复旦MBAer 🎓" delay={1.5} className="top-[5%] right-[5%] md:right-0" />
-                <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="top-[45%] left-[2%] md:-left-2" />
-                <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[35%] right-[2%] md:-right-2" />
-                <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="bottom-[25%] left-[8%] md:left-4" />
-                <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[5%] left-[25%] md:left-[20%]" />
-                <BreathingTag text="校企合作直播培训讲师 🏫" delay={2.5} className="top-[-5%] right-[15%] md:right-[5%]" />
-              </div>
-
-              {/* 完美透明人像 */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="relative w-48 md:w-56 aspect-[3/4] z-10"
-              >
-                <img 
-                  src="/touxiang-1.png" 
-                  alt="Jodie Zhu" 
-                  className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)] pointer-events-none" 
-                />
-              </motion.div>
-
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-rust/10 rounded-full blur-[60px] pointer-events-none" />
-            </div>
-
-            <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left z-10">
-              <h1 className="text-5xl md:text-7xl font-black text-ink tracking-tighter leading-[1.1] mb-4">
-                Hi, I'm Jodie<br/>朱闻樱
+              {/* 大字浮在人物下方 */}
+              <h1 className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[200%] text-center text-5xl md:text-6xl font-black text-rust tracking-tighter drop-shadow-md z-30">
+                JODIE ZHU
               </h1>
-              <p className="text-sm font-bold text-rust tracking-wider uppercase mb-6">
-                复旦MBA / 复合型运营专家 / AI应用体验官
-              </p>
-              <p className="text-sm text-ink/60 font-medium leading-relaxed max-w-lg mb-10">
-                9年互联网运营和产品经验，1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及内容生成的商业化机会。
-              </p>
+            </motion.div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <a href="mailto:zwy0025@gmail.com" className="flex items-center justify-center gap-2 bg-white border border-ink/10 text-ink px-8 py-3.5 rounded-full font-bold text-xs tracking-widest hover:border-rust hover:text-rust transition-colors w-full sm:w-48 shadow-sm">
-                  <Mail size={16} /> 发送邮件
-                </a>
-                <button onClick={() => setIsWeChatOpen(true)} className="flex items-center justify-center gap-2 bg-ink text-white px-8 py-3.5 rounded-full font-bold text-xs tracking-widest hover:bg-rust transition-colors w-full sm:w-48 shadow-xl">
-                  <QrCode size={16} /> 添加微信
-                </button>
-              </div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-rust/10 rounded-full blur-[60px] pointer-events-none z-0" />
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center text-center mt-8 px-4 max-w-2xl">
+            <p className="text-xs md:text-sm font-bold text-ink/80 tracking-widest uppercase mb-4">
+              复合型运营专家 / AI应用体验官
+            </p>
+            <p className="text-xs text-ink/60 font-medium leading-relaxed mb-8">
+              9年互联网运营和产品经验，1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及内容生成的商业化机会。
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a href="mailto:zwy0025@gmail.com" className="flex items-center justify-center gap-2 bg-white border border-ink/10 text-ink px-8 py-3.5 rounded-full font-bold text-xs tracking-widest hover:border-rust hover:text-rust transition-colors w-full sm:w-48 shadow-sm">
+                <Mail size={16} /> 发送邮件
+              </a>
+              <button onClick={() => setIsWeChatOpen(true)} className="flex items-center justify-center gap-2 bg-ink text-white px-8 py-3.5 rounded-full font-bold text-xs tracking-widest hover:bg-rust transition-colors w-full sm:w-48 shadow-xl">
+                <QrCode size={16} /> 添加微信
+              </button>
             </div>
-
           </div>
         </section>
 
@@ -484,46 +476,25 @@ export default function App() {
           <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
         </section>
         
+        {/* --- 这里维持了上个版本你确认满意的短视频悬浮占位组件，完全未动 --- */}
         <section id="ai-lab" className="mb-24">
           <SectionHeader zh="AI 实验室" en="AI Lab" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-8">
-            
             <AILabCard 
               tag="AI Agent" title="起号助手agent" bgColor="bg-[#F3F4F6]"
               desc="基于大语言模型开发的自媒体助手，能够自动生成账号定位与内容规划。" 
-              mockup={
-                <VideoMockup 
-                  src="/video-agent.mp4" 
-                  fallbackImg="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=400&auto=format&fit=crop"
-                  rotateClass="-rotate-3"
-                />
-              } 
+              mockup={<VideoMockup src="/video-agent.mp4" fallbackImg="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=400&auto=format&fit=crop" rotateClass="-rotate-3" />} 
             />
-
             <AILabCard 
               tag="AI Product" title="AI陪伴玩具" bgColor="bg-[#EEF2FF]"
               desc="结合多模态交互技术，为婴幼儿提供情感陪伴与早教互动，解决陪伴缺失问题。" 
-              mockup={
-                <VideoMockup 
-                  src="/video-toy.mp4" 
-                  fallbackImg="https://images.unsplash.com/photo-1535378273068-9bb67d5beacd?q=80&w=400&auto=format&fit=crop"
-                  rotateClass="rotate-2"
-                />
-              } 
+              mockup={<VideoMockup src="/video-toy.mp4" fallbackImg="https://images.unsplash.com/photo-1535378273068-9bb67d5beacd?q=80&w=400&auto=format&fit=crop" rotateClass="rotate-2" />} 
             />
-
             <AILabCard 
               tag="Live Stream" title="AI虚拟形象直播" bgColor="bg-[#FEF2F2]"
               desc="重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。" 
-              mockup={
-                <VideoMockup 
-                  src="/video-live.mp4" 
-                  fallbackImg="https://images.unsplash.com/photo-1617802690992-15d93263d3a9?q=80&w=400&auto=format&fit=crop"
-                  rotateClass="rotate-3"
-                />
-              } 
+              mockup={<VideoMockup src="/video-live.mp4" fallbackImg="https://images.unsplash.com/photo-1617802690992-15d93263d3a9?q=80&w=400&auto=format&fit=crop" rotateClass="rotate-3" />} 
             />
-
           </div>
         </section>
 
