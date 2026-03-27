@@ -1,14 +1,12 @@
 import { Client } from '@notionhq/client';
 
 export default async function handler(req, res) {
-  // 如果环境变量没读到，直接返回空，保证前端不崩溃
   if (!process.env.NOTION_TOKEN) {
     return res.status(200).json({ success: false, message: 'No Token' });
   }
 
   const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
-  // 超强容错的解析器：不管你 Notion 里的列叫什么，都不会报错
   const getStr = (propObj) => {
     if (!propObj) return '';
     if (propObj.title && propObj.title.length > 0) return propObj.title[0].plain_text;
@@ -19,69 +17,55 @@ export default async function handler(req, res) {
   };
 
   try {
-    // 1. 抓取 AI 实验室
+    // 1. AI 实验室 (对应图 image_950463.png)
     let aiLab = [];
     if (process.env.NOTION_AI_LAB_DB_ID) {
       const aiRes = await notion.databases.query({ database_id: process.env.NOTION_AI_LAB_DB_ID });
       aiLab = aiRes.results.map(page => ({
-        title: getStr(page.properties.Name) || getStr(page.properties['名称']) || '',
-        tag: getStr(page.properties.Tag) || getStr(page.properties['标签']) || 'AI',
-        desc: getStr(page.properties.Desc) || getStr(page.properties['描述']) || '',
-        bgColor: getStr(page.properties.BgColor) || getStr(page.properties['背景色']) || 'bg-[#F3F4F6]',
-        media: getStr(page.properties.Media) || getStr(page.properties.URL) || ''
+        title: getStr(page.properties['项目名称']), // 对应截图
+        tag: getStr(page.properties['标题']),    // 对应 Aa 标题列
+        desc: getStr(page.properties['项目描述']), // 对应截图
+        media: getStr(page.properties['url']) || getStr(page.properties['媒体 github URL']) // 对应截图
       })).filter(i => i.title !== '');
     }
 
-    // 2. 抓取项目经历
+    // 2. 项目经历 (对应图 image_950404.png)
     let projects = [];
     if (process.env.NOTION_PROJECT_DB_ID) {
       const projRes = await notion.databases.query({ database_id: process.env.NOTION_PROJECT_DB_ID });
       projects = projRes.results.map(page => ({
-        title: getStr(page.properties.Name) || getStr(page.properties['名称']) || '',
-        tag: getStr(page.properties.Tag) || getStr(page.properties['标签']) || '项目',
-        desc: getStr(page.properties.Desc) || getStr(page.properties['描述']) || '',
-        detail: getStr(page.properties.Detail) || getStr(page.properties['详情']) || '',
-        bgImage: getStr(page.properties.BgImage) || getStr(page.properties.URL) || '/yitiao.JPG'
+        title: getStr(page.properties['项目名称']), // 对应截图
+        tag: getStr(page.properties['标签']),     // 对应 Aa 标签列
+        desc: getStr(page.properties['项目描述']), // 对应截图
+        bgImage: getStr(page.properties['项目链接']) || '/yitiao.JPG' // 优先拿链接
       })).filter(i => i.title !== '');
     }
 
-    // 3. 抓取工作与教育经历
+    // 3. 工作经历 (对应图 image_950445.png)
     let timeline = [];
     if (process.env.NOTION_WORK_DB_ID) {
       const workRes = await notion.databases.query({ database_id: process.env.NOTION_WORK_DB_ID });
-      timeline = workRes.results.map(page => {
-        const dContent = getStr(page.properties.DetailsContent) || getStr(page.properties['工作内容']);
-        const dProjects = getStr(page.properties.DetailsProjects) || getStr(page.properties['核心项目']);
-        const dResults = getStr(page.properties.DetailsResults) || getStr(page.properties['突出成果']);
-        
-        return {
-          title: getStr(page.properties.Name) || getStr(page.properties['名称']),
-          company: getStr(page.properties.Company) || getStr(page.properties['公司']),
-          date: getStr(page.properties.Date) || getStr(page.properties['时间']),
-          type: getStr(page.properties.Type) || getStr(page.properties['类型']) || 'Work',
-          desc: getStr(page.properties.Desc) || getStr(page.properties['描述']),
-          details: (dContent || dProjects || dResults) ? {
-            content: dContent ? dContent.split(/[|\n]+/) : [],
-            projects: dProjects ? dProjects.split(/[|\n]+/) : [],
-            results: dResults ? dResults.split(/[|\n]+/) : []
-          } : null
-        };
-      }).filter(i => i.title);
+      timeline = workRes.results.map(page => ({
+        title: getStr(page.properties['职位']),      // 对应截图
+        company: getStr(page.properties['公司']),    // 对应截图
+        date: getStr(page.properties['时间段']),      // 对应 Aa 时间段列
+        desc: getStr(page.properties['工作内容描述']), // 对应截图
+        type: 'Work' // 默认为工作经历
+      })).filter(i => i.title);
     }
 
-    // 4. 抓取核心技能
+    // 4. 核心技能 (对应图 image_950424.png)
     let skills = [];
     if (process.env.NOTION_SKILLS_DB_ID) {
       const skillRes = await notion.databases.query({ database_id: process.env.NOTION_SKILLS_DB_ID });
       skills = skillRes.results.map(page => ({
-        title: getStr(page.properties.Name) || getStr(page.properties['名称']) || '',
-        desc: getStr(page.properties.Desc) || getStr(page.properties['描述']) || ''
+        title: getStr(page.properties['技能名称']), // 对应 Aa 技能名称列
+        desc: getStr(page.properties['技能描述'])   // 对应截图
       })).filter(i => i.title !== '');
     }
 
     res.status(200).json({ success: true, data: { aiLab, projects, timeline, skills } });
   } catch (error) {
-    // 遇到任何错误都温和处理，绝不抛出 500 导致白屏
     res.status(200).json({ success: false, error: error.message });
   }
 }
