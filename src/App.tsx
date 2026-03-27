@@ -289,11 +289,272 @@ export default function App() {
     window.addEventListener('scroll', handleScroll);
     
     // --- Notion 数据获取逻辑 ---
-    // 如果 Notion 获取成功，它会覆盖保底数据。如果 Notion 获取的数据里缺乏 details，
-    // 我们在这个前端代码里做了兼容处理，保证页面不出错。
     fetch('/api/notion')
       .then(res => res.json())
       .then(resData => {
         if (resData.success && resData.data) {
           setData(prev => ({
-            skills: resData.data.skills?.length > 0 ? resData.data.skills.map((s:any, i:number) => ({...s, icon: skillIcons[i%4]}
+            skills: resData.data.skills?.length > 0 ? resData.data.skills.map((s:any, i:number) => ({...s, icon: skillIcons[i%4]})) : prev.skills,
+            timeline: resData.data.timeline?.length > 0 ? resData.data.timeline : prev.timeline,
+            projects: resData.data.projects?.length > 0 ? resData.data.projects.map((p:any, i:number) => ({...p, icon: projIcons[i%4]})) : prev.projects,
+            aiLab: resData.data.aiLab?.length > 0 ? resData.data.aiLab : prev.aiLab,
+          }));
+        }
+      })
+      .catch(() => console.log("加载保底数据中..."));
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
+  return (
+    <div ref={containerRef} className="relative min-h-screen selection:bg-rust selection:text-white overflow-x-hidden bg-[#F8F9FB]">
+      
+      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-rust origin-left z-[1000]" style={{ scaleX }} />
+      <div className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.03] mix-blend-multiply">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" />
+      </div>
+
+      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-[#F8F9FB]/90 backdrop-blur-md border-b border-ink/5 py-2' : 'py-6'}`}>
+        <div className="max-w-5xl mx-auto px-6 flex justify-between items-center relative z-50 bg-transparent">
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="font-display font-black text-2xl tracking-tighter">
+            wenying<span className="text-rust">.website</span>
+          </motion.div>
+          
+          <div className="hidden md:flex items-center gap-2">
+            <NavItem zh="关于我" en="About Me" href="#about" icon={User} />
+            <NavItem zh="核心技能" en="Core Skills" href="#skills" icon={Star} />
+            <NavItem zh="个人经历" en="Experience" href="#experience" icon={Briefcase} />
+            <NavItem zh="项目经历" en="Projects" href="#projects" icon={Folder} />
+            <NavItem zh="AI 实验室" en="AI Lab" href="#ai-lab" icon={Sparkles} />
+          </div>
+          
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-ink hover:text-rust transition-colors relative z-50">
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: -20 }} 
+              className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border-b border-ink/10 shadow-2xl md:hidden flex flex-col py-2 px-6 z-40"
+            >
+              {[
+                { zh: "关于我", en: "About Me", href: "#about", icon: User },
+                { zh: "核心技能", en: "Core Skills", href: "#skills", icon: Star },
+                { zh: "个人经历", en: "Experience", href: "#experience", icon: Briefcase },
+                { zh: "项目经历", en: "Projects", href: "#projects", icon: Folder },
+                { zh: "AI 实验室", en: "AI Lab", href: "#ai-lab", icon: Sparkles }
+              ].map((link, idx) => (
+                <a 
+                  key={idx} 
+                  href={link.href} 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-4 text-ink/80 hover:text-rust font-bold text-sm py-4 border-b border-ink/5 last:border-0 group"
+                >
+                  <link.icon size={18} className="text-rust/70 group-hover:text-rust transition-colors" />
+                  <span>{link.zh}</span>
+                  <span className="text-[10px] text-ink/30 uppercase tracking-widest ml-auto">{link.en}</span>
+                </a>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+
+      <motion.div style={{ y: parallaxY }} className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
+        <div className="absolute top-[15%] right-[-10%] w-[40vw] h-[40vw] bg-rust/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[20%] left-[-5%] w-[30vw] h-[30vw] bg-ink/5 rotate-45 blur-[80px]" />
+      </motion.div>
+
+      <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
+        
+        {/* --- 重点重构：完美复刻截图的 About 区域排版 --- */}
+        <section id="about" className="relative min-h-[75vh] flex flex-col items-center justify-center pt-24 pb-12 overflow-hidden mb-12">
+          
+          <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="relative w-44 md:w-56 aspect-[3/4] z-10 mb-12"
+            >
+              <img 
+                src="/touxiang-1.png" 
+                alt="Jodie Zhu" 
+                className="w-full h-full object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.15)] pointer-events-none relative z-10" 
+              />
+              <div className="absolute inset-0 bg-rust/10 rounded-full blur-[60px] pointer-events-none z-0" />
+              
+              {/* 精准对齐截图的三个悬浮标签 */}
+              <BreathingTag text="10年运营经验 💼" delay={0.2} className="-top-4 -left-12 md:-left-20" />
+              <BreathingTag text="AI应用先锋 ✨" delay={1.5} className="top-[60%] -translate-y-1/2 -right-8 md:-right-16" />
+              <BreathingTag text="复旦MBA 🎓" delay={0.8} className="-bottom-6 left-1/2 -translate-x-1/2" />
+            </motion.div>
+
+            {/* 放大居中的名字 */}
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-6xl md:text-8xl font-black text-rust tracking-tighter uppercase mb-8 text-center"
+            >
+              ZHU WENYING
+            </motion.h1>
+            
+            {/* 居中的描述文案，照抄 App5 */}
+            <p className="text-xs md:text-[14px] text-ink/70 font-medium leading-relaxed mb-10 max-w-3xl text-center px-4">
+              上海 / 复旦大学MBA / 复合型运营专家。深耕互联网行业9年，具备从0-1搭建业务体系与规模化增长能力。持续探索AI与商业场景的深度融合，通过技术赋能业务创新。
+            </p>
+
+            {/* 居中的按钮 */}
+            <div className="flex flex-row items-center justify-center gap-6">
+              <button onClick={() => setIsWeChatOpen(true)} className="bg-ink text-white px-10 py-4 rounded-full font-bold text-xs tracking-widest shadow-xl hover:bg-rust transition-colors">
+                添加微信
+              </button>
+              <a href="mailto:zwy0025@gmail.com" className="bg-white border border-ink/10 text-ink px-10 py-4 rounded-full font-bold text-xs tracking-widest hover:border-rust hover:text-rust transition-colors shadow-sm">
+                联系我
+              </a>
+            </div>
+            
+          </div>
+        </section>
+
+        {/* --- 核心技能 --- */}
+        <section id="skills" className="mb-12">
+          <SectionHeader zh="核心技能" en="Core Skills" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-2">
+            {data.skills.map((s:any, idx:number) => (
+              <SkillCard key={idx} title={s.title} dataDesc={s.desc} icon={s.icon || skillIcons[idx%4]} />
+            ))}
+          </div>
+        </section>
+
+        {/* --- 个人经历 (保留 App 5 展开动画) --- */}
+        <section id="experience" className="mb-12">
+          <SectionHeader zh="个人经历" en="Personal Experience" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mt-4">
+            <div>
+              <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <Briefcase size={14} className="text-rust"/> 工作经历
+              </h3>
+              <div className="relative">
+                {data.timeline.filter((i:any) => i.type === 'Work').map((item:any, idx:number) => (
+                  <TimelineItem key={idx} {...item} />
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <GraduationCap size={14} className="text-rust"/> 教育经历
+              </h3>
+              <div className="relative">
+                {data.timeline.filter((i:any) => i.type === 'Education').map((item:any, idx:number) => (
+                  <TimelineItem key={idx} {...item} />
+                ))}
+                
+                <div 
+                  className="relative pl-[2.5px] -mt-6 mb-6 z-20 opacity-30 hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-2 w-fit group" 
+                  onClick={() => setShowUndergrad(!showUndergrad)}
+                  title=" "
+                >
+                  <div className={`w-[6px] h-[6px] rounded-full ${showUndergrad ? 'bg-rust' : 'bg-ink/40'} group-hover:bg-rust transition-colors`} />
+                  <span className="text-[10px] text-ink/40 tracking-widest uppercase scale-75 origin-left">
+                    {showUndergrad ? '' : '...'}
+                  </span>
+                </div>
+
+                <AnimatePresence>
+                  {showUndergrad && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }} 
+                      animate={{ height: 'auto', opacity: 1 }} 
+                      exit={{ height: 0, opacity: 0 }} 
+                      className="overflow-hidden"
+                    >
+                      <TimelineItem date="2012.09 - 2016.07" title="工业设计" company="嘉兴大学(本科)" desc="2016级优秀毕业生。培养了深厚的用户体验设计基础与产品思维。" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="projects" className="mb-12">
+          <SectionHeader zh="项目经历" en="Project Experience" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {data.projects.map((p:any, idx:number) => (
+              <ProjectCard key={idx} project={p} onClick={() => setSelectedProject(p)} />
+            ))}
+          </div>
+          <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+        </section>
+        
+        <section id="ai-lab" className="mb-12">
+          <SectionHeader zh="AI 实验室" en="AI Lab" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-8">
+             {data.aiLab.map((item:any, idx:number) => (
+              <AILabCard 
+                key={idx}
+                tag={item.tag} 
+                title={item.title} 
+                bgColor={item.bgColor || ["bg-[#F3F4F6]", "bg-[#EEF2FF]", "bg-[#FEF2F2]"][idx % 3]}
+                desc={item.desc} 
+                mockup={<VideoMockup src={item.media} fallbackImg="" rotateClass={idx % 2 === 0 ? "-rotate-3" : "rotate-2"} />} 
+              />
+            ))}
+          </div>
+        </section>
+
+        <footer className="pt-16 pb-12 border-t border-ink/10 flex flex-col items-center">
+          <motion.button whileHover={{ y: -5 }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="mb-12 flex flex-col items-center gap-2 group">
+            <div className="w-10 h-10 rounded-full border border-ink/10 flex items-center justify-center group-hover:border-rust transition-colors">
+              <ArrowUpRight className="rotate-[-135deg] text-ink/40 group-hover:text-rust transition-colors" size={18} />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ink/30 group-hover:text-rust transition-colors">Back to Top</span>
+          </motion.button>
+
+          <div className="w-full flex flex-col md:flex-row justify-between items-center gap-8">
+            <div>
+              <h2 className="text-3xl font-black mb-2 tracking-tighter">朱闻樱 / JODIEZHU</h2>
+              <p className="text-ink/40 font-mono text-[10px] uppercase tracking-[0.2em]">Open for New Opportunities & Collaborations © 2026</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <a href="mailto:zwy0025@gmail.com" className="flex items-center gap-2 bg-white border border-ink/10 px-6 py-2.5 rounded-full text-[11px] font-bold text-ink hover:border-rust hover:text-rust transition-colors shadow-sm">
+                <Mail size={14} /> 邮件联系
+              </a>
+              <button onClick={() => setIsWeChatOpen(true)} className="flex items-center gap-2 bg-ink text-white px-6 py-2.5 rounded-full font-bold text-[11px] hover:bg-rust transition-colors shadow-md">
+                <QrCode size={14} /> 添加微信
+              </button>
+            </div>
+          </div>
+        </footer>
+
+      </main>
+
+      <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
+        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsFaqOpen(!isFaqOpen)} className="w-14 h-14 bg-rust/90 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-[0_10px_30px_rgba(179,58,45,0.4)] relative group border border-white/20 p-1">
+          <div className="w-full h-full rounded-full relative z-10 overflow-hidden border border-white/50">
+            {isFaqOpen ? <div className="w-full h-full bg-rust/20 flex items-center justify-center"><X size={18} /></div> : (
+              <>
+                <img src="/fenshen-4.jpg" className="w-full h-full object-cover scale-[1.3] translate-y-0" alt="Avatar" />
+              </>
+            )}
+          </div>
+        </motion.button>
+        <FAQDialog isOpen={isFaqOpen} onClose={() => setIsFaqOpen(false)} />
+      </div>
+
+      <WeChatModal isOpen={isWeChatOpen} onClose={() => setIsWeChatOpen(false)} />
+    </div>
+  );
+}
