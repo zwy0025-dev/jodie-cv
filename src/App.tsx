@@ -70,7 +70,7 @@ const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: R
   </motion.div>
 );
 
-// 手机端垂直时间轴
+// --- 手机端专用的垂直时间轴组件 (已倒序处理) ---
 const TimelineItem = ({ date, title, company, desc, details }: { date: string; title: string; company: string; desc: string; details?: any }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
@@ -115,10 +115,11 @@ const TimelineItem = ({ date, title, company, desc, details }: { date: string; t
   );
 };
 
-// 电脑端专用的手绘风交互曲线组件
+// --- 电脑端专用的手绘风交互曲线组件 ---
 const ExperienceCurve = ({ items }: { items: any[] }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(items.length - 1); 
 
+  // 计算平滑的指数级上升贝塞尔曲线 (让曲线更饱满圆润)
   const P0 = { x: 0, y: 90 };
   const P1 = { x: 70, y: 85 };
   const P2 = { x: 100, y: 10 };
@@ -133,25 +134,30 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
   const points = items.map((_, i) => getBezierPoint(i / n));
 
   return (
-    <>
+    <div className="w-full hidden md:block">
+      {/* 坐标轴区域，点击空白处收起详情 */}
       <div 
         className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
         onClick={() => setActiveIndex(null)}
       >
         <div className="relative w-full h-full mt-4">
+          
+          {/* 上升曲线绘制 (加粗，更有弧度) */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 100">
             <path 
               d={`M ${P0.x} ${P0.y} Q ${P1.x} ${P1.y} ${P2.x} ${P2.y}`} 
               fill="none" 
-              stroke="rgba(179,58,45,0.4)" 
-              strokeWidth="1.5" 
+              stroke="rgba(179,58,45,0.3)" 
+              strokeWidth="1.2" 
             />
           </svg>
 
+          {/* 渲染坐标节点 */}
           {points.map((pt, i) => {
             const item = items[i];
             const isActive = activeIndex === i;
             
+            // 解析公司名称（实现：英文-中文-职位 三行）
             const companyParts = item.company.split(' ');
             const hasEn = companyParts.length > 1;
             const enStr = hasEn ? companyParts[0] : '';
@@ -165,9 +171,11 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
                 className="absolute z-10 flex flex-col items-center justify-center group"
                 style={{ left: `${pt.x}%`, top: `${pt.y}%`, transform: 'translate(-50%, -50%)' }}
               >
+                {/* 节点上方信息：三行错落展示 */}
                 <div 
                   className={`absolute bottom-full mb-3.5 flex flex-col items-center whitespace-nowrap transition-all duration-300 pointer-events-none ${isActive ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:-translate-y-1'}`}
                 >
+                  {/* 第一行：英文 + Icon（仅学校保留 Icon）*/}
                   {(enStr || isEdu) && (
                     <span className={`text-[10px] font-bold ${isEdu ? 'text-ink/60' : 'text-rust/60'} uppercase tracking-widest flex items-center gap-1.5 mb-1.5`}>
                       {isEdu && <GraduationCap size={12}/>}
@@ -175,22 +183,26 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
                     </span>
                   )}
                   
+                  {/* 第二行：中文公司/学校名 (全部统一为主题红，最大字号突出) */}
                   <span className={`text-lg font-black text-rust tracking-tight leading-none mb-2 flex items-center gap-1`}>
                     {zhStr}
                   </span>
                   
+                  {/* 第三行：职位 */}
                   <span className="text-sm font-bold text-ink/70 leading-none">
                     {item.title}
                   </span>
                 </div>
 
+                {/* 核心节点圆点，全部描红边，点击折叠/展开 */}
                 <motion.div 
                   onClick={(e) => { e.stopPropagation(); setActiveIndex(activeIndex === i ? null : i); }}
                   animate={isActive ? { scale: 1.4, backgroundColor: "rgba(179,58,45,1)" } : { scale: 1, backgroundColor: "rgba(255,255,255,1)" }}
-                  className={`w-3.5 h-3.5 rounded-full border-[3px] border-rust transition-colors z-20 relative cursor-pointer hover:scale-125 ${isActive ? 'border-transparent' : 'border-rust'}`}
+                  className={`w-3.5 h-3.5 rounded-full border-[3px] border-rust transition-colors z-20 relative cursor-pointer hover:scale-125 ${isActive ? 'border-transparent' : 'border-rust/70'}`}
                   style={isActive ? { boxShadow: `0 0 0 8px rgba(179,58,45,0.15)` } : {}}
                 />
 
+                {/* 节点下方信息 (时间，加大字号) */}
                 <div className={`absolute top-full mt-3.5 flex flex-col items-center whitespace-nowrap transition-all pointer-events-none ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>
                   <span className="text-[13px] font-bold text-ink/40 tracking-wide">{item.date}</span>
                 </div>
@@ -200,6 +212,7 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
         </div>
       </div>
 
+      {/* 底部详细展示面板 (点击节点后横向展示模块) */}
       <AnimatePresence mode="wait">
          {activeIndex !== null && items[activeIndex] && (
            <motion.div 
@@ -243,7 +256,7 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
            </motion.div>
          )}
       </AnimatePresence>
-    </>
+    </div>
   );
 };
 
@@ -334,54 +347,7 @@ const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: stri
   );
 };
 
-const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const [selectedQ, setSelectedQ] = useState<number | null>(null);
-  const [typingText, setTypingText] = useState("");
-  const faqs = [
-    { q: "离职原因", a: "寻求更广阔的 AI 应用落地场景，将 9 年运营经验与 AIGC 技术深度结合，创造指数级增长。" },
-    { q: "求职期望", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的合作方案，薪资可面议。" },
-    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" }
-  ];
-
-  useEffect(() => {
-    if (selectedQ !== null) {
-      setTypingText(""); let i = 0; const fullText = faqs[selectedQ].a;
-      const interval = setInterval(() => { setTypingText(fullText.slice(0, i + 1)); i++; if (i >= fullText.length) clearInterval(interval); }, 30);
-      return () => clearInterval(interval);
-    }
-  }, [selectedQ]);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="fixed bottom-24 right-6 w-80 md:w-96 bg-white border border-rust/20 shadow-2xl z-50 overflow-hidden rounded-2xl">
-          <div className="bg-rust p-4 flex justify-between items-center text-white">
-            <div className="flex items-center gap-2"><div className="w-2 h-2 bg-white rounded-full animate-pulse" /><h4 className="font-display font-bold uppercase tracking-widest text-[10px]">AI Digital Twin Active</h4></div>
-            <button onClick={onClose} className="hover:rotate-90 transition-transform"><X size={18} /></button>
-          </div>
-          <div className="p-6 space-y-4">
-            {faqs.map((faq, i) => (
-              <div key={i} className="border-b border-ink/5 pb-4 last:border-0">
-                <button onClick={() => setSelectedQ(selectedQ === i ? null : i)} className="w-full text-left flex justify-between items-center group">
-                  <span className="font-bold text-sm group-hover:text-rust transition-colors">{faq.q}</span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${selectedQ === i ? 'rotate-90' : ''}`} />
-                </button>
-                <AnimatePresence>
-                  {selectedQ === i && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="text-xs text-ink/60 mt-3 leading-relaxed overflow-hidden min-h-[3em]">
-                      {typingText}<motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.8, repeat: Infinity }} className="inline-block w-1 h-3 bg-rust ml-1 translate-y-0.5" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
-
+// --- 保底数据 ---
 const FULL_FALLBACK = {
   skills: [
     { title: "平台增长运营经验", icon: TrendingUp, desc: <>3年内推动携程直播平台规模1000万增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>，6个月内推动视频号矩阵直播<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</> },
@@ -525,11 +491,9 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        {/* 修改一：大幅缩减顶部 padding，从 pt-24 改为 pt-8 */}
         <section id="about" className="relative flex flex-col items-center justify-center pt-8 pb-4 overflow-hidden mb-12">
           <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
             
-            {/* 修改二：将 mt-12 改为 mt-4，进一步减少名字上方的留白 */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -588,7 +552,6 @@ export default function App() {
         <section id="experience" className="mb-24">
           <SectionHeader zh="个人经历" en="Experience" />
           
-          {/* 修改三：解除了外部固定高度的限制，让内容正常占据文档流，彻底解决重叠问题 */}
           <div className="w-full hidden md:block">
             <ExperienceCurve items={desktopTimeline} />
           </div>
@@ -700,135 +663,3 @@ export default function App() {
     </div>
   );
 }
-
-// 独立的曲线组件，去掉了可能导致重叠的定高限制
-const ExperienceCurve = ({ items }: { items: any[] }) => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(items.length - 1); 
-
-  const P0 = { x: 0, y: 90 };
-  const P1 = { x: 70, y: 85 };
-  const P2 = { x: 100, y: 10 };
-
-  const getBezierPoint = (t: number) => {
-    const x = Math.pow(1 - t, 2) * P0.x + 2 * (1 - t) * t * P1.x + Math.pow(t, 2) * P2.x;
-    const y = Math.pow(1 - t, 2) * P0.y + 2 * (1 - t) * t * P1.y + Math.pow(t, 2) * P2.y;
-    return { x, y };
-  };
-
-  const n = Math.max(1, items.length - 1);
-  const points = items.map((_, i) => getBezierPoint(i / n));
-
-  return (
-    <>
-      <div 
-        className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
-        onClick={() => setActiveIndex(null)}
-      >
-        <div className="relative w-full h-full mt-4">
-          <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 100">
-            <path 
-              d={`M ${P0.x} ${P0.y} Q ${P1.x} ${P1.y} ${P2.x} ${P2.y}`} 
-              fill="none" 
-              stroke="rgba(179,58,45,0.4)" 
-              strokeWidth="1.5" 
-            />
-          </svg>
-
-          {points.map((pt, i) => {
-            const item = items[i];
-            const isActive = activeIndex === i;
-            
-            const companyParts = item.company.split(' ');
-            const hasEn = companyParts.length > 1;
-            const enStr = hasEn ? companyParts[0] : '';
-            const zhStr = hasEn ? companyParts.slice(1).join(' ') : item.company;
-            
-            const isEdu = item.type === 'Education';
-
-            return (
-              <div 
-                key={i} 
-                className="absolute z-10 flex flex-col items-center justify-center group"
-                style={{ left: `${pt.x}%`, top: `${pt.y}%`, transform: 'translate(-50%, -50%)' }}
-              >
-                <div 
-                  className={`absolute bottom-full mb-3.5 flex flex-col items-center whitespace-nowrap transition-all duration-300 pointer-events-none ${isActive ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:-translate-y-1'}`}
-                >
-                  {(enStr || isEdu) && (
-                    <span className={`text-[10px] font-bold ${isEdu ? 'text-ink/60' : 'text-rust/60'} uppercase tracking-widest flex items-center gap-1.5 mb-1.5`}>
-                      {isEdu && <GraduationCap size={12}/>}
-                      {enStr}
-                    </span>
-                  )}
-                  
-                  <span className={`text-lg font-black text-rust tracking-tight leading-none mb-2 flex items-center gap-1`}>
-                    {zhStr}
-                  </span>
-                  
-                  <span className="text-sm font-bold text-ink/70 leading-none">
-                    {item.title}
-                  </span>
-                </div>
-
-                <motion.div 
-                  onClick={(e) => { e.stopPropagation(); setActiveIndex(activeIndex === i ? null : i); }}
-                  animate={isActive ? { scale: 1.4, backgroundColor: "rgba(179,58,45,1)" } : { scale: 1, backgroundColor: "rgba(255,255,255,1)" }}
-                  className={`w-3.5 h-3.5 rounded-full border-[3px] border-rust transition-colors z-20 relative cursor-pointer hover:scale-125 ${isActive ? 'border-transparent' : 'border-rust'}`}
-                  style={isActive ? { boxShadow: `0 0 0 8px rgba(179,58,45,0.15)` } : {}}
-                />
-
-                <div className={`absolute top-full mt-3.5 flex flex-col items-center whitespace-nowrap transition-all pointer-events-none ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>
-                  <span className="text-[13px] font-bold text-ink/40 tracking-wide">{item.date}</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      <AnimatePresence mode="wait">
-         {activeIndex !== null && items[activeIndex] && (
-           <motion.div 
-             key={activeIndex}
-             initial={{ opacity: 0, height: 0, y: -10 }}
-             animate={{ opacity: 1, height: 'auto', y: 0 }}
-             exit={{ opacity: 0, height: 0, y: -10 }}
-             className="w-full bg-white px-8 pt-6 pb-8 rounded-[2rem] border border-ink/5 shadow-xl overflow-hidden"
-           >
-             <div className="mb-6 pb-6 border-b border-ink/5 flex items-start justify-between mt-2">
-               <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 rounded-2xl bg-rust/5 text-rust flex items-center justify-center">
-                   {items[activeIndex].type === 'Education' ? <GraduationCap size={24}/> : <Briefcase size={24}/>}
-                 </div>
-                 <div>
-                   <h3 className="text-xl font-black text-ink mb-1">{items[activeIndex].title} <span className="text-ink/20 mx-2">|</span> <span className="text-rust">{items[activeIndex].company}</span></h3>
-                   <p className="text-[13px] text-ink/60 font-medium max-w-2xl">{items[activeIndex].desc}</p>
-                 </div>
-               </div>
-               <span className="text-sm font-bold text-rust bg-rust/5 px-4 py-1.5 rounded-full border border-rust/10">{items[activeIndex].date}</span>
-             </div>
-             
-             {items[activeIndex].details && items[activeIndex].details.content ? (
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-[#F8F9FB] p-6 rounded-2xl border border-ink/5 shadow-sm">
-                    <h5 className="text-[11px] font-black uppercase tracking-widest text-ink/40 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-ink/20 rounded-full" /> 工作内容</h5>
-                    <ul className="space-y-3.5">{items[activeIndex].details.content?.map((item: string, i: number) => (<li key={i} className="text-xs text-ink/70 leading-relaxed relative pl-3"><span className="absolute left-0 top-1.5 w-1 h-1 bg-ink/20 rounded-full" />{item}</li>))}</ul>
-                  </div>
-                  <div className="bg-rust/[0.03] p-6 rounded-2xl border border-rust/10 shadow-sm">
-                    <h5 className="text-[11px] font-black uppercase tracking-widest text-rust/60 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-rust/40 rounded-full" /> 核心项目</h5>
-                    <ul className="space-y-3.5">{items[activeIndex].details.projects?.map((item: string, i: number) => (<li key={i} className="text-xs text-rust/80 leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-rust/40 rounded-full" />{item}</li>))}</ul>
-                  </div>
-                  <div className="bg-rust p-6 rounded-2xl shadow-lg">
-                    <h5 className="text-[11px] font-black uppercase tracking-widest text-white/80 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" /> 突出成果</h5>
-                    <ul className="space-y-3.5">{items[activeIndex].details.results?.map((item: string, i: number) => (<li key={i} className="text-xs text-white leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-white/50 rounded-full" /><span dangerouslySetInnerHTML={{ __html: item.replace(/(\d+[%+万亿]*)/g, '<strong class="text-white font-black text-sm bg-white/20 px-1 rounded mx-0.5">$1</strong>') }} /></li>))}</ul>
-                  </div>
-               </div>
-             ) : (
-               <div className="text-sm text-ink/40 py-8 text-center font-medium tracking-widest">目前暂无更多模块详情</div>
-             )}
-           </motion.div>
-         )}
-      </AnimatePresence>
-    </>
-  );
-};
