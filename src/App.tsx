@@ -179,11 +179,11 @@ const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: 
   </motion.div>
 );
 
-// --- 强化版图片/视频展示组件 ---
+// --- 动画版与防报错图片组件 ---
 const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: string, fallbackImg?: string, rotateClass?: string }) => {
-  // 增加强大的容错机制：无论是视频、图片还是空链接，都不会白屏报错
   const isVideo = src?.toLowerCase().match(/\.(mp4|webm|mov)$/);
-  const placeholder = "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=600&auto=format&fit=crop";
+  // 漂亮的彩色3D底图，防止图片裂开
+  const placeholder = "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=600&auto=format&fit=crop";
   const finalSrc = src || fallbackImg || placeholder;
 
   return (
@@ -195,7 +195,7 @@ const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: stri
           src={finalSrc} 
           alt="demo" 
           className="w-full h-full object-cover" 
-          onError={(e) => { e.currentTarget.src = placeholder; }} // 如果图片裂开，自动换成漂亮底图
+          onError={(e) => { e.currentTarget.src = placeholder; }}
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 pointer-events-none" />
@@ -271,9 +271,10 @@ const FULL_FALLBACK = {
     { title: "携程直播青训营", tag: "校企合作", bgImage: "/qingxunying.jpg", icon: Video, desc: "通过搭建视频号直播矩阵，6个月实现项目收入从0到4000万的突破，累计孵化200+学员，获集团Superhero称号。", detail: "负责该项目前期的孵化与规模建设，主导校企合作方案、商务拓展、学员培训、运营策略等全链路落地。具备单场百万直播GMV操盘及个人直播带货能力。" }
   ],
   aiLab: [
-    { title: "向往的offer", tag: "AI Agent", desc: "基于大语言模型开发的 AI 面试助手，帮助求职者快速提升面试表现与职业规划。", bgColor: "bg-[#F3F4F6]", media: "https://media.giphy.com/media/L1R1tvI9svkIWwpVYr/giphy.gif" },
-    { title: "婴幼儿AI服务产品", tag: "AI Product", desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", bgColor: "bg-[#EEF2FF]", media: "/aitoy.gif" },
-    { title: "AI虚拟形象直播", tag: "Live Stream", desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", bgColor: "bg-[#FEF2F2]", media: "/xiaozhang.gif" }
+    // 换成超级可爱、友好的动画 GIF
+    { title: "向往的offer", tag: "AI Agent", desc: "基于大语言模型开发的 AI 面试助手，帮助求职者快速提升面试表现与职业规划。", bgColor: "bg-[#F3F4F6]", media: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" },
+    { title: "婴幼儿AI服务产品", tag: "AI Product", desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", bgColor: "bg-[#EEF2FF]", media: "https://media.giphy.com/media/3o7aD2saalEvXDI1zO/giphy.gif" },
+    { title: "AI虚拟形象直播", tag: "Live Stream", desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", bgColor: "bg-[#FEF2F2]", media: "https://media.giphy.com/media/11c7UUfNsqOUzC/giphy.gif" }
   ]
 };
 
@@ -331,7 +332,6 @@ export default function App() {
           </motion.div>
           
           <div className="hidden md:flex items-center gap-2">
-            {/* 补充了关于我，保持导航完整 */}
             <NavItem zh="关于我" en="About Me" href="#about" icon={User} />
             <NavItem zh="核心技能" en="Core Skills" href="#skills" icon={Star} />
             <NavItem zh="个人经历" en="Experience" href="#experience" icon={Briefcase} />
@@ -382,16 +382,14 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        {/* --- 重点重构：完美复刻截图的 About 区域排版 --- */}
-        <section id="about" className="relative flex flex-col items-center justify-center pt-28 pb-4 overflow-hidden mb-12">
+        <section id="about" className="relative flex flex-col items-center justify-center pt-24 pb-12 overflow-hidden mb-12">
           <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
             
-            {/* 形象照容器：恢复 w-40 md:w-48 大小 */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-8"
+              className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-8 mt-12"
             >
               <img 
                 src="/touxiang-1.png" 
@@ -400,15 +398,16 @@ export default function App() {
               />
               <div className="absolute inset-0 bg-rust/10 rounded-full blur-[60px] pointer-events-none z-0" />
               
-              {/* 精准重定位的 5 个标签，绝对不挡脸 */}
-              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="-top-6 left-[-60%] md:left-[-80%]" />
-              <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[15%] right-[-60%] md:right-[-90%]" />
-              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="top-[45%] left-[-50%] md:left-[-70%]" />
-              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="top-[65%] right-[-50%] md:right-[-70%]" />
-              <BreathingTag text="10年运营经验 💼" delay={2.1} className="-bottom-6 left-[10%] md:left-[20%]" />
+              {/* 精准分布在两侧的 6 个标签，绝对不盖在头上和脚下 */}
+              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] -left-[70%] md:-left-[90%]" />
+              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="top-[45%] -left-[80%] md:-left-[100%]" />
+              <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[80%] -left-[60%] md:-left-[80%]" />
+
+              <BreathingTag text="AI工具重度用户 🛠️" delay={1.2} className="top-[15%] -right-[60%] md:-right-[80%]" />
+              <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[50%] -right-[70%] md:-right-[100%]" />
+              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="top-[85%] -right-[50%] md:-right-[70%]" />
             </motion.div>
 
-            {/* 名字：独立于照片下方，保持合理大小不压迫 */}
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -417,12 +416,10 @@ export default function App() {
               ZHU WENYING
             </motion.h1>
             
-            {/* 描述文案：已去掉“上海/复旦MBA”那句话 */}
-            <p className="text-xs md:text-[13px] text-ink/70 font-medium leading-relaxed mb-10 max-w-2xl text-center px-4">
+            <p className="text-xs md:text-[14px] text-ink/70 font-medium leading-relaxed mb-10 max-w-2xl text-center px-4">
               9年互联网运营和产品经验、1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及人机协同的商业化机会。
             </p>
 
-            {/* 顶部居中按钮：统一样式 */}
             <div className="flex flex-row items-center justify-center gap-4">
               <a href="mailto:zwy0025@gmail.com" className="flex items-center justify-center gap-2 bg-white border border-ink/10 text-ink px-8 py-3.5 rounded-full font-bold text-[12px] tracking-widest hover:border-rust hover:text-rust transition-all shadow-sm w-full sm:w-44">
                 <Mail size={16} /> 发送邮件
@@ -435,7 +432,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* --- 核心技能 --- */}
         <section id="skills" className="mb-24">
           <SectionHeader zh="核心技能" en="Core Skills" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -445,7 +441,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* --- 个人经历 --- */}
         <section id="experience" className="mb-24">
           <SectionHeader zh="个人经历" en="Experience" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
@@ -479,7 +474,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* --- 项目经历 --- */}
         <section id="projects" className="mb-24">
           <SectionHeader zh="项目经历" en="Projects" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -490,7 +484,6 @@ export default function App() {
           <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
         </section>
         
-        {/* --- AI 实验室 --- */}
         <section id="ai-lab" className="mb-24">
           <SectionHeader zh="AI 实验室" en="AI Lab" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pt-8">
@@ -507,27 +500,18 @@ export default function App() {
           </div>
         </section>
 
-        {/* --- 页脚统一样式 --- */}
         <footer className="pt-20 pb-12 border-t border-ink/10 flex flex-col items-center">
-          <motion.button whileHover={{ y: -5 }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="mb-12 flex flex-col items-center gap-2 group">
-            <div className="w-10 h-10 rounded-full border border-ink/10 flex items-center justify-center group-hover:border-rust transition-colors">
-              <ArrowUpRight className="rotate-[-135deg] text-ink/40 group-hover:text-rust transition-colors" size={18} />
-            </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ink/30 group-hover:text-rust transition-colors">Back to Top</span>
-          </motion.button>
-
           <div className="w-full flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="text-center md:text-left">
-              {/* 底部Logo与顶部保持一致 */}
               <h2 className="font-display font-black text-2xl tracking-tighter mb-2">wenying<span className="text-rust">.website</span></h2>
               <p className="text-ink/30 text-[10px] uppercase tracking-[0.3em]">Building Business with AI © 2026</p>
             </div>
             <div className="flex items-center justify-center gap-4">
-              <a href="mailto:zwy0025@gmail.com" className="flex items-center justify-center gap-2 bg-white border border-ink/10 text-ink px-6 py-2.5 rounded-full font-bold text-[11px] tracking-widest hover:border-rust hover:text-rust transition-all shadow-sm">
-                <Mail size={14} /> 邮件联系
+              <a href="mailto:zwy0025@gmail.com" className="flex items-center justify-center gap-2 bg-white border border-ink/10 text-ink px-8 py-3.5 rounded-full font-bold text-[12px] tracking-widest hover:border-rust hover:text-rust transition-all shadow-sm w-full sm:w-44">
+                <Mail size={16} /> 发送邮件
               </a>
-              <button onClick={() => setIsWeChatOpen(true)} className="flex items-center justify-center gap-2 bg-ink text-white px-6 py-2.5 rounded-full font-bold text-[11px] tracking-widest hover:bg-rust transition-all shadow-md">
-                <QrCode size={14} /> 添加微信
+              <button onClick={() => setIsWeChatOpen(true)} className="flex items-center justify-center gap-2 bg-ink text-white px-8 py-3.5 rounded-full font-bold text-[12px] tracking-widest hover:bg-rust transition-all shadow-xl w-full sm:w-44">
+                <QrCode size={16} /> 添加微信
               </button>
             </div>
           </div>
