@@ -70,7 +70,7 @@ const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: R
   </motion.div>
 );
 
-// --- 手机端专用的垂直时间轴组件 (已倒序处理) ---
+// --- 手机端垂直时间轴组件 ---
 const TimelineItem = ({ date, title, company, desc, details }: { date: string; title: string; company: string; desc: string; details?: any }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
@@ -119,7 +119,7 @@ const TimelineItem = ({ date, title, company, desc, details }: { date: string; t
 const ExperienceCurve = ({ items }: { items: any[] }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(items.length - 1); 
 
-  // 计算平滑的指数级上升贝塞尔曲线 (让曲线更饱满圆润)
+  // 计算平滑的指数级上升贝塞尔曲线
   const P0 = { x: 0, y: 90 };
   const P1 = { x: 70, y: 85 };
   const P2 = { x: 100, y: 10 };
@@ -135,7 +135,7 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
 
   return (
     <div className="w-full hidden md:block">
-      {/* 坐标轴区域，点击空白处收起详情 */}
+      {/* 去掉了白底，点击空白处收起详情 */}
       <div 
         className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
         onClick={() => setActiveIndex(null)}
@@ -162,7 +162,6 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
             const hasEn = companyParts.length > 1;
             const enStr = hasEn ? companyParts[0] : '';
             const zhStr = hasEn ? companyParts.slice(1).join(' ') : item.company;
-            
             const isEdu = item.type === 'Education';
 
             return (
@@ -347,7 +346,54 @@ const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: stri
   );
 };
 
-// --- 保底数据 ---
+const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [selectedQ, setSelectedQ] = useState<number | null>(null);
+  const [typingText, setTypingText] = useState("");
+  const faqs = [
+    { q: "离职原因", a: "寻求更广阔的 AI 应用落地场景，将 9 年运营经验与 AIGC 技术深度结合，创造指数级增长。" },
+    { q: "求职期望", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的合作方案，薪资可面议。" },
+    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" }
+  ];
+
+  useEffect(() => {
+    if (selectedQ !== null) {
+      setTypingText(""); let i = 0; const fullText = faqs[selectedQ].a;
+      const interval = setInterval(() => { setTypingText(fullText.slice(0, i + 1)); i++; if (i >= fullText.length) clearInterval(interval); }, 30);
+      return () => clearInterval(interval);
+    }
+  }, [selectedQ]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="fixed bottom-24 right-6 w-80 md:w-96 bg-white border border-rust/20 shadow-2xl z-50 overflow-hidden rounded-2xl">
+          <div className="bg-rust p-4 flex justify-between items-center text-white">
+            <div className="flex items-center gap-2"><div className="w-2 h-2 bg-white rounded-full animate-pulse" /><h4 className="font-display font-bold uppercase tracking-widest text-[10px]">AI Digital Twin Active</h4></div>
+            <button onClick={onClose} className="hover:rotate-90 transition-transform"><X size={18} /></button>
+          </div>
+          <div className="p-6 space-y-4">
+            {faqs.map((faq, i) => (
+              <div key={i} className="border-b border-ink/5 pb-4 last:border-0">
+                <button onClick={() => setSelectedQ(selectedQ === i ? null : i)} className="w-full text-left flex justify-between items-center group">
+                  <span className="font-bold text-sm group-hover:text-rust transition-colors">{faq.q}</span>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${selectedQ === i ? 'rotate-90' : ''}`} />
+                </button>
+                <AnimatePresence>
+                  {selectedQ === i && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="text-xs text-ink/60 mt-3 leading-relaxed overflow-hidden min-h-[3em]">
+                      {typingText}<motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.8, repeat: Infinity }} className="inline-block w-1 h-3 bg-rust ml-1 translate-y-0.5" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 const FULL_FALLBACK = {
   skills: [
     { title: "平台增长运营经验", icon: TrendingUp, desc: <>3年内推动携程直播平台规模1000万增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>，6个月内推动视频号矩阵直播<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</> },
@@ -491,14 +537,14 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        <section id="about" className="relative flex flex-col items-center justify-center pt-8 pb-4 overflow-hidden mb-12">
+        <section id="about" className="relative flex flex-col items-center justify-center pt-24 pb-4 overflow-hidden mb-12">
           <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
             
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-8 mt-4"
+              className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-8 mt-12"
             >
               <img 
                 src="/touxiang-1.png" 
@@ -553,7 +599,12 @@ export default function App() {
           <SectionHeader zh="个人经历" en="Experience" />
           
           <div className="w-full hidden md:block">
-            <ExperienceCurve items={desktopTimeline} />
+            <div 
+              className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
+              onClick={() => setSelectedProject(null)} 
+            >
+              <ExperienceCurve items={desktopTimeline} />
+            </div>
           </div>
 
           <div className="md:hidden mt-8">
