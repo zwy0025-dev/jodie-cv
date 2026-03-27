@@ -6,7 +6,8 @@ import {
   MapPin, Palette, Video, GraduationCap 
 } from 'lucide-react';
 
-// --- 完整组件定义 ---
+// --- 高级 UI 组件 ---
+
 const SectionHeader = ({ zh, en }: { zh: string; en: string }) => (
   <div className="mb-12 flex items-baseline gap-4">
     <h2 className="text-rust font-bold text-xl uppercase tracking-tighter">{en}</h2>
@@ -183,21 +184,44 @@ const VideoMockup = ({ src, rotateClass = "rotate-3" }: { src: string, rotateCla
   );
 };
 
-const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
-  <AnimatePresence>
-    {isOpen && (
-      <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-rust/10 w-80 mb-4">
-        <h4 className="text-base font-black text-rust mb-4 flex items-center gap-2"><MessageCircle size={18}/> 常见问题 FAQ</h4>
-        <div className="space-y-4 text-[13px] text-ink/70 leading-relaxed font-medium">
-          <p><strong className="text-ink">Q: 目前的合作方式？</strong><br/>A: 支持品牌顾问咨询、项目陪跑以及特定增长领域的全案规划。</p>
-          <p><strong className="text-ink">Q: 您更擅长哪些领域？</strong><br/>A: 擅长直播生态搭建、内容营销策略以及AI在业务流程中的降本增效应用。</p>
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [selectedQ, setSelectedQ] = useState<number | null>(null);
+  const [typingText, setTypingText] = useState("");
+  const faqs = [
+    { q: "离职原因", a: "寻求更广阔的 AI 应用落地场景，将 9 年运营经验与 AIGC 技术深度结合，创造指数级增长。" },
+    { q: "求职期望", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的合作方案，薪资可面议。" },
+    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" }
+  ];
+  useEffect(() => {
+    if (selectedQ !== null) {
+      setTypingText(""); let i = 0; const fullText = faqs[selectedQ].a;
+      const interval = setInterval(() => { setTypingText(fullText.slice(0, i + 1)); i++; if (i >= fullText.length) clearInterval(interval); }, 30);
+      return () => clearInterval(interval);
+    }
+  }, [selectedQ]);
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-rust/10 w-80 mb-4">
+          <h4 className="text-base font-black text-rust mb-4 flex items-center gap-2"><MessageCircle size={18}/> 常见问题 FAQ</h4>
+          <div className="space-y-4 text-[13px] text-ink/70 leading-relaxed font-medium">
+            {faqs.map((f, idx) => (
+               <div key={idx} className="cursor-pointer group" onClick={() => setSelectedQ(selectedQ === idx ? null : idx)}>
+                 <div className="flex justify-between items-center mb-1">
+                   <span className="font-bold text-ink group-hover:text-rust transition-colors">{f.q}</span>
+                   <ChevronRight size={14} className={selectedQ === idx ? 'rotate-90' : ''}/>
+                 </div>
+                 {selectedQ === idx && <div className="text-xs bg-rust/5 p-2 rounded-lg">{typingText}</div>}
+               </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
-// --- 究极完整版保底数据 (包含所有粗体和详细逻辑) ---
+// --- 精华版保底数据 (同步自 App (5).tsx) ---
 const FULL_FALLBACK = {
   skills: [
     { title: "平台增长运营经验", desc: <>3年内推动携程直播平台规模1000万增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>，6个月内推动视频号矩阵直播<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</> },
@@ -213,15 +237,17 @@ const FULL_FALLBACK = {
   ],
   projects: [
     { title: "一条艺术电商平台", tag: "电商运营", bgImage: "/yitiao.JPG", desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系。", detail: "负责电商平台产品运营，内容生态建设；有效降低了艺术品消费者的线上决策成本。" },
-    { title: "携程直播青训营", tag: "业务孵化", bgImage: "/qingxunying.jpg", desc: "搭建视频号直播矩阵，6个月实现收入0到4000万突破，获集团Superhero称号。", detail: "主导校企合作方案，通过规模化培训为平台注入优质直播供给，具备百万级GMV操盘经验。" },
+    { title: "携程直播青训营", tag: "业务孵化", bgImage: "/qingxunying.jpg", desc: "搭建视频号直播矩阵，6个月实现收入0到4000万突破，获集团Superhero称号。", detail: "主导校企合作方案。具备单场百万直播GMV操盘能力。" },
     { title: "饿了么下沉市场调优", tag: "系统调优", bgImage: "/taobaoshangou.jpg", desc: "主导下沉市场智能调度系统覆盖率从30%提升至98%，提升平台整体效率。", detail: "作为业务方主导，与产研、算法团队紧密配合，实现下沉市场的精细化物流调度。" }
   ],
   aiLab: [
     { title: "向往的offer", tag: "AI Agent", desc: "基于大语言模型开发的AI面试助手，帮助求职者快速提升面试表现与职业规划。", bgColor: "bg-[#F3F4F6]", media: "https://media.giphy.com/media/L1R1tvI9svkIWwpVYr/giphy.gif" },
-    { title: "婴幼儿AI服务产品", tag: "AI Product", desc: "结合多模态交互技术，为婴幼儿提供情感陪伴与早教互动场景，探索AI硬件落地。", bgColor: "bg-[#EEF2FF]", media: "/aitoy.gif" },
-    { title: "AI虚拟形象直播", tag: "Live Stream", desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", bgColor: "bg-[#FEF2F2]", media: "/xiaozhang.gif" }
+    { title: "婴幼儿AI服务产品", tag: "AI Product", desc: "结合多模态交互技术，为婴幼儿提供情感陪伴与早教互动场景，探索AI硬件落地。", bgColor: "bg-[#EEF2FF]", media: "/aitoy.mp4" },
+    { title: "AI虚拟形象直播", tag: "Live Stream", desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", bgColor: "bg-[#FEF2F2]", media: "/xiaozhang.mp4" }
   ]
 };
+
+const skillIcons = [TrendingUp, Cpu, Lightbulb, Rocket];
 
 export default function App() {
   const [isFaqOpen, setIsFaqOpen] = useState(false);
@@ -229,6 +255,7 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [showUndergrad, setShowUndergrad] = useState(false);
   
   const [data, setData] = useState(FULL_FALLBACK);
   const containerRef = useRef(null);
@@ -249,7 +276,7 @@ export default function App() {
           });
         }
       })
-      .catch(() => console.log("加载保底内容中..."));
+      .catch(() => console.log("加载数据中..."));
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -260,11 +287,9 @@ export default function App() {
   return (
     <div ref={containerRef} className="relative min-h-screen bg-[#F8F9FB] selection:bg-rust selection:text-white overflow-x-hidden">
       <motion.div className="fixed top-0 left-0 right-0 h-1 bg-rust origin-left z-[1000]" style={{ scaleX }} />
-      <div className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.03] mix-blend-multiply">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" />
-      </div>
-
-      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-white/90 backdrop-blur-md py-2 shadow-sm' : 'py-8'}`}>
+      
+      {/* 头部导航：优化了布局高度 */}
+      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-white/90 backdrop-blur-md py-4 shadow-sm' : 'py-8'}`}>
         <div className="max-w-5xl mx-auto px-6 flex justify-between items-center">
           <div className="font-black text-2xl tracking-tighter">wenying<span className="text-rust">.website</span></div>
           <div className="hidden md:flex gap-8 items-center">
@@ -278,33 +303,48 @@ export default function App() {
       </nav>
 
       <main className="max-w-5xl mx-auto px-6 pt-40 pb-20">
-        <section id="about" className="relative flex flex-col items-center justify-center text-center mb-32">
+        
+        {/* --- 视觉升级版 About Section (参考截图 image_951706.jpg) --- */}
+        <section id="about" className="relative flex flex-col items-center justify-center text-center mb-40">
           <div className="relative w-44 h-56 mb-12">
             <img src="/touxiang-1.png" className="w-full h-full object-contain drop-shadow-2xl" />
             <div className="absolute inset-0 bg-rust/10 rounded-full blur-[80px] -z-10" />
-            <BreathingTag text="10年运营经验 💼" delay={0} className="-top-6 -left-16" />
-            <BreathingTag text="AI应用先锋 ✨" delay={1} className="bottom-4 -right-16" />
-            <BreathingTag text="复旦MBA 🎓" delay={2} className="-bottom-8 left-0" />
+            
+            {/* 按照截图优化的 Breathing Tags 位置 */}
+            <BreathingTag text="10年运营经验 💼" delay={0} className="-top-10 left-[-30%] md:left-[-60%]" />
+            <BreathingTag text="AI应用先锋 ✨" delay={1} className="bottom-12 right-[-20%] md:right-[-50%]" />
+            <BreathingTag text="复旦MBA 🎓" delay={2} className="-bottom-8 left-1/2 -translate-x-1/2" />
           </div>
-          <h1 className="text-6xl font-black text-rust mb-8 tracking-tighter">ZHU WENYING</h1>
+
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-7xl font-black text-rust mb-8 tracking-tighter uppercase"
+          >
+            ZHU WENYING
+          </motion.h1>
+
           <p className="max-w-2xl text-[14px] text-ink/70 font-medium leading-relaxed mb-10">
             上海 / 复旦大学MBA / 复合型运营专家。深耕互联网行业9年，具备从0-1搭建业务体系与规模化增长能力。持续探索AI与商业场景的深度融合，通过技术赋能业务创新。
           </p>
+
           <div className="flex gap-4">
             <button onClick={() => setIsWeChatOpen(true)} className="bg-ink text-white px-10 py-4 rounded-full font-bold text-[13px] tracking-widest shadow-2xl hover:bg-rust transition-colors">添加微信</button>
             <a href="mailto:zwy0025@gmail.com" className="bg-white border border-ink/10 px-10 py-4 rounded-full font-bold text-[13px] tracking-widest hover:border-rust transition-colors">联系我</a>
           </div>
         </section>
 
+        {/* --- 核心技能 --- */}
         <section id="skills" className="mb-24">
           <SectionHeader zh="核心技能" en="Core Skills" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {data.skills.map((s, idx) => (
-              <SkillCard key={idx} title={s.title} dataDesc={s.desc} icon={TrendingUp} />
+              <SkillCard key={idx} title={s.title} dataDesc={s.desc} icon={skillIcons[idx%4]} />
             ))}
           </div>
         </section>
 
+        {/* --- 个人经历 (恢复 App (5) 的完整详情逻辑) --- */}
         <section id="experience" className="mb-24">
           <SectionHeader zh="个人经历" en="Experience" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
@@ -323,6 +363,7 @@ export default function App() {
           </div>
         </section>
 
+        {/* --- 项目经历 --- */}
         <section id="projects" className="mb-24">
           <SectionHeader zh="项目经历" en="Projects" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -332,6 +373,7 @@ export default function App() {
           </div>
         </section>
 
+        {/* --- AI 实验室 --- */}
         <section id="ai-lab" className="mb-24">
           <SectionHeader zh="AI 实验室" en="AI Lab" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -341,6 +383,7 @@ export default function App() {
           </div>
         </section>
 
+        {/* --- 页脚 --- */}
         <footer className="pt-20 pb-12 border-t border-ink/10 flex flex-col items-center">
           <div className="w-full flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="text-center md:text-left">
@@ -355,9 +398,10 @@ export default function App() {
         </footer>
       </main>
 
+      {/* 右下角浮动按钮 */}
       <div className="fixed bottom-10 right-10 z-50 flex flex-col items-end">
         <FAQDialog isOpen={isFaqOpen} onClose={() => setIsFaqOpen(false)} />
-        <button onClick={() => setIsFaqOpen(!isFaqOpen)} className="w-16 h-16 bg-rust rounded-full flex items-center justify-center text-white shadow-2xl border-4 border-white overflow-hidden hover:scale-105 transition-transform">
+        <button onClick={() => setIsFaqOpen(!isFaqOpen)} className="w-16 h-16 bg-rust rounded-full flex items-center justify-center text-white shadow-2xl border-4 border-white overflow-hidden hover:scale-110 transition-transform">
           <img src="/fenshen-4.jpg" className="w-full h-full object-cover" />
         </button>
       </div>
