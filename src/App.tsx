@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { 
@@ -11,8 +6,7 @@ import {
   MapPin, Palette, Video, GraduationCap 
 } from 'lucide-react';
 
-// --- 通用组件 ---
-
+// --- 通用 UI 组件 ---
 const SectionHeader = ({ zh, en }: { zh: string; en: string }) => (
   <div className="mb-8 flex items-baseline gap-4">
     <h2 className="text-rust font-bold text-lg uppercase tracking-tight">{en}</h2>
@@ -47,30 +41,6 @@ const NavItem = ({ zh, en, href, icon: Icon }: { zh: string; en: string; href: s
     <span className="text-[9px] uppercase tracking-[0.2em] text-ink/30 group-hover:text-rust/50 transition-colors leading-none font-bold">{en}</span>
   </motion.a>
 );
-
-const CharacterPop = ({ text, className = "" }: { text: string; className?: string }) => {
-  return (
-    <div className={`flex flex-wrap justify-center ${className}`}>
-      {text.split('\n').map((line, lineIdx) => (
-        <React.Fragment key={lineIdx}>
-          {lineIdx > 0 && <div className="basis-full h-0" />}
-          {line.trim().split('').map((char, i) => (
-            <motion.span
-              key={`${lineIdx}-${i}`}
-              initial={{ y: 50, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ type: "spring", damping: 15, stiffness: 100, delay: (lineIdx * 20 + i) * 0.02 }}
-              className="inline-block"
-            >
-              {char === ' ' ? '\u00A0' : char}
-            </motion.span>
-          ))}
-        </React.Fragment>
-      ))}
-    </div>
-  );
-};
 
 const BreathingTag = ({ text, delay, className }: { text: string, delay: number, className?: string }) => (
   <motion.div
@@ -124,15 +94,15 @@ const TimelineItem = ({ date, title, company, desc, details }: { date: string; t
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white p-5 rounded-2xl border border-ink/5 shadow-sm hover:shadow-md transition-shadow">
                   <h5 className="text-[10px] font-black uppercase tracking-widest text-ink/40 mb-4 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-ink/20 rounded-full" /> 工作内容</h5>
-                  <ul className="space-y-2.5">{details.content.map((item: string, i: number) => (<li key={i} className="text-xs text-ink/70 leading-relaxed relative pl-3"><span className="absolute left-0 top-1.5 w-1 h-1 bg-ink/20 rounded-full" />{item}</li>))}</ul>
+                  <ul className="space-y-2.5">{details.content?.map((item: string, i: number) => (<li key={i} className="text-xs text-ink/70 leading-relaxed relative pl-3"><span className="absolute left-0 top-1.5 w-1 h-1 bg-ink/20 rounded-full" />{item}</li>))}</ul>
                 </div>
                 <div className="bg-rust/[0.03] p-5 rounded-2xl border border-rust/10 shadow-sm hover:shadow-md transition-shadow">
                   <h5 className="text-[10px] font-black uppercase tracking-widest text-rust/60 mb-4 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-rust/40 rounded-full" /> 核心项目</h5>
-                  <ul className="space-y-2.5">{details.projects.map((item: string, i: number) => (<li key={i} className="text-xs text-rust/80 leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-rust/40 rounded-full" />{item}</li>))}</ul>
+                  <ul className="space-y-2.5">{details.projects?.map((item: string, i: number) => (<li key={i} className="text-xs text-rust/80 leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-rust/40 rounded-full" />{item}</li>))}</ul>
                 </div>
                 <div className="bg-rust p-5 rounded-2xl shadow-lg hover:-translate-y-1 transition-transform">
                   <h5 className="text-[10px] font-black uppercase tracking-widest text-white/80 mb-4 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" /> 突出成果</h5>
-                  <ul className="space-y-2.5">{details.results.map((item: string, i: number) => (<li key={i} className="text-xs text-white leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-white/50 rounded-full" /><span dangerouslySetInnerHTML={{ __html: item.replace(/(\d+[%+万亿]*)/g, '<strong class="text-white font-black text-xs bg-white/20 px-1 rounded mx-0.5">$1</strong>') }} /></li>))}</ul>
+                  <ul className="space-y-2.5">{details.results?.map((item: string, i: number) => (<li key={i} className="text-xs text-white leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-white/50 rounded-full" /><span dangerouslySetInnerHTML={{ __html: item.replace(/(\d+[%+万亿]*)/g, '<strong class="text-white font-black text-xs bg-white/20 px-1 rounded mx-0.5">$1</strong>') }} /></li>))}</ul>
                 </div>
               </div>
             </motion.div>
@@ -150,7 +120,7 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-ink/70 backdrop-blur-md" />
         <motion.div initial={{ scale: 0.95, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 30 }} className="relative w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] bg-white">
           <div className="h-48 md:h-64 relative w-full flex-shrink-0 bg-ink">
-            <img src={project.bgImage} alt={project.title} className="w-full h-full object-cover opacity-80" />
+            <img src={project.bgImage} alt={project.title} className="w-full h-full object-cover opacity-80 object-top" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent" />
             <button onClick={onClose} className="absolute top-4 right-4 text-white/70 hover:text-white bg-black/20 p-2 rounded-full backdrop-blur-md transition-colors"><X size={20} /></button>
             <div className="absolute bottom-6 left-6 right-6">
@@ -177,38 +147,21 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
 );
 
 const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }) => (
-  <motion.div 
-    onClick={onClick} 
-    whileHover={{ y: -8 }} 
-    className="relative rounded-[1.5rem] flex flex-col cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all bg-white overflow-hidden h-[260px] group"
-  >
+  <motion.div onClick={onClick} whileHover={{ y: -8 }} className="relative rounded-[1.5rem] flex flex-col cursor-pointer shadow-sm border border-ink/5 hover:shadow-xl transition-all bg-white overflow-hidden h-[260px] group">
     <div className="relative h-[140px] w-full flex-shrink-0 overflow-hidden bg-ink/5">
-      <img 
-        src={project.bgImage} 
-        alt={project.title} 
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-      />
+      <img src={project.bgImage} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 object-top" />
       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/10 to-transparent" />
-      
       <div className="absolute top-3 left-4">
         <span className="text-white text-[9px] font-bold uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/20 flex items-center gap-1.5 shadow-sm">
           <project.icon size={10} className="text-rust/80" /> {project.tag}
         </span>
       </div>
     </div>
-    
     <div className="p-4 pt-3 flex flex-col flex-1 z-10 bg-white">
       <h3 className="text-base font-bold mb-1.5 tracking-tight text-ink leading-tight">{project.title}</h3>
-      {/* 修复点：这里的字体大小从 text-[11px] 统一修改为了 text-xs */}
       <p className="text-xs text-ink/50 leading-relaxed font-medium line-clamp-2 mb-2">{project.desc}</p>
-      
       <div className="mt-auto">
-        <motion.span 
-          whileHover={{ x: 5 }} 
-          className="text-rust font-bold text-[11px] tracking-widest flex items-center gap-1"
-        >
-          了解详情 &rarr;
-        </motion.span>
+        <motion.span whileHover={{ x: 5 }} className="text-rust font-bold text-[11px] tracking-widest flex items-center gap-1">了解详情 &rarr;</motion.span>
       </div>
     </div>
   </motion.div>
@@ -216,89 +169,54 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
 
 const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode }) => (
   <motion.div whileHover={{ y: -5 }} className={`${bgColor} rounded-[2rem] p-6 flex flex-col min-h-[180px] relative group border border-ink/5 shadow-sm hover:shadow-md transition-all mt-8 md:mt-10`}>
-    <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">
-      {mockup}
-    </div>
+    <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">{mockup}</div>
     <div className="z-10 relative max-w-[65%]">
       <span className="text-[9px] font-black uppercase tracking-widest text-ink/50 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-3 inline-block">{tag}</span>
       <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight">{title}</h3>
-      {/* 修复点：这里的字体大小从 text-[10px] 统一修改为了 text-xs */}
       <p className="text-xs text-ink/60 leading-relaxed font-medium line-clamp-3">{desc}</p>
     </div>
   </motion.div>
 );
 
-// 修复点：使 VideoMockup 兼容 GIF 格式播放
 const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: string, fallbackImg: string, rotateClass?: string }) => {
-  const isGif = src.toLowerCase().endsWith('.gif');
-  
+  const isGif = src?.toLowerCase().endsWith('.gif');
   return (
     <div className={`w-full h-full rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] border-[4px] border-white/90 bg-white ${rotateClass} transition-transform duration-500`}>
-      {isGif ? (
-        <img src={src} alt="demo" className="w-full h-full object-cover" />
-      ) : (
-        <video 
-          src={src}
-          poster={fallbackImg}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover"
-        />
-      )}
+      {isGif ? <img src={src} alt="demo" className="w-full h-full object-cover" /> : <video src={src} poster={fallbackImg} autoPlay loop muted playsInline className="w-full h-full object-cover" />}
       <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 pointer-events-none" />
     </div>
   );
 };
 
-const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const [selectedQ, setSelectedQ] = useState<number | null>(null);
-  const [typingText, setTypingText] = useState("");
-  const faqs = [
-    { q: "离职原因", a: "寻求更广阔的 AI 应用落地场景，将 9 年运营经验与 AIGC 技术深度结合，创造指数级增长。" },
-    { q: "求职期望", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的合作方案，薪资可面议。" },
-    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" }
-  ];
-
-  useEffect(() => {
-    if (selectedQ !== null) {
-      setTypingText(""); let i = 0; const fullText = faqs[selectedQ].a;
-      const interval = setInterval(() => { setTypingText(fullText.slice(0, i + 1)); i++; if (i >= fullText.length) clearInterval(interval); }, 30);
-      return () => clearInterval(interval);
-    }
-  }, [selectedQ]);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="fixed bottom-24 right-6 w-80 md:w-96 bg-white border border-rust/20 shadow-2xl z-50 overflow-hidden rounded-2xl">
-          <div className="bg-rust p-4 flex justify-between items-center text-white">
-            <div className="flex items-center gap-2"><div className="w-2 h-2 bg-white rounded-full animate-pulse" /><h4 className="font-display font-bold uppercase tracking-widest text-[10px]">AI Digital Twin Active</h4></div>
-            <button onClick={onClose} className="hover:rotate-90 transition-transform"><X size={18} /></button>
-          </div>
-          <div className="p-6 space-y-4">
-            {faqs.map((faq, i) => (
-              <div key={i} className="border-b border-ink/5 pb-4 last:border-0">
-                <button onClick={() => setSelectedQ(selectedQ === i ? null : i)} className="w-full text-left flex justify-between items-center group">
-                  <span className="font-bold text-sm group-hover:text-rust transition-colors">{faq.q}</span>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${selectedQ === i ? 'rotate-90' : ''}`} />
-                </button>
-                <AnimatePresence>
-                  {selectedQ === i && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="text-xs text-ink/60 mt-3 leading-relaxed overflow-hidden min-h-[3em]">
-                      {typingText}<motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.8, repeat: Infinity }} className="inline-block w-1 h-3 bg-rust ml-1 translate-y-0.5" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+// --- 保底静态数据：如果 Notion 没配好或没网，依然绝美展示 ---
+const FALLBACK_DATA = {
+  skills: [
+    { title: "平台增长运营经验", icon: TrendingUp, desc: <>3年内推动携程直播平台规模1000万增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>，6个月内推动视频号矩阵直播<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</> },
+    { title: "中后台产品运营", icon: Cpu, desc: <>复杂系统推广培训经验，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长跨部门协同与商务谈判、资源整合</strong>。</> },
+    { title: "业务赋能与项目落地", icon: Lightbulb, desc: <><strong className="text-ink font-bold">多次0-1项目落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→规模化增长的全链路操盘能力。</> },
+    { title: "复合运营背景与商业思维", icon: Rocket, desc: <>服务过多家互联网企业，参与初创企业运营，能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出内容营销策略和行业解决方案</strong>。</> }
+  ],
+  timeline: [
+    { type: 'Work', date: "2025.10 - 至今", title: "餐厅合伙人/企业顾问", company: "和牛定食餐厅/予童科技", desc: "BP撰写与融资 / 线上培训课程体系搭建、婴幼儿家庭AI服务产品孵化" },
+    { type: 'Work', date: "2021.07 - 2025.07", title: "运营经理", company: "Ctrip 携程", desc: "从0-1搭建携程商家直播生态体系，3年推动平台直播GMV从1000万增至10亿+。", details: { content: ["从 0 到 1 搭建商家直播生态体系","制定直播间运营标准与流量分发策略"], projects: ["携程直播青训营：孵化 0 基础团队","携程 AI 直播"], results: ["3 年推动 GMV 增至 10 亿+","转化率提升 70%+"] } },
+    { type: 'Work', date: "2020.05 - 2021.07", title: "产品运营", company: "Yitiao 一条", desc: "0-1艺术电商平台搭建。优化用户注册转化节点，将小程序注册率提升至80%。", details: { content: ["负责艺术电商平台的产品运营与用户增长"], projects: ["一条艺术品电商平台"], results: ["小程序注册率提升至 80%"] } },
+    { type: 'Work', date: "2016.09 - 2020.04", title: "产品运营", company: "Ele.me 饿了么", desc: "主导下沉市场智能调度系统覆盖率从30%提升至98%。", details: { content: ["负责下沉市场物流调度系统的产品运营"], projects: ["下沉市场智能调度系统覆盖提升项目"], results: ["系统覆盖率提升至 98%"] } },
+    { type: 'Education', date: "2024.09 - 2027.03", title: "工商管理(MBA)", company: "复旦大学（硕士）", desc: "专注于商业领导力与创新管理。参与 Esade University 交换项目：Leading Innovation。" }
+  ],
+  projects: [
+    { title: "饿了么下沉市场外卖配送", tag: "系统调优", bgImage: "/taobaoshangou.jpg", icon: MapPin, desc: "主导下沉市场智能调度系统覆盖率从30%提升至98%，提升平台整体效率。", detail: "该项目为公司战略级项目，作为业务方主导，产研和算法团队紧密配合，实现降本增效。" },
+    { title: "一条艺术电商平台", tag: "电商运营", bgImage: "/yitiao.JPG", icon: Palette, desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系。", detail: "负责电商平台产品运营，内容生态建设；降低艺术品消费者线上购买门槛。" },
+    { title: "携程直播青训营", tag: "校企合作", bgImage: "/qingxunying.jpg", icon: Video, desc: "搭建视频号直播矩阵，6个月实现收入0到4000万突破，获集团Superhero称号。", detail: "负责该项目前期的孵化与规模建设，主导校企合作方案。具备百万直播GMV操盘能力。" }
+  ],
+  aiLab: [
+    { title: "自媒体起号助手", tag: "AI Agent", desc: "基于大语言模型开发的自媒体起号助手，帮助新手完成前期账号诊断与内容规划。", bgColor: "bg-[#F3F4F6]", media: "https://media.giphy.com/media/L1R1tvI9svkIWwpVYr/giphy.gif" },
+    { title: "婴幼儿AI服务产品", tag: "AI Product", desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", bgColor: "bg-[#EEF2FF]", media: "/aitoy.gif" },
+    { title: "AI虚拟形象直播", tag: "Live Stream", desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", bgColor: "bg-[#FEF2F2]", media: "/xiaozhang.gif" }
+  ]
 };
+
+const skillIcons = [TrendingUp, Cpu, Lightbulb, Rocket];
+const projIcons = [MapPin, Palette, Video, Folder];
 
 export default function App() {
   const [isFaqOpen, setIsFaqOpen] = useState(false);
@@ -308,6 +226,9 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [showUndergrad, setShowUndergrad] = useState(false);
   
+  // 数据源状态
+  const [data, setData] = useState(FALLBACK_DATA);
+  
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -316,34 +237,29 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // 从 Notion API 抓取数据，如果失败则静默回落到静态数据
+  useEffect(() => {
+    fetch('/api/notion')
+      .then(res => res.json())
+      .then(resData => {
+        if (resData.success) {
+          setData({
+            skills: resData.data.skills.length > 0 ? resData.data.skills : FALLBACK_DATA.skills,
+            timeline: resData.data.timeline.length > 0 ? resData.data.timeline : FALLBACK_DATA.timeline,
+            projects: resData.data.projects.length > 0 ? resData.data.projects : FALLBACK_DATA.projects,
+            aiLab: resData.data.aiLab.length > 0 ? resData.data.aiLab : FALLBACK_DATA.aiLab,
+          });
+        }
+      })
+      .catch(err => console.error("Notion 同步异常，启用本地备份:", err));
+  }, []);
+
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -150]);
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
-  const projectsData = [
-    {
-      title: "饿了么下沉市场外卖配送提效", tag: "系统调优", 
-      bgImage: "/taobaoshangou.jpg", icon: MapPin,
-      desc: "主导饿了么下沉市场智能调度系统覆盖率从30%提升至98%，提升平台整体配送效率和履约质量。",
-      detail: "该项目为公司战略级项目，作为业务方主导，产研和算法团队紧密配合，通过系统赋能与宣讲培训，帮助全国 1800 个城市代理商实现降本增效。"
-    },
-    {
-      title: "一条艺术电商平台", tag: "电商运营", 
-      bgImage: "/yitiao.JPG", icon: Palette, 
-      desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系，降低消费者线上购买门槛。",
-      detail: "负责艺术电商平台产品运营，运营艺术品线上展厅、直播、拍卖、线上销售板块的产品规划与内容生态建设；同艺术品BD、内容编辑团队共同搭建从艺术家到艺术作品的完整基础知识体系，降低艺术品消费者线上购买门槛。"
-    },
-    {
-      title: "携程直播青训营", tag: "校企合作", 
-      bgImage: "/qingxunying.jpg", icon: Video,
-      desc: "通过搭建视频号直播矩阵，6个月实现项目收入从0到4000万的突破，累计孵化200+学员，获集团Superhero称号。",
-      detail: "负责该项目前期的孵化与规模建设，主导校企合作方案、商务拓展、学员培训、运营策略等全链路落地。具备单场百万直播GMV操盘及个人直播带货能力。"
-    }
-  ];
-
   return (
     <div ref={containerRef} className="relative min-h-screen selection:bg-rust selection:text-white overflow-x-hidden bg-[#F8F9FB]">
-      
       <motion.div className="fixed top-0 left-0 right-0 h-1 bg-rust origin-left z-[1000]" style={{ scaleX }} />
       <div className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.03] mix-blend-multiply">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" />
@@ -362,7 +278,6 @@ export default function App() {
             <NavItem zh="项目经历" en="Projects" href="#projects" icon={Folder} />
             <NavItem zh="AI 实验室" en="AI Lab" href="#ai-lab" icon={Sparkles} />
           </div>
-          
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-ink hover:text-rust transition-colors relative z-50">
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -370,12 +285,7 @@ export default function App() {
 
         <AnimatePresence>
           {isMobileMenuOpen && (
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -20 }} 
-              className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border-b border-ink/10 shadow-2xl md:hidden flex flex-col py-2 px-6 z-40"
-            >
+            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border-b border-ink/10 shadow-2xl md:hidden flex flex-col py-2 px-6 z-40">
               {[
                 { zh: "关于我", en: "About Me", href: "#about", icon: User },
                 { zh: "核心技能", en: "Core Skills", href: "#skills", icon: Star },
@@ -383,12 +293,7 @@ export default function App() {
                 { zh: "项目经历", en: "Projects", href: "#projects", icon: Folder },
                 { zh: "AI 实验室", en: "AI Lab", href: "#ai-lab", icon: Sparkles }
               ].map((link, idx) => (
-                <a 
-                  key={idx} 
-                  href={link.href} 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-4 text-ink/80 hover:text-rust font-bold text-sm py-4 border-b border-ink/5 last:border-0 group"
-                >
+                <a key={idx} href={link.href} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-4 text-ink/80 hover:text-rust font-bold text-sm py-4 border-b border-ink/5 last:border-0 group">
                   <link.icon size={18} className="text-rust/70 group-hover:text-rust transition-colors" />
                   <span>{link.zh}</span>
                   <span className="text-[10px] text-ink/30 uppercase tracking-widest ml-auto">{link.en}</span>
@@ -407,9 +312,7 @@ export default function App() {
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
         <section id="about" className="relative min-h-[75vh] flex flex-col items-center justify-center pt-16 pb-8 overflow-hidden mb-12">
-          
           <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
-            
             <div className="absolute inset-0 w-full h-full pointer-events-none z-20">
               <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] left-[8%] md:left-[15%]" />
               <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[5%] right-[5%] md:right-[15%]" />
@@ -418,37 +321,18 @@ export default function App() {
               <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="bottom-[25%] left-[8%] md:left-[15%]" />
               <BreathingTag text="AI应用体验官 ✨" delay={1.2} className="bottom-[5%] left-[10%] md:left-[20%]" />
             </div>
-
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-4"
-            >
-              <img 
-                src="/touxiang-1.png" 
-                alt="Jodie Zhu" 
-                className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)] pointer-events-none" 
-              />
-              
-              <h1 className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[200%] text-center text-5xl md:text-6xl font-black text-rust tracking-tighter drop-shadow-md z-30 pointer-events-none">
-                ZHU WENYING
-              </h1>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-4">
+              <img src="/touxiang-1.png" alt="Jodie Zhu" className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)] pointer-events-none" />
+              <h1 className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[200%] text-center text-5xl md:text-6xl font-black text-rust tracking-tighter drop-shadow-md z-30 pointer-events-none">ZHU WENYING</h1>
             </motion.div>
-
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-rust/10 rounded-full blur-[60px] pointer-events-none z-0" />
           </div>
 
           <div className="relative z-10 flex flex-col items-center text-center mt-6 px-4 max-w-2xl">
-            <p className="text-xs md:text-sm font-bold text-ink/80 tracking-widest uppercase mb-3">
-               上海 / 复旦大学MBA / 复合型运营专家
-            </p>
+            <p className="text-xs md:text-sm font-bold text-ink/80 tracking-widest uppercase mb-3">上海 / 复旦大学MBA / 复合型运营专家</p>
             <p className="text-xs text-ink/60 font-medium leading-relaxed mb-6">
-              9年互联网运营和产品经验、1年创业项目经验。
-              深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。
-              持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及人机协同的商业化机会。
+              9年互联网运营和产品经验、1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及人机协同的商业化机会。
             </p>
-
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a href="mailto:zwy0025@gmail.com" className="flex items-center justify-center gap-2 bg-white border border-ink/10 text-ink px-8 py-3.5 rounded-full font-bold text-xs tracking-widest hover:border-rust hover:text-rust transition-colors w-full sm:w-48 shadow-sm">
                 <Mail size={16} /> 发送邮件
@@ -463,72 +347,37 @@ export default function App() {
         <section id="skills" className="mb-12">
           <SectionHeader zh="核心技能" en="Core Skills" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-2">
-            <SkillCard 
-              title="平台增长运营经验" 
-              icon={TrendingUp} 
-              dataDesc={<>3年内推动携程直播平台规模1000万增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>，6个月内推动视频号矩阵直播<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</>}
-            />
-            {/* 修复点：补全了这里的空标签 < */}
-            <SkillCard 
-              title="中后台产品运营" 
-              icon={Cpu} 
-              dataDesc={<>复杂系统推广培训经验，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长跨部门协同与商务谈判、资源整合</strong>。</>}
-            />
-            <SkillCard 
-              title="业务赋能与项目落地经验" 
-              icon={Lightbulb} 
-              dataDesc={<><strong className="text-ink font-bold">多次0-1项目落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→规模化增长的全链路操盘能力，擅长业务痛点诊断和赋能</>}
-            />
-            <SkillCard 
-              title="复合运营背景与商业思维" 
-              icon={Rocket} 
-              dataDesc={<>服务过多家互联网企业，参与初创企业运营，能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出内容营销策略和行业解决方案</strong>。</>}
-            />
+            {data.skills.map((s: any, idx) => (
+              <SkillCard key={idx} title={s.title} dataDesc={s.desc} icon={s.icon || skillIcons[idx % 4]} />
+            ))}
           </div>
         </section>
 
         <section id="experience" className="mb-12">
           <SectionHeader zh="个人经历" en="Personal Experience" />
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mt-4">
             <div>
-              <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-8 flex items-center gap-2">
-                <Briefcase size={14} className="text-rust"/> 工作经历
-              </h3>
+              <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-8 flex items-center gap-2"><Briefcase size={14} className="text-rust"/> 工作经历</h3>
               <div className="relative">
-                <TimelineItem date="2025.10 - 至今" title="餐厅合伙人/企业顾问" company="和牛定食餐厅/予童科技" desc="BP撰写与融资 / 线上培训课程体系搭建、婴幼儿家庭AI服务产品孵化" />
-                <TimelineItem date="2021.07 - 2025.07" title="运营经理" company="Ctrip 携程" desc="从0-1搭建携程商家直播生态体系，3年推动平台直播GMV从1000万增至10亿+。" details={{content: ["从 0 到 1 搭建商家直播生态体系","制定直播间运营标准与流量分发策略","负责直播业务的整体增长与商业化变现"], projects: ["携程直播青训营：孵化 0 基础团队","携程 AI 直播：真人+AI 24小时客服直播间"], results: ["3 年推动 GMV 从 1000 万增至 10 亿+","直播间转化率提升 70%+","孵化团队 1 个月直播 GMV 破百万"]}} />
-                <TimelineItem date="2020.05 - 2021.07" title="产品运营" company="Yitiao 一条" desc="0-1艺术电商平台搭建。优化用户注册转化节点，将小程序注册率提升至80%。" details={{content: ["负责艺术电商平台的产品运营与用户增长","优化用户注册与交易转化路径","打通拍卖+直播的闭环交易链路"], projects: ["一条艺术品电商平台：小程序注册转化优化","拍卖+直播交易链路整合"], results: ["小程序注册率从 30% 提升至 80%","成功上线艺术品拍卖直播功能","显著提升高客单价商品转化效率"]}} />
-                <TimelineItem date="2016.09 - 2020.04" title="产品运营" company="Ele.me 饿了么" desc="主导下沉市场智能调度系统覆盖率从30%提升至98%。" details={{content: ["负责下沉市场物流调度系统的产品运营","协调全国 1800 个城市代理商的系统落地","通过数据分析优化配送效率与成本控制"], projects: ["下沉市场智能调度系统覆盖提升项目","代理商降本增效专项行动"], results: ["系统覆盖率从 30% 提升至 98%","帮助全国代理商显著降低运营成本","配送效率提升 25% 以上"]}} />
+                {data.timeline.filter(i => i.type === 'Work').map((item: any, idx) => (
+                  <TimelineItem key={idx} {...item} />
+                ))}
               </div>
             </div>
-            
             <div>
-              <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-8 flex items-center gap-2">
-                <GraduationCap size={14} className="text-rust"/> 教育经历
-              </h3>
+              <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-8 flex items-center gap-2"><GraduationCap size={14} className="text-rust"/> 教育经历</h3>
               <div className="relative">
-                <TimelineItem date="2024.09 - 2027.03" title="工商管理(MBA)" company="复旦大学（硕士）" desc="专注于商业领导力与创新管理。参与 Esade University 交换项目：Leading Innovation。" />
-                
-                <div 
-                  className="relative pl-[2.5px] -mt-6 mb-6 z-20 opacity-30 hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-2 w-fit group" 
-                  onClick={() => setShowUndergrad(!showUndergrad)}
-                  title=" "
-                >
+                {data.timeline.filter(i => i.type === 'Education').map((item: any, idx) => (
+                  <TimelineItem key={idx} {...item} />
+                ))}
+                {/* 隐藏的本科彩蛋 */}
+                <div className="relative pl-[2.5px] -mt-6 mb-6 z-20 opacity-30 hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-2 w-fit group" onClick={() => setShowUndergrad(!showUndergrad)} title=" ">
                   <div className={`w-[6px] h-[6px] rounded-full ${showUndergrad ? 'bg-rust' : 'bg-ink/40'} group-hover:bg-rust transition-colors`} />
-                  <span className="text-[10px] text-ink/40 tracking-widest uppercase scale-75 origin-left">
-                    {showUndergrad ? '' : '...'}
-                  </span>
+                  <span className="text-[10px] text-ink/40 tracking-widest uppercase scale-75 origin-left">{showUndergrad ? '' : '...'}</span>
                 </div>
-
                 <AnimatePresence>
                   {showUndergrad && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0 }} 
-                      animate={{ height: 'auto', opacity: 1 }} 
-                      exit={{ height: 0, opacity: 0 }} 
-                      className="overflow-hidden"
-                    >
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                       <TimelineItem date="2012.09 - 2016.07" title="工业设计" company="嘉兴大学(本科)" desc="2016级优秀毕业生。培养了深厚的用户体验设计基础与产品思维。" />
                     </motion.div>
                   )}
@@ -541,8 +390,8 @@ export default function App() {
         <section id="projects" className="mb-12">
           <SectionHeader zh="项目经历" en="Project Experience" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {projectsData.map((p, idx) => (
-              <ProjectCard key={idx} project={p} onClick={() => setSelectedProject(p)} />
+            {data.projects.map((p: any, idx) => (
+              <ProjectCard key={idx} project={{...p, icon: p.icon || projIcons[idx % 4]}} onClick={() => setSelectedProject({...p, icon: p.icon || projIcons[idx % 4]})} />
             ))}
           </div>
           <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
@@ -551,63 +400,38 @@ export default function App() {
         <section id="ai-lab" className="mb-12">
           <SectionHeader zh="AI 实验室" en="AI Lab" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-8">
-            <AILabCard 
-              tag="AI Agent" title="自媒体起号助手" bgColor="bg-[#F3F4F6]"
-              desc="基于大语言模型开发的自媒体起号助手，帮助新手完成前期账号诊断与内容规划。" 
-              mockup={<VideoMockup src="https://media.giphy.com/media/L1R1tvI9svkIWwpVYr/giphy.gif" fallbackImg="" rotateClass="-rotate-3" />} 
-            />
-            <AILabCard 
-              tag="AI Product" title="婴幼儿AI服务产品" bgColor="bg-[#EEF2FF]"
-              desc="结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。" 
-              mockup={<VideoMockup src="/aitoy.mp4" fallbackImg="/ai-wanju-2.jpg" rotateClass="rotate-2" />} 
-            />
-            <AILabCard 
-              tag="Live Stream" title="AI虚拟形象直播" bgColor="bg-[#FEF2F2]"
-              desc="重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。" 
-              mockup={<VideoMockup src="/xiaozhang.mp4" fallbackImg="/ai-zhibo-3.jpg" rotateClass="rotate-3" />} 
-            />
+            {data.aiLab.map((item: any, idx) => (
+              <AILabCard key={idx} tag={item.tag} title={item.title} bgColor={item.bgColor} desc={item.desc} mockup={<VideoMockup src={item.media} fallbackImg="" rotateClass={idx % 2 === 0 ? "rotate-2" : "-rotate-3"} />} />
+            ))}
           </div>
         </section>
 
         <footer className="pt-16 pb-12 border-t border-ink/10 flex flex-col items-center">
           <motion.button whileHover={{ y: -5 }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="mb-12 flex flex-col items-center gap-2 group">
-            <div className="w-10 h-10 rounded-full border border-ink/10 flex items-center justify-center group-hover:border-rust transition-colors">
-              <ArrowUpRight className="rotate-[-135deg] text-ink/40 group-hover:text-rust transition-colors" size={18} />
-            </div>
+            <div className="w-10 h-10 rounded-full border border-ink/10 flex items-center justify-center group-hover:border-rust transition-colors"><ArrowUpRight className="rotate-[-135deg] text-ink/40 group-hover:text-rust transition-colors" size={18} /></div>
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ink/30 group-hover:text-rust transition-colors">Back to Top</span>
           </motion.button>
-
           <div className="w-full flex flex-col md:flex-row justify-between items-center gap-8">
             <div>
               <h2 className="text-3xl font-black mb-2 tracking-tighter">朱闻樱 / JODIEZHU</h2>
               <p className="text-ink/40 font-mono text-[10px] uppercase tracking-[0.2em]">Open for New Opportunities & Collaborations © 2026</p>
             </div>
             <div className="flex items-center gap-4">
-              <a href="mailto:zwy0025@gmail.com" className="flex items-center gap-2 bg-white border border-ink/10 px-6 py-2.5 rounded-full text-[11px] font-bold text-ink hover:border-rust hover:text-rust transition-colors shadow-sm">
-                <Mail size={14} /> 邮件联系
-              </a>
-              <button onClick={() => setIsWeChatOpen(true)} className="flex items-center gap-2 bg-ink text-white px-6 py-2.5 rounded-full font-bold text-[11px] hover:bg-rust transition-colors shadow-md">
-                <QrCode size={14} /> 添加微信
-              </button>
+              <a href="mailto:zwy0025@gmail.com" className="flex items-center gap-2 bg-white border border-ink/10 px-6 py-2.5 rounded-full text-[11px] font-bold text-ink hover:border-rust hover:text-rust transition-colors shadow-sm"><Mail size={14} /> 邮件联系</a>
+              <button onClick={() => setIsWeChatOpen(true)} className="flex items-center gap-2 bg-ink text-white px-6 py-2.5 rounded-full font-bold text-[11px] hover:bg-rust transition-colors shadow-md"><QrCode size={14} /> 添加微信</button>
             </div>
           </div>
         </footer>
-
       </main>
 
       <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
         <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsFaqOpen(!isFaqOpen)} className="w-14 h-14 bg-rust/90 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-[0_10px_30px_rgba(179,58,45,0.4)] relative group border border-white/20 p-1">
           <div className="w-full h-full rounded-full relative z-10 overflow-hidden border border-white/50">
-            {isFaqOpen ? <div className="w-full h-full bg-rust/20 flex items-center justify-center"><X size={18} /></div> : (
-              <>
-                <img src="/fenshen-4.jpg" className="w-full h-full object-cover scale-[1.3] translate-y-0" alt="Avatar" />
-              </>
-            )}
+            {isFaqOpen ? <div className="w-full h-full bg-rust/20 flex items-center justify-center"><X size={18} /></div> : <img src="/fenshen-4.jpg" className="w-full h-full object-cover scale-[1.3] translate-y-0" alt="Avatar" />}
           </div>
         </motion.button>
         <FAQDialog isOpen={isFaqOpen} onClose={() => setIsFaqOpen(false)} />
       </div>
-
       <WeChatModal isOpen={isWeChatOpen} onClose={() => setIsWeChatOpen(false)} />
     </div>
   );
