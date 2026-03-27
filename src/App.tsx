@@ -115,7 +115,7 @@ const TimelineItem = ({ date, title, company, desc, details }: { date: string; t
   );
 };
 
-// --- 电脑端专用的手绘风交互曲线组件 ---
+// --- 电脑端专用的手绘风交互曲线组件 (解除了容器高度限制) ---
 const ExperienceCurve = ({ items }: { items: any[] }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(items.length - 1); 
 
@@ -134,8 +134,9 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
   const points = items.map((_, i) => getBezierPoint(i / n));
 
   return (
+    // 修改处二：去掉了 h-[400px] 的固定高度限制，让它能够自动撑开内容
     <div className="w-full hidden md:block">
-      {/* 去掉了白底，点击空白处收起详情 */}
+      {/* 坐标轴区域，点击空白处收起详情 */}
       <div 
         className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
         onClick={() => setActiveIndex(null)}
@@ -211,7 +212,7 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
         </div>
       </div>
 
-      {/* 底部详细展示面板 (点击节点后横向展示模块) */}
+      {/* 底部详细展示面板 (自然下推，不再重叠) */}
       <AnimatePresence mode="wait">
          {activeIndex !== null && items[activeIndex] && (
            <motion.div 
@@ -219,7 +220,7 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
              initial={{ opacity: 0, height: 0, y: -10 }}
              animate={{ opacity: 1, height: 'auto', y: 0 }}
              exit={{ opacity: 0, height: 0, y: -10 }}
-             className="w-full bg-white px-8 pt-6 pb-8 rounded-[2rem] border border-ink/5 shadow-xl overflow-hidden"
+             className="w-full bg-white px-8 pt-6 pb-8 rounded-[2rem] border border-ink/5 shadow-xl overflow-hidden mb-8"
            >
              <div className="mb-6 pb-6 border-b border-ink/5 flex items-start justify-between mt-2">
                <div className="flex items-center gap-4">
@@ -537,14 +538,16 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        <section id="about" className="relative flex flex-col items-center justify-center pt-24 pb-4 overflow-hidden mb-12">
+        {/* 修改点 1：把外层容器的 pt-24 减到了 pt-8 */}
+        <section id="about" className="relative flex flex-col items-center justify-center pt-8 pb-4 overflow-hidden mb-12">
           <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
             
+            {/* 修改点 1：把图片的 mt-12 减到了 mt-4 */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-8 mt-12"
+              className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-8 mt-4"
             >
               <img 
                 src="/touxiang-1.png" 
@@ -599,12 +602,8 @@ export default function App() {
           <SectionHeader zh="个人经历" en="Experience" />
           
           <div className="w-full hidden md:block">
-            <div 
-              className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
-              onClick={() => setSelectedProject(null)} 
-            >
-              <ExperienceCurve items={desktopTimeline} />
-            </div>
+            {/* 修改点 2：将这个固定高度限制从外部移除了，让组件自己控制 */}
+            <ExperienceCurve items={desktopTimeline} />
           </div>
 
           <div className="md:hidden mt-8">
