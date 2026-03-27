@@ -115,14 +115,14 @@ const TimelineItem = ({ date, title, company, desc, details }: { date: string; t
   );
 };
 
-// --- 电脑端专用的交互曲线上升坐标轴组件 ---
+// --- 电脑端专用的手绘风交互曲线组件 ---
 const ExperienceCurve = ({ items }: { items: any[] }) => {
-  const [activeIndex, setActiveIndex] = useState(items.length - 1); // 默认选中最新的经历
+  const [activeIndex, setActiveIndex] = useState<number | null>(items.length - 1); 
 
-  // 计算贝塞尔曲线以形成向右上方延伸的上升轨迹 (ViewBox 0 0 100 100)
-  const P0 = { x: 5, y: 80 };  // 左下角起点
-  const P1 = { x: 45, y: 75 }; // 控制点：让前半段平缓
-  const P2 = { x: 95, y: 15 }; // 右上角终点
+  // 计算贝塞尔曲线，形成平滑的上升轨迹
+  const P0 = { x: 5, y: 85 };
+  const P1 = { x: 50, y: 80 };
+  const P2 = { x: 95, y: 20 };
 
   const getBezierPoint = (t: number) => {
     const x = Math.pow(1 - t, 2) * P0.x + 2 * (1 - t) * t * P1.x + Math.pow(t, 2) * P2.x;
@@ -135,68 +135,82 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
 
   return (
     <div className="w-full hidden md:block">
-      {/* 坐标轴绘图区域 */}
-      <div className="relative w-full h-[420px] mb-8 bg-white rounded-[2rem] border border-ink/5 shadow-sm p-8 overflow-hidden">
-        
-        <div className="relative w-full h-full mt-8">
-          {/* 底部横向时间轴基准线 */}
-          <div className="absolute bottom-[10%] left-0 right-0 h-px bg-rust/10 flex items-center justify-end">
-            <div className="w-2 h-2 border-t border-r border-rust/30 rotate-45 translate-x-1" />
-            <span className="absolute -bottom-6 right-0 text-[10px] font-bold text-ink/30 tracking-widest">时间轴 / 经历增长轨迹</span>
-          </div>
-
-          {/* 绘制上升曲线 */}
+      {/* 坐标轴区域，点击空白处收起详情 */}
+      <div 
+        className="relative w-full h-[400px] mb-8 bg-white rounded-[2rem] border border-ink/5 shadow-sm p-8 overflow-hidden cursor-default transition-all"
+        onClick={() => setActiveIndex(null)}
+      >
+        <div className="relative w-full h-full mt-4">
+          
+          {/* 上升曲线绘制 */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
-            <defs>
-              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(179,58,45,0.4)" />
-              </marker>
-            </defs>
             <path 
               d={`M ${P0.x} ${P0.y} Q ${P1.x} ${P1.y} ${P2.x} ${P2.y}`} 
               fill="none" 
-              stroke="rgba(179,58,45,0.2)" 
-              strokeWidth="0.3" 
-              markerEnd="url(#arrow)" 
+              stroke="rgba(179,58,45,0.25)" 
+              strokeWidth="0.4" 
             />
           </svg>
 
-          {/* 渲染坐标点和标签 */}
+          {/* 渲染坐标节点 */}
           {points.map((pt, i) => {
             const item = items[i];
             const isActive = activeIndex === i;
+            
+            // 解析公司名称（实现：英文-中文-职位 三行）
+            const companyParts = item.company.split(' ');
+            const hasEn = companyParts.length > 1;
+            const enStr = hasEn ? companyParts[0] : '';
+            const zhStr = hasEn ? companyParts.slice(1).join(' ') : item.company;
+            
+            const isEdu = item.type === 'Education';
+            // 颜色与 Icon 逻辑：工作为红不带Icon，教育为黑带Icon
+            const colorClass = isEdu ? 'text-ink' : 'text-rust';
+            const dotBorderClass = isEdu ? 'border-ink' : 'border-rust';
+            const dotBgClass = isEdu ? 'rgba(31,35,41,1)' : 'rgba(179,58,45,1)'; 
+            const dotGlowClass = isEdu ? 'rgba(31,35,41,0.1)' : 'rgba(179,58,45,0.1)';
+
             return (
               <div 
                 key={i} 
-                className="absolute z-10 flex flex-col items-center justify-center cursor-pointer group"
+                className="absolute z-10 flex flex-col items-center justify-center group"
                 style={{ left: `${pt.x}%`, top: `${pt.y}%`, transform: 'translate(-50%, -50%)' }}
-                onClick={() => setActiveIndex(i)}
               >
-                {/* 节点上方信息 (公司/岗位) */}
-                <div className={`absolute bottom-full mb-3 flex flex-col items-center whitespace-nowrap transition-all ${isActive ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:-translate-y-1'}`}>
-                  <span className="text-[10px] font-bold text-rust/80 uppercase tracking-widest mb-1 flex items-center gap-1">
-                    {item.type === 'Education' ? <GraduationCap size={10}/> : <Briefcase size={10}/>} {item.company}
+                {/* 节点上方信息：三行错落展示 */}
+                <div 
+                  className={`absolute bottom-full mb-3.5 flex flex-col items-center whitespace-nowrap transition-all duration-300 pointer-events-none ${isActive ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:-translate-y-1'}`}
+                >
+                  {/* 第一行：英文 + Icon（仅学校）*/}
+                  {(enStr || isEdu) && (
+                    <span className={`text-[10px] font-bold ${colorClass}/60 uppercase tracking-widest flex items-center gap-1 mb-1`}>
+                      {isEdu && <GraduationCap size={12}/>}
+                      {enStr}
+                    </span>
+                  )}
+                  
+                  {/* 第二行：中文公司/学校名 (最大字号，最突出) */}
+                  <span className={`text-lg font-black ${colorClass} tracking-tight leading-none mb-1.5 flex items-center gap-1`}>
+                    {(!enStr && isEdu) && <GraduationCap size={16} className="mr-1"/>}
+                    {zhStr}
                   </span>
-                  <span className="text-sm font-black text-ink">{item.title}</span>
+                  
+                  {/* 第三行：职位 */}
+                  <span className="text-sm font-bold text-ink/70 leading-none">
+                    {item.title}
+                  </span>
                 </div>
 
-                {/* 核心节点圆点 */}
+                {/* 核心节点圆点，点击折叠/展开 */}
                 <motion.div 
-                  animate={isActive ? { scale: 1.5, backgroundColor: "rgba(179,58,45,1)" } : { scale: 1, backgroundColor: "rgba(255,255,255,1)" }}
-                  className={`w-3 h-3 rounded-full border-[3px] transition-colors z-20 relative ${isActive ? 'border-rust/20' : 'border-rust/60'}`}
-                  style={isActive ? { boxShadow: "0 0 0 8px rgba(179,58,45,0.1)" } : {}}
-                >
-                  {/* Hover 提示气泡 */}
-                  {!isActive && (
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-rust/0 group-hover:bg-rust/10 transition-colors flex items-center justify-center pointer-events-none">
-                      <span className="absolute top-full mt-4 text-[9px] bg-rust text-white px-2 py-0.5 rounded shadow-lg opacity-0 group-hover:opacity-100 whitespace-nowrap">点击了解</span>
-                    </div>
-                  )}
-                </motion.div>
+                  onClick={(e) => { e.stopPropagation(); setActiveIndex(activeIndex === i ? null : i); }}
+                  animate={isActive ? { scale: 1.4, backgroundColor: dotBgClass } : { scale: 1, backgroundColor: "rgba(255,255,255,1)" }}
+                  className={`w-3.5 h-3.5 rounded-full border-[3px] transition-colors z-20 relative cursor-pointer hover:scale-125 ${isActive ? 'border-transparent' : `${dotBorderClass}/50`}`}
+                  style={isActive ? { boxShadow: `0 0 0 8px ${dotGlowClass}` } : {}}
+                />
 
-                {/* 节点下方信息 (时间) */}
-                <div className={`absolute top-full mt-3 flex flex-col items-center whitespace-nowrap transition-all ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>
-                  <span className="text-[10px] font-medium text-ink/60">{item.date}</span>
+                {/* 节点下方信息 (时间，加大字号) */}
+                <div className={`absolute top-full mt-3.5 flex flex-col items-center whitespace-nowrap transition-all pointer-events-none ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>
+                  <span className="text-[12px] font-bold text-ink/40 tracking-wide">{item.date}</span>
                 </div>
               </div>
             )
@@ -206,50 +220,47 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
 
       {/* 底部详细展示面板 (点击节点后横向展示模块) */}
       <AnimatePresence mode="wait">
-         <motion.div 
-           key={activeIndex}
-           initial={{ opacity: 0, y: 15 }}
-           animate={{ opacity: 1, y: 0 }}
-           exit={{ opacity: 0, y: -15 }}
-           className="w-full bg-white p-8 rounded-[2rem] border border-ink/5 shadow-xl"
-         >
-           {items[activeIndex] && (
-             <div>
-               <div className="mb-6 pb-6 border-b border-ink/5 flex items-start justify-between">
-                 <div className="flex items-center gap-4">
-                   <div className="w-12 h-12 rounded-2xl bg-rust/5 text-rust flex items-center justify-center">
-                     {items[activeIndex].type === 'Education' ? <GraduationCap size={24}/> : <Briefcase size={24}/>}
-                   </div>
-                   <div>
-                     <h3 className="text-xl font-black text-ink mb-1">{items[activeIndex].title} <span className="text-ink/20 mx-2">|</span> <span className="text-rust">{items[activeIndex].company}</span></h3>
-                     <p className="text-[13px] text-ink/60 font-medium max-w-2xl">{items[activeIndex].desc}</p>
-                   </div>
+         {activeIndex !== null && items[activeIndex] && (
+           <motion.div 
+             key={activeIndex}
+             initial={{ opacity: 0, height: 0, y: -10 }}
+             animate={{ opacity: 1, height: 'auto', y: 0 }}
+             exit={{ opacity: 0, height: 0, y: -10 }}
+             className="w-full bg-white px-8 pt-6 pb-8 rounded-[2rem] border border-ink/5 shadow-xl overflow-hidden"
+           >
+             <div className="mb-6 pb-6 border-b border-ink/5 flex items-start justify-between mt-2">
+               <div className="flex items-center gap-4">
+                 <div className="w-12 h-12 rounded-2xl bg-rust/5 text-rust flex items-center justify-center">
+                   {items[activeIndex].type === 'Education' ? <GraduationCap size={24}/> : <Briefcase size={24}/>}
                  </div>
-                 <span className="text-xs font-bold text-rust bg-rust/5 px-4 py-1.5 rounded-full border border-rust/10">{items[activeIndex].date}</span>
+                 <div>
+                   <h3 className="text-xl font-black text-ink mb-1">{items[activeIndex].title} <span className="text-ink/20 mx-2">|</span> <span className="text-rust">{items[activeIndex].company}</span></h3>
+                   <p className="text-[13px] text-ink/60 font-medium max-w-2xl">{items[activeIndex].desc}</p>
+                 </div>
                </div>
-               
-               {/* 动态渲染列模块 */}
-               {items[activeIndex].details && items[activeIndex].details.content ? (
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-[#F8F9FB] p-6 rounded-2xl border border-ink/5 shadow-sm">
-                      <h5 className="text-[11px] font-black uppercase tracking-widest text-ink/40 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-ink/20 rounded-full" /> 工作内容</h5>
-                      <ul className="space-y-3.5">{items[activeIndex].details.content?.map((item: string, i: number) => (<li key={i} className="text-xs text-ink/70 leading-relaxed relative pl-3"><span className="absolute left-0 top-1.5 w-1 h-1 bg-ink/20 rounded-full" />{item}</li>))}</ul>
-                    </div>
-                    <div className="bg-rust/[0.03] p-6 rounded-2xl border border-rust/10 shadow-sm">
-                      <h5 className="text-[11px] font-black uppercase tracking-widest text-rust/60 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-rust/40 rounded-full" /> 核心项目</h5>
-                      <ul className="space-y-3.5">{items[activeIndex].details.projects?.map((item: string, i: number) => (<li key={i} className="text-xs text-rust/80 leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-rust/40 rounded-full" />{item}</li>))}</ul>
-                    </div>
-                    <div className="bg-rust p-6 rounded-2xl shadow-lg">
-                      <h5 className="text-[11px] font-black uppercase tracking-widest text-white/80 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" /> 突出成果</h5>
-                      <ul className="space-y-3.5">{items[activeIndex].details.results?.map((item: string, i: number) => (<li key={i} className="text-xs text-white leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-white/50 rounded-full" /><span dangerouslySetInnerHTML={{ __html: item.replace(/(\d+[%+万亿]*)/g, '<strong class="text-white font-black text-sm bg-white/20 px-1 rounded mx-0.5">$1</strong>') }} /></li>))}</ul>
-                    </div>
-                 </div>
-               ) : (
-                 <div className="text-sm text-ink/40 py-8 text-center font-medium tracking-widest">目前暂无更多模块详情</div>
-               )}
+               <span className="text-xs font-bold text-rust bg-rust/5 px-4 py-1.5 rounded-full border border-rust/10">{items[activeIndex].date}</span>
              </div>
-           )}
-         </motion.div>
+             
+             {items[activeIndex].details && items[activeIndex].details.content ? (
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-[#F8F9FB] p-6 rounded-2xl border border-ink/5 shadow-sm">
+                    <h5 className="text-[11px] font-black uppercase tracking-widest text-ink/40 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-ink/20 rounded-full" /> 工作内容</h5>
+                    <ul className="space-y-3.5">{items[activeIndex].details.content?.map((item: string, i: number) => (<li key={i} className="text-xs text-ink/70 leading-relaxed relative pl-3"><span className="absolute left-0 top-1.5 w-1 h-1 bg-ink/20 rounded-full" />{item}</li>))}</ul>
+                  </div>
+                  <div className="bg-rust/[0.03] p-6 rounded-2xl border border-rust/10 shadow-sm">
+                    <h5 className="text-[11px] font-black uppercase tracking-widest text-rust/60 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-rust/40 rounded-full" /> 核心项目</h5>
+                    <ul className="space-y-3.5">{items[activeIndex].details.projects?.map((item: string, i: number) => (<li key={i} className="text-xs text-rust/80 leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-rust/40 rounded-full" />{item}</li>))}</ul>
+                  </div>
+                  <div className="bg-rust p-6 rounded-2xl shadow-lg">
+                    <h5 className="text-[11px] font-black uppercase tracking-widest text-white/80 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" /> 突出成果</h5>
+                    <ul className="space-y-3.5">{items[activeIndex].details.results?.map((item: string, i: number) => (<li key={i} className="text-xs text-white leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-white/50 rounded-full" /><span dangerouslySetInnerHTML={{ __html: item.replace(/(\d+[%+万亿]*)/g, '<strong class="text-white font-black text-sm bg-white/20 px-1 rounded mx-0.5">$1</strong>') }} /></li>))}</ul>
+                  </div>
+               </div>
+             ) : (
+               <div className="text-sm text-ink/40 py-8 text-center font-medium tracking-widest">目前暂无更多模块详情</div>
+             )}
+           </motion.div>
+         )}
       </AnimatePresence>
     </div>
   );
@@ -390,7 +401,6 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   );
 };
 
-// --- 保底数据 ---
 const FULL_FALLBACK = {
   skills: [
     { title: "平台增长运营经验", icon: TrendingUp, desc: <>3年内推动携程直播平台规模1000万增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>，6个月内推动视频号矩阵直播<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</> },
@@ -399,12 +409,11 @@ const FULL_FALLBACK = {
     { title: "复合运营背景与商业思维", icon: Rocket, desc: <>服务过多家互联网企业，参与初创企业运营，能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出内容营销策略和行业解决方案</strong>。</> }
   ],
   timeline: [
-    // 注意：这里的本科学历被我正式放进大数组里了，这样它才能成为时间轴曲线上的第一个圆点！
     { type: 'Education', date: "2012.09 - 2016.07", title: "工业设计", company: "嘉兴大学(本科)", desc: "2016级优秀毕业生。培养了深厚的用户体验设计基础与产品思维。" },
     { type: 'Work', date: "2016.09 - 2020.04", title: "产品运营", company: "Ele.me 饿了么", desc: "主导下沉市场智能调度系统覆盖率从30%提升至98%。", details: { content: ["负责下沉市场物流调度系统的产品运营","协调全国 1800 个城市代理商的系统落地","通过数据分析优化配送效率与成本控制"], projects: ["下沉市场智能调度系统覆盖提升项目","代理商降本增效专项行动"], results: ["系统覆盖率从 30% 提升至 98%","帮助全国代理商显著降低运营成本","配送效率提升 25% 以上"] } },
     { type: 'Work', date: "2020.05 - 2021.07", title: "产品运营", company: "Yitiao 一条", desc: "0-1艺术电商平台搭建。优化用户注册转化节点，将小程序注册率提升至80%。", details: { content: ["负责艺术电商平台的产品运营与用户增长","优化用户注册与交易转化路径","打通拍卖+直播的闭环交易链路"], projects: ["一条艺术品电商平台：小程序注册转化优化","拍卖+直播交易链路整合"], results: ["小程序注册率从 30% 提升至 80%","成功上线艺术品拍卖直播功能","显著提升高客单价商品转化效率"] } },
     { type: 'Work', date: "2021.07 - 2025.07", title: "运营经理", company: "Ctrip 携程", desc: "从0-1搭建携程商家直播生态体系，3年推动平台直播GMV从1000万增至10亿+。", details: { content: ["从 0 到 1 搭建商家直播生态体系","制定直播间运营标准与流量分发策略","负责直播业务的整体增长与商业化变现"], projects: ["携程直播青训营：孵化 0 基础团队","携程 AI 直播：真人+AI 24小时客服直播间"], results: ["3 年推动 GMV 从 1000 万增至 10 亿+","直播间转化率提升 70%+","孵化团队 1 个月直播 GMV 破百万"] } },
-    { type: 'Education', date: "2024.09 - 2027.03", title: "工商管理(MBA)", company: "复旦大学（硕士）", desc: "专注于商业领导力与创新管理。参与 Esade University 交换项目：Leading Innovation。" },
+    { type: 'Education', date: "2024.09 - 2027.03", title: "工商管理(MBA)", company: "复旦大学(硕士)", desc: "专注于商业领导力与创新管理。参与 Esade University 交换项目：Leading Innovation。" },
     { type: 'Work', date: "2025.10 - 至今", title: "企业顾问", company: "予童科技等", desc: "BP撰写与融资 / 线上培训课程体系搭建、婴幼儿家庭AI服务产品孵化" }
   ],
   projects: [
@@ -545,13 +554,13 @@ export default function App() {
               />
               <div className="absolute inset-0 bg-rust/10 rounded-full blur-[60px] pointer-events-none z-0" />
               
-              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] -left-[70%] md:-left-[90%]" />
-              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="top-[45%] -left-[80%] md:-left-[100%]" />
-              <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[80%] -left-[60%] md:-left-[80%]" />
+              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="-top-6 left-[-60%] md:-left-[90%]" />
+              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="top-[45%] left-[-50%] md:-left-[70%]" />
+              <BreathingTag text="10年运营经验 💼" delay={2.1} className="-bottom-6 left-[10%] md:left-[20%]" />
 
-              <BreathingTag text="AI工具重度用户 🛠️" delay={1.2} className="top-[15%] -right-[60%] md:-right-[80%]" />
-              <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[50%] -right-[70%] md:-right-[100%]" />
-              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="top-[85%] -right-[50%] md:-right-[70%]" />
+              <BreathingTag text="AI工具重度用户 🛠️" delay={1.2} className="-top-6 right-[-60%] md:-right-[90%]" />
+              <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[45%] right-[-50%] md:-right-[70%]" />
+              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="-bottom-6 right-[10%] md:right-[20%]" />
             </motion.div>
 
             <motion.h1 
@@ -587,14 +596,13 @@ export default function App() {
           </div>
         </section>
 
-        {/* --- 重构：基于手绘图的上升曲线个人经历体系 --- */}
+        {/* --- 重构：手绘风曲线上升个人经历架构 --- */}
         <section id="experience" className="mb-24">
           <SectionHeader zh="个人经历" en="Experience" />
           
-          {/* 1. 电脑宽屏版：上升曲线坐标轴 */}
           <ExperienceCurve items={sortedTimeline} />
 
-          {/* 2. 手机窄屏版：垂直时间轴 */}
+          {/* 手机端备用：垂直时间轴 */}
           <div className="md:hidden mt-8">
             <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-10 flex items-center gap-2"><Briefcase size={14} className="text-rust"/> 个人履历</h3>
             <div className="relative pl-2">
