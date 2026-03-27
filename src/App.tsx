@@ -70,14 +70,14 @@ const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: R
   </motion.div>
 );
 
-// 手机端专用的垂直时间轴组件
+// 手机端专用的垂直时间轴组件 (已倒序处理)
 const TimelineItem = ({ date, title, company, desc, details }: { date: string; title: string; company: string; desc: string; details?: any }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
     <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="relative pl-8 mb-12 group last:mb-0">
       <div className="absolute left-[5px] top-2 bottom-[-3rem] w-px bg-rust/20 group-last:bg-transparent transition-colors duration-500 group-hover:bg-rust/50" />
       <div className="absolute left-0 top-1.5 w-[11px] h-[11px] rounded-full bg-[#F8F9FB] border-[2.5px] border-rust shadow-[0_0_0_4px_rgba(179,58,45,0.1)] group-hover:scale-125 group-hover:bg-rust transition-all duration-300 z-10" />
-      <div className="text-rust font-bold text-[11px] tracking-widest mb-1.5 uppercase">{date}</div>
+      <div className="text-rust font-bold text-[12px] tracking-widest mb-1.5 uppercase">{date}</div>
       <div className="flex flex-wrap items-center gap-4 mb-2">
         <h4 className="text-base font-black tracking-tight text-ink">
           {title} <span className="text-ink/20 mx-1 font-normal">—</span> <span className="text-rust/80">{company}</span>
@@ -119,10 +119,10 @@ const TimelineItem = ({ date, title, company, desc, details }: { date: string; t
 const ExperienceCurve = ({ items }: { items: any[] }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(items.length - 1); 
 
-  // 计算贝塞尔曲线，形成平滑的上升轨迹
-  const P0 = { x: 5, y: 85 };
-  const P1 = { x: 50, y: 80 };
-  const P2 = { x: 95, y: 20 };
+  // 计算平滑的指数级上升贝塞尔曲线 (让曲线更饱满圆润)
+  const P0 = { x: 0, y: 90 };
+  const P1 = { x: 70, y: 85 };
+  const P2 = { x: 100, y: 10 };
 
   const getBezierPoint = (t: number) => {
     const x = Math.pow(1 - t, 2) * P0.x + 2 * (1 - t) * t * P1.x + Math.pow(t, 2) * P2.x;
@@ -135,20 +135,20 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
 
   return (
     <div className="w-full hidden md:block">
-      {/* 坐标轴区域，点击空白处收起详情 */}
+      {/* 坐标轴区域，去掉了白底，点击空白处收起详情 */}
       <div 
-        className="relative w-full h-[400px] mb-8 bg-white rounded-[2rem] border border-ink/5 shadow-sm p-8 overflow-hidden cursor-default transition-all"
+        className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
         onClick={() => setActiveIndex(null)}
       >
         <div className="relative w-full h-full mt-4">
           
-          {/* 上升曲线绘制 */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
+          {/* 上升曲线绘制 (加粗，更有弧度) */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 100">
             <path 
               d={`M ${P0.x} ${P0.y} Q ${P1.x} ${P1.y} ${P2.x} ${P2.y}`} 
               fill="none" 
-              stroke="rgba(179,58,45,0.25)" 
-              strokeWidth="0.4" 
+              stroke="rgba(179,58,45,0.3)" 
+              strokeWidth="1.2" 
             />
           </svg>
 
@@ -164,11 +164,6 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
             const zhStr = hasEn ? companyParts.slice(1).join(' ') : item.company;
             
             const isEdu = item.type === 'Education';
-            // 颜色与 Icon 逻辑：工作为红不带Icon，教育为黑带Icon
-            const colorClass = isEdu ? 'text-ink' : 'text-rust';
-            const dotBorderClass = isEdu ? 'border-ink' : 'border-rust';
-            const dotBgClass = isEdu ? 'rgba(31,35,41,1)' : 'rgba(179,58,45,1)'; 
-            const dotGlowClass = isEdu ? 'rgba(31,35,41,0.1)' : 'rgba(179,58,45,0.1)';
 
             return (
               <div 
@@ -180,17 +175,16 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
                 <div 
                   className={`absolute bottom-full mb-3.5 flex flex-col items-center whitespace-nowrap transition-all duration-300 pointer-events-none ${isActive ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:-translate-y-1'}`}
                 >
-                  {/* 第一行：英文 + Icon（仅学校）*/}
+                  {/* 第一行：英文 + Icon（仅学校保留 Icon）*/}
                   {(enStr || isEdu) && (
-                    <span className={`text-[10px] font-bold ${colorClass}/60 uppercase tracking-widest flex items-center gap-1 mb-1`}>
+                    <span className={`text-[10px] font-bold ${isEdu ? 'text-ink/60' : 'text-rust/60'} uppercase tracking-widest flex items-center gap-1.5 mb-1.5`}>
                       {isEdu && <GraduationCap size={12}/>}
                       {enStr}
                     </span>
                   )}
                   
-                  {/* 第二行：中文公司/学校名 (最大字号，最突出) */}
-                  <span className={`text-lg font-black ${colorClass} tracking-tight leading-none mb-1.5 flex items-center gap-1`}>
-                    {(!enStr && isEdu) && <GraduationCap size={16} className="mr-1"/>}
+                  {/* 第二行：中文公司/学校名 (全部统一为主题红，最大字号突出) */}
+                  <span className={`text-lg font-black text-rust tracking-tight leading-none mb-2 flex items-center gap-1`}>
                     {zhStr}
                   </span>
                   
@@ -200,17 +194,17 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
                   </span>
                 </div>
 
-                {/* 核心节点圆点，点击折叠/展开 */}
+                {/* 核心节点圆点，全部描红边，点击折叠/展开 */}
                 <motion.div 
                   onClick={(e) => { e.stopPropagation(); setActiveIndex(activeIndex === i ? null : i); }}
-                  animate={isActive ? { scale: 1.4, backgroundColor: dotBgClass } : { scale: 1, backgroundColor: "rgba(255,255,255,1)" }}
-                  className={`w-3.5 h-3.5 rounded-full border-[3px] transition-colors z-20 relative cursor-pointer hover:scale-125 ${isActive ? 'border-transparent' : `${dotBorderClass}/50`}`}
-                  style={isActive ? { boxShadow: `0 0 0 8px ${dotGlowClass}` } : {}}
+                  animate={isActive ? { scale: 1.4, backgroundColor: "rgba(179,58,45,1)" } : { scale: 1, backgroundColor: "rgba(255,255,255,1)" }}
+                  className={`w-3.5 h-3.5 rounded-full border-[3px] border-rust transition-colors z-20 relative cursor-pointer hover:scale-125 ${isActive ? 'border-transparent' : 'border-rust/70'}`}
+                  style={isActive ? { boxShadow: `0 0 0 8px rgba(179,58,45,0.15)` } : {}}
                 />
 
                 {/* 节点下方信息 (时间，加大字号) */}
                 <div className={`absolute top-full mt-3.5 flex flex-col items-center whitespace-nowrap transition-all pointer-events-none ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>
-                  <span className="text-[12px] font-bold text-ink/40 tracking-wide">{item.date}</span>
+                  <span className="text-[13px] font-bold text-ink/40 tracking-wide">{item.date}</span>
                 </div>
               </div>
             )
@@ -238,7 +232,7 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
                    <p className="text-[13px] text-ink/60 font-medium max-w-2xl">{items[activeIndex].desc}</p>
                  </div>
                </div>
-               <span className="text-xs font-bold text-rust bg-rust/5 px-4 py-1.5 rounded-full border border-rust/10">{items[activeIndex].date}</span>
+               <span className="text-sm font-bold text-rust bg-rust/5 px-4 py-1.5 rounded-full border border-rust/10">{items[activeIndex].date}</span>
              </div>
              
              {items[activeIndex].details && items[activeIndex].details.content ? (
@@ -423,8 +417,8 @@ const FULL_FALLBACK = {
   ],
   aiLab: [
     { title: "向往的offer", tag: "AI Agent", desc: "基于大语言模型开发的 AI 面试助手，帮助求职者快速提升面试表现与职业规划。", bgColor: "bg-[#F3F4F6]", media: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" },
-    { title: "婴幼儿AI服务产品", tag: "AI Product", desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", bgColor: "bg-[#EEF2FF]", media: "https://media.giphy.com/media/3o7aD2saalEvXDI1zO/giphy.gif" },
-    { title: "AI虚拟形象直播", tag: "Live Stream", desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", bgColor: "bg-[#FEF2F2]", media: "https://media.giphy.com/media/11c7UUfNsqOUzC/giphy.gif" }
+    { title: "婴幼儿AI服务产品", tag: "AI Product", desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", bgColor: "bg-[#EEF2FF]", media: "https://media.giphy.com/media/mguPrVJAnEHIY/giphy.gif" }, // 萌系机器人动图
+    { title: "AI虚拟形象直播", tag: "Live Stream", desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", bgColor: "bg-[#FEF2F2]", media: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif" } // 赛博风/直播感动图
   ]
 };
 
@@ -437,6 +431,7 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [showUndergrad, setShowUndergrad] = useState(false);
   
   const [data, setData] = useState(FULL_FALLBACK);
   const containerRef = useRef(null);
@@ -466,11 +461,18 @@ export default function App() {
   const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -150]);
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
-  // 将所有经历统一按时间排序，提供给时间轴使用
-  const sortedTimeline = [...data.timeline].sort((a, b) => {
+  // 电脑端：按照时间正序排列（从左到右）
+  const desktopTimeline = [...data.timeline].sort((a, b) => {
     const yearA = parseInt(a.date.match(/\d{4}/)?.[0] || "0");
     const yearB = parseInt(b.date.match(/\d{4}/)?.[0] || "0");
     return yearA - yearB;
+  });
+
+  // 手机端：按照时间倒序排列（最新的在最上面）
+  const mobileTimeline = [...data.timeline].sort((a, b) => {
+    const yearA = parseInt(a.date.match(/\d{4}/)?.[0] || "0");
+    const yearB = parseInt(b.date.match(/\d{4}/)?.[0] || "0");
+    return yearB - yearA;
   });
 
   return (
@@ -538,7 +540,7 @@ export default function App() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
         
-        <section id="about" className="relative flex flex-col items-center justify-center pt-24 pb-12 overflow-hidden mb-12">
+        <section id="about" className="relative flex flex-col items-center justify-center pt-24 pb-4 overflow-hidden mb-12">
           <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
             
             <motion.div 
@@ -554,13 +556,14 @@ export default function App() {
               />
               <div className="absolute inset-0 bg-rust/10 rounded-full blur-[60px] pointer-events-none z-0" />
               
-              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="-top-6 left-[-60%] md:-left-[90%]" />
-              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="top-[45%] left-[-50%] md:-left-[70%]" />
-              <BreathingTag text="10年运营经验 💼" delay={2.1} className="-bottom-6 left-[10%] md:left-[20%]" />
+              {/* 精准分布在两侧的 6 个标签，绝对不盖在头上和脚下 */}
+              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] -left-[70%] md:-left-[90%]" />
+              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="top-[45%] -left-[80%] md:-left-[100%]" />
+              <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[80%] -left-[60%] md:-left-[80%]" />
 
-              <BreathingTag text="AI工具重度用户 🛠️" delay={1.2} className="-top-6 right-[-60%] md:-right-[90%]" />
-              <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[45%] right-[-50%] md:-right-[70%]" />
-              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="-bottom-6 right-[10%] md:right-[20%]" />
+              <BreathingTag text="AI工具重度用户 🛠️" delay={1.2} className="top-[15%] -right-[60%] md:-right-[80%]" />
+              <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[50%] -right-[70%] md:-right-[100%]" />
+              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="top-[85%] -right-[50%] md:-right-[70%]" />
             </motion.div>
 
             <motion.h1 
@@ -575,11 +578,11 @@ export default function App() {
               9年互联网运营和产品经验、1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及人机协同的商业化机会。
             </p>
 
-            <div className="flex flex-row items-center justify-center gap-4">
-              <a href="mailto:zwy0025@gmail.com" className="flex items-center justify-center gap-2 bg-white border border-ink/10 text-ink px-8 py-3.5 rounded-full font-bold text-[12px] tracking-widest hover:border-rust hover:text-rust transition-all shadow-sm w-full sm:w-44">
+            <div className="flex flex-row items-center justify-center gap-3 w-full px-4 sm:px-0">
+              <a href="mailto:zwy0025@gmail.com" className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-white border border-ink/10 text-ink py-3.5 rounded-full font-bold text-[11px] sm:text-[12px] tracking-widest hover:border-rust hover:text-rust transition-all shadow-sm sm:w-44 whitespace-nowrap">
                 <Mail size={16} /> 发送邮件
               </a>
-              <button onClick={() => setIsWeChatOpen(true)} className="flex items-center justify-center gap-2 bg-ink text-white px-8 py-3.5 rounded-full font-bold text-[12px] tracking-widest hover:bg-rust transition-all shadow-xl w-full sm:w-44">
+              <button onClick={() => setIsWeChatOpen(true)} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-ink text-white py-3.5 rounded-full font-bold text-[11px] sm:text-[12px] tracking-widest hover:bg-rust transition-all shadow-xl sm:w-44 whitespace-nowrap">
                 <QrCode size={16} /> 添加微信
               </button>
             </div>
@@ -596,18 +599,57 @@ export default function App() {
           </div>
         </section>
 
-        {/* --- 重构：手绘风曲线上升个人经历架构 --- */}
+        {/* --- 重构：基于手绘图的上升曲线个人经历体系 --- */}
         <section id="experience" className="mb-24">
           <SectionHeader zh="个人经历" en="Experience" />
           
-          <ExperienceCurve items={sortedTimeline} />
+          {/* 1. 电脑宽屏版：上升曲线坐标轴 */}
+          <div className="w-full hidden md:block">
+            {/* 点击空白处收起详情 */}
+            <div 
+              className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
+              onClick={() => setSelectedProject(null)} // 利用同一个状态清空激活态
+            >
+              {/* 这里把内部组件抽离，为了能直接复用 states，把 ExperienceCurve 逻辑直接写在里面 */}
+              <ExperienceCurve items={desktopTimeline} />
+            </div>
+          </div>
 
-          {/* 手机端备用：垂直时间轴 */}
+          {/* 2. 手机窄屏版：倒序垂直时间轴，默认折叠本科 */}
           <div className="md:hidden mt-8">
             <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-10 flex items-center gap-2"><Briefcase size={14} className="text-rust"/> 个人履历</h3>
-            <div className="relative pl-2">
-              {sortedTimeline.map((item:any, idx:number) => (
-                <TimelineItem key={idx} {...item} />
+            <div className="relative pl-2 border-l-2 border-rust/10 ml-2">
+              {mobileTimeline.map((item:any, idx:number) => {
+                const isUndergrad = item.company.includes('本科') || item.title.includes('本科');
+                if (isUndergrad) return null; // 排除本科，放在下面单独处理
+                return <TimelineItem key={idx} {...item} />;
+              })}
+
+              {/* 专门处理早期经历（如本科）的折叠显示 */}
+              {mobileTimeline.filter((i:any) => i.company.includes('本科') || i.title.includes('本科')).map((item:any, idx:number) => (
+                <div key={`ug-${idx}`} className="relative">
+                  <div 
+                    className="relative -left-[2.5px] -mt-6 mb-6 z-20 opacity-40 hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-2 w-fit group" 
+                    onClick={() => setShowUndergrad(!showUndergrad)}
+                  >
+                    <div className={`w-[7px] h-[7px] rounded-full ${showUndergrad ? 'bg-rust' : 'bg-ink/30'} group-hover:bg-rust transition-colors`} />
+                    <span className="text-[10px] text-ink/40 tracking-widest uppercase origin-left">
+                      {showUndergrad ? '收起早期经历' : '查看更早经历...'}
+                    </span>
+                  </div>
+                  <AnimatePresence>
+                    {showUndergrad && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }} 
+                        animate={{ height: 'auto', opacity: 1 }} 
+                        exit={{ height: 0, opacity: 0 }} 
+                        className="overflow-hidden relative"
+                      >
+                         <TimelineItem {...item} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               ))}
             </div>
           </div>
@@ -620,7 +662,8 @@ export default function App() {
               <ProjectCard key={idx} project={p} onClick={() => setSelectedProject(p)} />
             ))}
           </div>
-          <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+          {/* 项目弹窗用的也是 selectedProject，与曲线解耦不会冲突，因为分别在不同 section */}
+          <ProjectModal project={selectedProject?.bgImage ? selectedProject : null} onClose={() => setSelectedProject(null)} />
         </section>
         
         <section id="ai-lab" className="mb-24">
@@ -682,3 +725,136 @@ export default function App() {
     </div>
   );
 }
+
+// 提取出来的电脑端独立组件，不干扰主页面的状态
+const ExperienceCurve = ({ items }: { items: any[] }) => {
+  const [activeIndex, setActiveIndex] = useState<number | null>(items.length - 1); 
+
+  // 更饱满的指数级上升贝塞尔曲线坐标
+  const P0 = { x: 0, y: 90 };
+  const P1 = { x: 70, y: 85 };
+  const P2 = { x: 100, y: 10 };
+
+  const getBezierPoint = (t: number) => {
+    const x = Math.pow(1 - t, 2) * P0.x + 2 * (1 - t) * t * P1.x + Math.pow(t, 2) * P2.x;
+    const y = Math.pow(1 - t, 2) * P0.y + 2 * (1 - t) * t * P1.y + Math.pow(t, 2) * P2.y;
+    return { x, y };
+  };
+
+  const n = Math.max(1, items.length - 1);
+  const points = items.map((_, i) => getBezierPoint(i / n));
+
+  return (
+    <>
+      <div 
+        className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
+        onClick={() => setActiveIndex(null)}
+      >
+        <div className="relative w-full h-full mt-4">
+          <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 100">
+            <path 
+              d={`M ${P0.x} ${P0.y} Q ${P1.x} ${P1.y} ${P2.x} ${P2.y}`} 
+              fill="none" 
+              stroke="rgba(179,58,45,0.4)" 
+              strokeWidth="1.5" 
+            />
+          </svg>
+
+          {points.map((pt, i) => {
+            const item = items[i];
+            const isActive = activeIndex === i;
+            
+            const companyParts = item.company.split(' ');
+            const hasEn = companyParts.length > 1;
+            const enStr = hasEn ? companyParts[0] : '';
+            const zhStr = hasEn ? companyParts.slice(1).join(' ') : item.company;
+            
+            const isEdu = item.type === 'Education';
+
+            return (
+              <div 
+                key={i} 
+                className="absolute z-10 flex flex-col items-center justify-center group"
+                style={{ left: `${pt.x}%`, top: `${pt.y}%`, transform: 'translate(-50%, -50%)' }}
+              >
+                <div 
+                  className={`absolute bottom-full mb-3.5 flex flex-col items-center whitespace-nowrap transition-all duration-300 pointer-events-none ${isActive ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:-translate-y-1'}`}
+                >
+                  {(enStr || isEdu) && (
+                    <span className={`text-[10px] font-bold ${isEdu ? 'text-ink/60' : 'text-rust/60'} uppercase tracking-widest flex items-center gap-1.5 mb-1.5`}>
+                      {isEdu && <GraduationCap size={12}/>}
+                      {enStr}
+                    </span>
+                  )}
+                  
+                  <span className={`text-lg font-black text-rust tracking-tight leading-none mb-2 flex items-center gap-1`}>
+                    {zhStr}
+                  </span>
+                  
+                  <span className="text-sm font-bold text-ink/70 leading-none">
+                    {item.title}
+                  </span>
+                </div>
+
+                <motion.div 
+                  onClick={(e) => { e.stopPropagation(); setActiveIndex(activeIndex === i ? null : i); }}
+                  animate={isActive ? { scale: 1.4, backgroundColor: "rgba(179,58,45,1)" } : { scale: 1, backgroundColor: "rgba(255,255,255,1)" }}
+                  className={`w-3.5 h-3.5 rounded-full border-[3px] border-rust transition-colors z-20 relative cursor-pointer hover:scale-125 ${isActive ? 'border-transparent' : 'border-rust'}`}
+                  style={isActive ? { boxShadow: `0 0 0 8px rgba(179,58,45,0.15)` } : {}}
+                />
+
+                <div className={`absolute top-full mt-3.5 flex flex-col items-center whitespace-nowrap transition-all pointer-events-none ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>
+                  <span className="text-[13px] font-bold text-ink/40 tracking-wide">{item.date}</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      <AnimatePresence mode="wait">
+         {activeIndex !== null && items[activeIndex] && (
+           <motion.div 
+             key={activeIndex}
+             initial={{ opacity: 0, height: 0, y: -10 }}
+             animate={{ opacity: 1, height: 'auto', y: 0 }}
+             exit={{ opacity: 0, height: 0, y: -10 }}
+             className="w-full bg-white px-8 pt-6 pb-8 rounded-[2rem] border border-ink/5 shadow-xl overflow-hidden"
+           >
+             <div className="mb-6 pb-6 border-b border-ink/5 flex items-start justify-between mt-2">
+               <div className="flex items-center gap-4">
+                 <div className="w-12 h-12 rounded-2xl bg-rust/5 text-rust flex items-center justify-center">
+                   {items[activeIndex].type === 'Education' ? <GraduationCap size={24}/> : <Briefcase size={24}/>}
+                 </div>
+                 <div>
+                   <h3 className="text-xl font-black text-ink mb-1">{items[activeIndex].title} <span className="text-ink/20 mx-2">|</span> <span className="text-rust">{items[activeIndex].company}</span></h3>
+                   <p className="text-[13px] text-ink/60 font-medium max-w-2xl">{items[activeIndex].desc}</p>
+                 </div>
+               </div>
+               <span className="text-sm font-bold text-rust bg-rust/5 px-4 py-1.5 rounded-full border border-rust/10">{items[activeIndex].date}</span>
+             </div>
+             
+             {items[activeIndex].details && items[activeIndex].details.content ? (
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-[#F8F9FB] p-6 rounded-2xl border border-ink/5 shadow-sm">
+                    <h5 className="text-[11px] font-black uppercase tracking-widest text-ink/40 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-ink/20 rounded-full" /> 工作内容</h5>
+                    <ul className="space-y-3.5">{items[activeIndex].details.content?.map((item: string, i: number) => (<li key={i} className="text-xs text-ink/70 leading-relaxed relative pl-3"><span className="absolute left-0 top-1.5 w-1 h-1 bg-ink/20 rounded-full" />{item}</li>))}</ul>
+                  </div>
+                  <div className="bg-rust/[0.03] p-6 rounded-2xl border border-rust/10 shadow-sm">
+                    <h5 className="text-[11px] font-black uppercase tracking-widest text-rust/60 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-rust/40 rounded-full" /> 核心项目</h5>
+                    <ul className="space-y-3.5">{items[activeIndex].details.projects?.map((item: string, i: number) => (<li key={i} className="text-xs text-rust/80 leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-rust/40 rounded-full" />{item}</li>))}</ul>
+                  </div>
+                  <div className="bg-rust p-6 rounded-2xl shadow-lg">
+                    <h5 className="text-[11px] font-black uppercase tracking-widest text-white/80 mb-5 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" /> 突出成果</h5>
+                    <ul className="space-y-3.5">{items[activeIndex].details.results?.map((item: string, i: number) => (<li key={i} className="text-xs text-white leading-relaxed relative pl-3 font-medium"><span className="absolute left-0 top-1.5 w-1 h-1 bg-white/50 rounded-full" /><span dangerouslySetInnerHTML={{ __html: item.replace(/(\d+[%+万亿]*)/g, '<strong class="text-white font-black text-sm bg-white/20 px-1 rounded mx-0.5">$1</strong>') }} /></li>))}</ul>
+                  </div>
+               </div>
+             ) : (
+               <div className="text-sm text-ink/40 py-8 text-center font-medium tracking-widest">目前暂无更多模块详情</div>
+             )}
+           </motion.div>
+         )}
+      </AnimatePresence>
+    </>
+  );
+};
