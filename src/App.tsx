@@ -59,12 +59,18 @@ const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: R
     <div className="absolute -bottom-6 -right-6 text-rust opacity-[0.04] pointer-events-none group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500">
       <Icon size={140} strokeWidth={1.5} />
     </div>
-    <div className="mb-4 text-rust flex items-center justify-between opacity-90 relative z-10">
-      <Icon size={24} strokeWidth={2} />
-      <div className="w-8 h-1 bg-rust/10 rounded-full" />
+    
+    {/* 顶部区域：左侧是 Icon + 标题，右侧是装饰小横线 */}
+    <div className="mb-4 flex items-center justify-between opacity-90 relative z-10">
+      <div className="flex items-center gap-3 text-rust">
+        <Icon size={24} strokeWidth={2} />
+        <h3 className="font-black text-base tracking-tight m-0">{title}</h3>
+      </div>
+      <div className="w-8 h-1 bg-rust/10 rounded-full flex-shrink-0" />
     </div>
-    <h3 className="font-black text-base text-rust tracking-tight relative z-10 mb-3">{title}</h3>
-    <div className="text-xs text-ink/60 leading-relaxed font-medium relative z-10">
+    
+    {/* 描述文本内容 */}
+    <div className="text-xs text-ink/60 leading-relaxed font-medium relative z-10 mt-1">
       {dataDesc}
     </div>
   </motion.div>
