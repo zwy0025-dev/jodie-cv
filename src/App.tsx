@@ -408,7 +408,7 @@ const FULL_FALLBACK = {
       desc: <>服务过多家互联网企业，参与初创企业运营，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长业务痛点诊断和赋能</strong>。</> 
     },
     { 
-      title: "0-1项目落地能力", 
+      title: "项目落地能力", 
       icon: Lightbulb, 
       desc: <><strong className="text-ink font-bold">多次0-1项目孵化与落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→<strong className="text-ink font-bold">规模化增长的全链路操盘能力</strong>，喜欢挑战、能为结果负责。</> 
     },
