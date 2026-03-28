@@ -391,10 +391,26 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
 // 这里的 content 数组现在支持 "模块标题：详细内容" 格式，页面组件会自动解析并高亮展示
 const FULL_FALLBACK = {
   skills: [
-    { title: "平台增长运营经验", icon: TrendingUp, desc: <>3年内推动携程直播平台规模1000万增至<strong className="text-rust font-black text-sm mx-0.5">10亿+</strong>，6个月内推动视频号矩阵直播<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</> },
-    { title: "中后台产品运营", icon: Cpu, desc: <>复杂系统推广培训经验，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长跨部门协同与商务谈判、资源整合</strong>。</> },
-    { title: "业务赋能与项目落地经验", icon: Lightbulb, desc: <><strong className="text-ink font-bold">多次0-1项目落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→规模化增长的全链路操盘能力，擅长业务痛点诊断和赋能</> },
-    { title: "复合运营背景与商业思维", icon: Rocket, desc: <>服务过多家互联网企业，参与初创企业运营，能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出内容营销策略和行业解决方案</strong>。</> }
+   { 
+      title: "增长运营经验", 
+      icon: TrendingUp, 
+      desc: <>能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出营销和增长策略</strong>，3年内推动携程直播平台规模<strong className="text-rust font-black text-sm mx-0.5">1000万增至10亿+</strong>，6个月内推动视频号矩阵直播GMV实现<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</> 
+    },
+    { 
+      title: "产品思维", 
+      icon: Cpu, 
+      desc: <>服务过多家互联网企业，参与初创企业运营，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长业务痛点诊断和赋能</strong>。</> 
+    },
+    { 
+      title: "0-1项目落地能力", 
+      icon: Lightbulb, 
+      desc: <><strong className="text-ink font-bold">多次0-1项目孵化与落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→<strong className="text-ink font-bold">规模化增长的全链路操盘能力</strong>，喜欢挑战、能为结果负责。</> 
+    },
+    { 
+      title: "业务培训赋能", 
+      icon: Rocket, 
+      desc: <><strong className="text-ink font-bold">擅长SOP标准制定和培训体系搭建</strong>，能够把经验、工具等抽象的场景“翻译”成用户语言，<strong className="text-ink font-bold">可胜任台前幕后多重角色</strong>。</> 
+    }
   ],
   timeline: [
     { type: 'Education', date: "2012.09 - 2016.07", title: "工业设计", company: "嘉兴大学(本科)", desc: "2016级优秀毕业生。培养了深厚的用户体验设计基础与产品思维。" },
