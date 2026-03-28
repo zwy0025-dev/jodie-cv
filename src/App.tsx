@@ -120,7 +120,7 @@ const ExperienceDetailPanel = ({ item }: { item: any }) => (
     {item.details && item.details.content && item.details.content.length > 0 ? (
       <div className="bg-[#F8F9FB] p-6 md:p-8 rounded-2xl border border-ink/5 shadow-sm">
         <h5 className="text-[11px] md:text-xs font-black uppercase tracking-widest text-rust mb-6 flex items-center gap-2">
-          <Briefcase size={14} /> 核心工作与成果拆解
+          <Briefcase size={14} /> 核心工作与成果
         </h5>
         <div className="space-y-6">
           {item.details.content.map((detailText: string, i: number) => (
@@ -344,9 +344,8 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   const [selectedQ, setSelectedQ] = useState<number | null>(null);
   const [typingText, setTypingText] = useState("");
   const faqs = [
-    { q: "离职原因", a: "寻求更广阔的 AI 应用落地场景，将 9 年运营经验与 AIGC 技术深度结合，创造指数级增长。" },
-    { q: "求职期望", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的合作方案，薪资可面议。" },
-    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" }
+    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" },
+    { q: "职业发展", a: "基于行业标准与岗位价值，期待一份能体现商业价值与创业精神的合作方案，薪资可面议。" },
   ];
 
   useEffect(() => {
