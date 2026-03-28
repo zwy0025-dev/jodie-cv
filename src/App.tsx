@@ -394,7 +394,7 @@ const FULL_FALLBACK = {
    { 
       title: "增长运营经验", 
       icon: TrendingUp, 
-      desc: <>能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出营销和增长策略</strong>，3年内推动携程直播平台规模<strong className="text-rust font-black text-sm mx-0.5">1000万增至10亿+</strong>，6个月内推动视频号矩阵直播GMV实现<strong className="text-rust font-black text-sm mx-0.5">0-4000万</strong>。</> 
+      desc: <>能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出营销和增长策略</strong>，3年内推动携程直播平台规模<strong className="text-rust font-black mx-0.5">1000万增至10亿+</strong>，6个月内推动视频号矩阵直播GMV实现<strong className="text-rust font-black mx-0.5">0-4000万</strong>。</> 
     },
     { 
       title: "产品思维", 
@@ -409,7 +409,7 @@ const FULL_FALLBACK = {
     { 
       title: "业务培训赋能", 
       icon: Rocket, 
-      desc: <><strong className="text-ink font-bold">擅长SOP标准制定和培训体系搭建</strong>，能够把经验、工具等抽象的场景“翻译”成用户语言，<strong className="text-ink font-bold">可胜任台前幕后多重角色</strong>。</> 
+      desc: <><strong className="text-ink font-bold">擅长提炼业务SOP与沉淀知识库</strong>。能将复杂的工具与经验转化为“用户语言”，<strong className="text-ink font-bold">具备培训体系搭建与培训赋能的能力</strong>。</> 
     }
   ],
   timeline: [
