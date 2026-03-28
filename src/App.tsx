@@ -403,7 +403,7 @@ const FULL_FALLBACK = {
       desc: <>能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出营销和增长策略</strong>，3年内推动携程直播平台规模<strong className="text-rust font-black mx-0.5">1000万增至10亿+</strong>，6个月内推动视频号矩阵直播GMV实现<strong className="text-rust font-black mx-0.5">0-4000万</strong>。</> 
     },
     { 
-      title: "产品思维", 
+      title: "产品运营思维", 
       icon: Cpu, 
       desc: <>服务过多家互联网企业，参与初创企业运营，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长业务痛点诊断和赋能</strong>。</> 
     },
