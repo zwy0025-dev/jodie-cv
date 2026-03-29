@@ -405,17 +405,17 @@ const FULL_FALLBACK = {
     { 
       title: "产品运营思维", 
       icon: Cpu, 
-      desc: <>服务过多家互联网企业，参与初创企业运营，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长业务痛点诊断和赋能</strong>。</> 
+      desc: <>服务过多家互联网企业，参与初创企业运营，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长业务痛点诊断和产品工具赋能</strong>。</> 
     },
     { 
       title: "项目落地能力", 
       icon: Lightbulb, 
-      desc: <><strong className="text-ink font-bold">多次0-1项目孵化与落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→<strong className="text-ink font-bold">规模化增长的全链路操盘能力</strong>，喜欢挑战、能为结果负责。</> 
+      desc: <><strong className="text-ink font-bold">多次0-1项目孵化与落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→<strong className="text-ink font-bold">规模化增长的全链路操盘能力</strong>，喜欢挑战、解决复杂问题、能为结果负责。</> 
     },
     { 
       title: "业务培训赋能", 
       icon: Rocket, 
-      desc: <><strong className="text-ink font-bold">擅长提炼业务SOP与沉淀知识库</strong>。能将复杂的工具与经验转化为“用户语言”，<strong className="text-ink font-bold">具备培训体系搭建与培训赋能的能力</strong>。</> 
+      desc: <><strong className="text-ink font-bold">具备复合运营背景与商业思维</strong>。能将复杂的工具与经验转化为“用户语言”，<strong className="text-ink font-bold">擅长提炼业务SOP与沉淀知识库，具备培训体系搭建与培训赋能的能力</strong>。</> 
     }
   ],
   timeline: [
