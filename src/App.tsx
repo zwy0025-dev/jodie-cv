@@ -54,13 +54,63 @@ const BreathingTag = ({ text, delay, className }: { text: string, delay: number,
   </motion.div>
 );
 
+// --- 改动 1：升级 AILabCard 组件，使其支持点击跳转 ---
+const AILabCard = ({ title, tag, desc, bgColor, mockup, link }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode, link?: string }) => {
+  
+  // 定义卡片的共同内容
+  const cardContent = (
+    <>
+      {/* 顶部悬浮 Mockup (GIF) */}
+      <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">{mockup}</div>
+      
+      {/* 文本内容区域 */}
+      <div className="z-10 relative max-w-[65%]">
+        <span className="text-[9px] font-black uppercase tracking-widest text-ink/50 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-3 inline-block">{tag}</span>
+        <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight flex items-center gap-2">
+          {title}
+          {/* 如果有链接，显示一个跳转小图标 */}
+          {link && <ArrowUpRight size={14} className="text-ink/30 group-hover:text-rust transition-colors" />}
+        </h3>
+        <p className="text-xs text-ink/60 leading-relaxed font-medium line-clamp-3 mb-1">{desc}</p>
+        
+        {/* 如果有链接，显示点击提示 */}
+        {link && <span className="text-[9px] text-rust font-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">点击测试 &rarr;</span>}
+      </div>
+    </>
+  );
+
+  // 基础样式
+  const baseClassName = `${bgColor} rounded-[2rem] p-6 flex flex-col min-h-[180px] relative group border border-ink/5 shadow-sm hover:shadow-xl transition-all mt-8 md:mt-10 overflow-hidden`;
+
+  // 根据是否有链接，决定渲染为 <a> 标签还是 <div> 标签
+  if (link) {
+    return (
+      <motion.a 
+        href={link}
+        target="_blank" // 新窗口打开
+        rel="noopener noreferrer" // 安全属性
+        whileHover={{ y: -8, scale: 1.02 }}
+        className={`${baseClassName} cursor-pointer block`}
+      >
+        {cardContent}
+      </motion.a>
+    );
+  }
+
+  // 没有链接时，保持为普通 div
+  return (
+    <motion.div whileHover={{ y: -5 }} className={baseClassName}>
+      {cardContent}
+    </motion.div>
+  );
+};
+
 const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: React.ReactNode, icon: any }) => (
   <motion.div whileHover={{ y: -5 }} className="bg-white p-6 rounded-2xl shadow-sm border border-ink/5 hover:shadow-xl transition-all flex flex-col relative overflow-hidden h-full group">
     <div className="absolute -bottom-6 -right-6 text-rust opacity-[0.04] pointer-events-none group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500">
       <Icon size={140} strokeWidth={1.5} />
     </div>
     
-    {/* 顶部区域：左侧是 Icon + 标题，右侧是装饰小横线 */}
     <div className="mb-4 flex items-center justify-between opacity-90 relative z-10">
       <div className="flex items-center gap-3 text-rust">
         <Icon size={24} strokeWidth={2} />
@@ -69,27 +119,20 @@ const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: R
       <div className="w-8 h-1 bg-rust/10 rounded-full flex-shrink-0" />
     </div>
     
-    {/* 描述文本内容 */}
     <div className="text-xs text-ink/60 leading-relaxed font-medium relative z-10 mt-1">
       {dataDesc}
     </div>
   </motion.div>
 );
 
-// --- 提取高亮渲染函数 (支持冒号分割与数字/符号高亮) ---
+// --- 统一的经历详情展开面板组件 ---
 const HighlightedText = ({ text }: { text: string }) => {
-  // 1. 根据中文冒号分割标题和内容
   const parts = text.split('：');
   const title = parts.length > 1 ? parts[0] : '';
   const content = parts.length > 1 ? parts.slice(1).join('：') : text;
-
-  // 2. 替换数据和符号为高亮 HTML
   let formattedContent = content
-    // 高亮数据 (数字+百分号/万/亿/+)
     .replace(/(\d+[\.\d]*[%+万亿]*)/g, '<strong class="text-rust font-black text-[13px] md:text-[14px] bg-rust/5 px-1 rounded mx-0.5">$1</strong>')
-    // 高亮「」内的内容
     .replace(/「(.*?)」/g, '<strong class="text-ink font-bold px-0.5">「$1」</strong>');
-
   return (
     <div className="text-[13px] md:text-[14px] text-ink/75 leading-relaxed">
       {title && <strong className="text-ink font-black mr-1 text-[14px] md:text-[15px] block mb-1">{title}：</strong>}
@@ -98,7 +141,6 @@ const HighlightedText = ({ text }: { text: string }) => {
   );
 };
 
-// --- 统一的经历详情展开面板组件 ---
 const ExperienceDetailPanel = ({ item }: { item: any }) => (
   <motion.div 
     initial={{ opacity: 0, height: 0, y: -10 }}
@@ -122,11 +164,10 @@ const ExperienceDetailPanel = ({ item }: { item: any }) => (
         {item.date}
       </span>
     </div>
-    
     {item.details && item.details.content && item.details.content.length > 0 ? (
       <div className="bg-[#F8F9FB] p-6 md:p-8 rounded-2xl border border-ink/5 shadow-sm">
         <h5 className="text-[11px] md:text-xs font-black uppercase tracking-widest text-rust mb-6 flex items-center gap-2">
-          <Briefcase size={14} /> 核心工作与成果
+          <Briefcase size={14} /> 核心工作与成果拆解
         </h5>
         <div className="space-y-6">
           {item.details.content.map((detailText: string, i: number) => (
@@ -137,9 +178,7 @@ const ExperienceDetailPanel = ({ item }: { item: any }) => (
           ))}
         </div>
       </div>
-    ) : (
-      <div className="text-sm text-ink/40 py-8 text-center font-medium tracking-widest">目前暂无更多详情模块</div>
-    )}
+    ) : null}
   </motion.div>
 );
 
@@ -173,74 +212,39 @@ const TimelineItem = ({ item }: { item: any }) => {
 // --- 电脑端专用的手绘风交互曲线组件 ---
 const ExperienceCurve = ({ items }: { items: any[] }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(items.length - 1); 
-
   const P0 = { x: 0, y: 90 };
   const P1 = { x: 70, y: 85 };
   const P2 = { x: 100, y: 10 };
-
   const getBezierPoint = (t: number) => {
     const x = Math.pow(1 - t, 2) * P0.x + 2 * (1 - t) * t * P1.x + Math.pow(t, 2) * P2.x;
     const y = Math.pow(1 - t, 2) * P0.y + 2 * (1 - t) * t * P1.y + Math.pow(t, 2) * P2.y;
     return { x, y };
   };
-
   const n = Math.max(1, items.length - 1);
   const points = items.map((_, i) => getBezierPoint(i / n));
-
   return (
     <div className="w-full hidden md:block">
-      <div 
-        className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all"
-        onClick={() => setActiveIndex(null)}
-      >
+      <div className="relative w-full h-[400px] mb-4 overflow-visible cursor-default transition-all" onClick={() => setActiveIndex(null)}>
         <div className="relative w-full h-full mt-4">
           <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 100">
-            <path 
-              d={`M ${P0.x} ${P0.y} Q ${P1.x} ${P1.y} ${P2.x} ${P2.y}`} 
-              fill="none" 
-              stroke="rgba(179,58,45,0.3)" 
-              strokeWidth="1.2" 
-            />
+            <path d={`M ${P0.x} ${P0.y} Q ${P1.x} ${P1.y} ${P2.x} ${P2.y}`} fill="none" stroke="rgba(179,58,45,0.3)" strokeWidth="1.2" />
           </svg>
-
           {points.map((pt, i) => {
             const item = items[i];
             const isActive = activeIndex === i;
-            
             const companyParts = item.company.split(' ');
             const hasEn = companyParts.length > 1;
             const enStr = hasEn ? companyParts[0] : '';
             const zhStr = hasEn ? companyParts.slice(1).join(' ') : item.company;
             const isEdu = item.type === 'Education';
-
             return (
-              <div 
-                key={i} 
-                className="absolute z-10 flex flex-col items-center justify-center group"
-                style={{ left: `${pt.x}%`, top: `${pt.y}%`, transform: 'translate(-50%, -50%)' }}
-              >
+              <div key={i} className="absolute z-10 flex flex-col items-center justify-center group" style={{ left: `${pt.x}%`, top: `${pt.y}%`, transform: 'translate(-50%, -50%)' }}>
                 <div className={`absolute bottom-full mb-3.5 flex flex-col items-center whitespace-nowrap transition-all duration-300 pointer-events-none ${isActive ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:-translate-y-1'}`}>
-                  {(enStr || isEdu) && (
-                    <span className={`text-[10px] font-bold ${isEdu ? 'text-ink/60' : 'text-rust/60'} uppercase tracking-widest flex items-center gap-1.5 mb-1.5`}>
-                      {isEdu && <GraduationCap size={12}/>}
-                      {enStr}
-                    </span>
-                  )}
-                  <span className={`text-lg font-black text-rust tracking-tight leading-none mb-2 flex items-center gap-1`}>
-                    {zhStr}
-                  </span>
-                  <span className="text-sm font-bold text-ink/70 leading-none">
-                    {item.title}
-                  </span>
+                  {(enStr || isEdu) && (<span className={`text-[10px] font-bold ${isEdu ? 'text-ink/60' : 'text-rust/60'} uppercase tracking-widest flex items-center gap-1.5 mb-1.5`}>{isEdu && <GraduationCap size={12}/>}{enStr}</span>)}
+                  <span className={`text-lg font-black text-rust tracking-tight leading-none mb-2 flex items-center gap-1`}>{zhStr}</span>
+                  <span className="text-sm font-bold text-ink/70 leading-none">{item.title}</span>
                 </div>
-
-                <motion.div 
-                  onClick={(e) => { e.stopPropagation(); setActiveIndex(activeIndex === i ? null : i); }}
-                  animate={isActive ? { scale: 1.4, backgroundColor: "rgba(179,58,45,1)" } : { scale: 1, backgroundColor: "rgba(255,255,255,1)" }}
-                  className={`w-3.5 h-3.5 rounded-full border-[3px] border-rust transition-colors z-20 relative cursor-pointer hover:scale-125 ${isActive ? 'border-transparent' : 'border-rust/70'}`}
-                  style={isActive ? { boxShadow: `0 0 0 8px rgba(179,58,45,0.15)` } : {}}
-                />
-
+                <motion.div onClick={(e) => { e.stopPropagation(); setActiveIndex(activeIndex === i ? null : i); }} animate={isActive ? { scale: 1.4, backgroundColor: "rgba(179,58,45,1)" } : { scale: 1, backgroundColor: "rgba(255,255,255,1)" }} className={`w-3.5 h-3.5 rounded-full border-[3px] border-rust transition-colors z-20 relative cursor-pointer hover:scale-125 ${isActive ? 'border-transparent' : 'border-rust/70'}`} style={isActive ? { boxShadow: `0 0 0 8px rgba(179,58,45,0.15)` } : {}}/>
                 <div className={`absolute top-full mt-3.5 flex flex-col items-center whitespace-nowrap transition-all pointer-events-none ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>
                   <span className="text-[13px] font-bold text-ink/40 tracking-wide">{item.date}</span>
                 </div>
@@ -249,7 +253,6 @@ const ExperienceCurve = ({ items }: { items: any[] }) => {
           })}
         </div>
       </div>
-
       <AnimatePresence mode="wait">
          {activeIndex !== null && items[activeIndex] && (
             <ExperienceDetailPanel key={activeIndex} item={items[activeIndex]} />
@@ -282,7 +285,7 @@ const ProjectModal = ({ project, onClose }: { project: any, onClose: () => void 
               <p className="text-sm text-ink/70 leading-relaxed font-medium">{project.desc}</p>
             </div>
             <div className="bg-[#F8F9FB] p-6 rounded-2xl border border-ink/5 shadow-sm hover:shadow-md transition-shadow">
-              <h4 className="text-xs font-bold text-rust uppercase tracking-widest mb-3 flex items-center gap-2"><Briefcase size={14}/> 职责与成果</h4>
+              <h4 className="text-xs font-bold text-rust uppercase tracking-widest mb-3 flex items-center gap-2"><Briefcase size={14}/>职责与成果</h4>
               <p className="text-sm text-ink/80 leading-relaxed">{project.detail}</p>
             </div>
           </div>
@@ -313,34 +316,13 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
   </motion.div>
 );
 
-const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode }) => (
-  <motion.div whileHover={{ y: -5 }} className={`${bgColor} rounded-[2rem] p-6 flex flex-col min-h-[180px] relative group border border-ink/5 shadow-sm hover:shadow-md transition-all mt-8 md:mt-10`}>
-    <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">{mockup}</div>
-    <div className="z-10 relative max-w-[65%]">
-      <span className="text-[9px] font-black uppercase tracking-widest text-ink/50 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-3 inline-block">{tag}</span>
-      <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight">{title}</h3>
-      <p className="text-xs text-ink/60 leading-relaxed font-medium line-clamp-3">{desc}</p>
-    </div>
-  </motion.div>
-);
-
 const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: string, fallbackImg?: string, rotateClass?: string }) => {
   const isVideo = src?.toLowerCase().match(/\.(mp4|webm|mov)$/);
   const placeholder = "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=600&auto=format&fit=crop";
   const finalSrc = src || fallbackImg || placeholder;
-
   return (
     <div className={`w-full h-full rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] border-[4px] border-white/90 bg-white ${rotateClass} transition-transform duration-500`}>
-      {isVideo ? (
-        <video src={finalSrc} poster={fallbackImg || placeholder} autoPlay loop muted playsInline className="w-full h-full object-cover" />
-      ) : (
-        <img 
-          src={finalSrc} 
-          alt="demo" 
-          className="w-full h-full object-cover" 
-          onError={(e) => { e.currentTarget.src = placeholder; }}
-        />
-      )}
+      {isVideo ? (<video src={finalSrc} poster={fallbackImg || placeholder} autoPlay loop muted playsInline className="w-full h-full object-cover" />) : (<img src={finalSrc} alt="demo" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = placeholder; }}/>)}
       <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 pointer-events-none" />
     </div>
   );
@@ -350,10 +332,10 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   const [selectedQ, setSelectedQ] = useState<number | null>(null);
   const [typingText, setTypingText] = useState("");
   const faqs = [
-    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" },
-    { q: "职业发展", a: "基于行业标准与岗位价值，期待一份能体现商业价值与创业精神的合作方案，薪资可面议。" },
+    { q: "离职原因", a: "寻求更广阔的 AI 应用落地场景，将 9 年运营经验与 AIGC 技术深度结合，创造指数级增长。" },
+    { q: "求职期望", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的合作方案，薪资可面议。" },
+    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" }
   ];
-
   useEffect(() => {
     if (selectedQ !== null) {
       setTypingText(""); let i = 0; const fullText = faqs[selectedQ].a;
@@ -361,7 +343,6 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
       return () => clearInterval(interval);
     }
   }, [selectedQ]);
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -378,11 +359,7 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                   <ChevronRight className={`w-4 h-4 transition-transform ${selectedQ === i ? 'rotate-90' : ''}`} />
                 </button>
                 <AnimatePresence>
-                  {selectedQ === i && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="text-xs text-ink/60 mt-3 leading-relaxed overflow-hidden min-h-[3em]">
-                      {typingText}<motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.8, repeat: Infinity }} className="inline-block w-1 h-3 bg-rust ml-1 translate-y-0.5" />
-                    </motion.div>
-                  )}
+                  {selectedQ === i && (<motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="text-xs text-ink/60 mt-3 leading-relaxed overflow-hidden min-h-[3em]">{typingText}<motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.8, repeat: Infinity }} className="inline-block w-1 h-3 bg-rust ml-1 translate-y-0.5" /></motion.div>)}
                 </AnimatePresence>
               </div>
             ))}
@@ -393,31 +370,41 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   );
 };
 
-// --- 重构后基于 Word 文档的保底数据 ---
-// 这里的 content 数组现在支持 "模块标题：详细内容" 格式，页面组件会自动解析并高亮展示
+// --- ========================================== ---
+// --- ========================================== ---
+// ---            数据维护核心区域                ---
+// --- ========================================== ---
+// --- ========================================== ---
+
+const skillIcons = [TrendingUp, Cpu, Lightbulb, Rocket];
+const projIcons = [MapPin, Palette, Video, Folder];
+
 const FULL_FALLBACK = {
+  // 1. 【核心技能】模块 (已经去掉了红色数字的text-sm)
   skills: [
-   { 
+    { 
       title: "增长运营经验", 
       icon: TrendingUp, 
       desc: <>能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出营销和增长策略</strong>，3年内推动携程直播平台规模<strong className="text-rust font-black mx-0.5">1000万增至10亿+</strong>，6个月内推动视频号矩阵直播GMV实现<strong className="text-rust font-black mx-0.5">0-4000万</strong>。</> 
     },
     { 
-      title: "产品运营思维", 
+      title: "产品思维", 
       icon: Cpu, 
-      desc: <>服务过多家互联网企业，参与初创企业运营，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长业务痛点诊断和赋能</strong>。</> 
+      desc: <>服务过多家互联网企业，参与初创企业运营，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长跨部门协同与商务谈判、资源整合</strong>。</> 
     },
     { 
-      title: "项目落地能力", 
+      title: "0-1项目落地能力", 
       icon: Lightbulb, 
       desc: <><strong className="text-ink font-bold">多次0-1项目孵化与落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→<strong className="text-ink font-bold">规模化增长的全链路操盘能力</strong>，喜欢挑战、能为结果负责。</> 
     },
     { 
       title: "业务培训赋能", 
       icon: Rocket, 
-      desc: <><strong className="text-ink font-bold">擅长提炼业务SOP与沉淀知识库</strong>。能将复杂的工具与经验转化为“用户语言”，<strong className="text-ink font-bold">具备培训体系搭建与培训赋能的能力</strong>。</> 
+      desc: <><strong className="text-ink font-bold">擅长提炼业务SOP与搭建培训体系</strong>。能将复杂的工具与经验转化为清晰易懂的用户指引，<strong className="text-ink font-bold">兼具幕后体系搭建与台前讲师宣讲的复合能力</strong>。</> 
     }
   ],
+
+  // 2. 【个人经历】模块 (带复杂详情高亮)
   timeline: [
     { type: 'Education', date: "2012.09 - 2016.07", title: "工业设计", company: "嘉兴大学(本科)", desc: "2016级优秀毕业生。培养了深厚的用户体验设计基础与产品思维。" },
     { 
@@ -465,20 +452,68 @@ const FULL_FALLBACK = {
       }
     }
   ],
+
+  // 3. 【项目经历】模块
   projects: [
     { title: "饿了么下沉市场外卖配送提效", tag: "系统调优", bgImage: "/taobaoshangou.jpg", icon: MapPin, desc: "主导饿了么下沉市场智能调度系统覆盖率从30%提升至98%，提升平台整体配送效率和履约质量。", detail: "该项目为公司战略级项目，作为业务方主导，产研和算法团队紧密配合，通过系统赋能与宣讲培训，帮助全国 1800 个城市代理商实现降本增效。" },
-    { title: "一条艺术电商平台", tag: "电商运营", bgImage: "/yitiao.JPG", icon: Palette, desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系，降低消费者线上购买门槛。", detail: "负责艺术电商平台产品运营，运营艺术品线上展厅、直播、拍卖、线上销售板块的产品规划与内容生态建设；同艺术品BD、内容编辑团队共同搭建从艺术家到艺术作品的完整基础知识体系，降低艺术品消费者线上购买门槛。" },
+    { title: "一条艺术电商平台", tag: "电商运营", bgImage: "/yitiao.JPG", icon: Palette, desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系，降低消费者线上购买门槛。", detail: "负责艺术电商平台产品运营，运营艺术品线上展厅、直播、拍卖、线上销售板块的产品规划与内容生态建设；同艺术品BD、内容编辑团队共同搭建从艺术家到艺术作品的完整知识体系，降低艺术品消费者线上购买门槛。" },
     { title: "携程直播青训营", tag: "校企合作", bgImage: "/qingxunying.jpg", icon: Video, desc: "通过搭建视频号直播矩阵，6个月实现项目收入从0到4000万的突破，累计孵化200+学员，获集团Superhero称号。", detail: "负责该项目前期的孵化与规模建设，主导校企合作方案、商务拓展、学员培训、运营策略等全链路落地。具备单场百万直播GMV操盘及个人直播带货能力。" }
   ],
+
+  // 4. 【AI 实验室】模块 (这里维护你的 GIF 和 测试链接)
   aiLab: [
-    { title: "向往的offer", tag: "AI Agent", desc: "基于大语言模型开发的 AI 面试助手，帮助求职者快速提升面试表现与职业规划。", bgColor: "bg-[#F3F4F6]", media: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" },
-    { title: "婴幼儿AI服务产品", tag: "AI Product", desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", bgColor: "bg-[#EEF2FF]", media: "https://media.giphy.com/media/mguPrVJAnEHIY/giphy.gif" },
-    { title: "AI虚拟形象直播", tag: "Live Stream", desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", bgColor: "bg-[#FEF2F2]", media: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif" }
+    // 项目 1
+    { 
+      title: "向往的offer", 
+      tag: "AI Agent", 
+      desc: "基于大语言模型开发的 AI 面试助手，帮助求职者快速提升面试表现与职业规划。", 
+      bgColor: "bg-[#F3F4F6]", 
+      // 🔗 在这里替换你的 GIF 链接
+      media: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif",
+      // 🔗 在这里替换你的 AI 项目测试跳转链接
+      link: "https://wenying.website/offer-demo" 
+    },
+    // 项目 2
+    { 
+      title: "婴幼儿AI服务产品", 
+      tag: "AI Product", 
+      desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", 
+      bgColor: "bg-[#EEF2FF]", 
+      // 🔗 替换 GIF
+      media: "https://media.giphy.com/media/mguPrVJAnEHIY/giphy.gif",
+      // 🔗 替换跳转链接 (如果没有链接，可以删掉这一行或保持为空)
+      link: "" 
+    },
+    // 项目 3
+    { 
+      title: "AI虚拟形象直播", 
+      tag: "Live Stream", 
+      desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", 
+      bgColor: "bg-[#FEF2F2]", 
+      // 🔗 替换 GIF
+      media: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif",
+      // 🔗 替换跳转链接
+      link: "https://wenying.website/live-demo"
+    },
+
+    // 💡 这是一个空白模板，你可以复制它来新增项目：
+    /*
+    { 
+      title: "你的新AI项目名", 
+      tag: "项目标签", 
+      desc: "这里写一段简短的项目描述，介绍它的核心功能。", 
+      bgColor: "bg-[#F3F4F6]", // 背景色，可选: bg-[#F3F4F6] (灰), bg-[#EEF2FF] (蓝), bg-[#FEF2F2] (红)
+      media: "这里放入你的 GIF 链接",
+      link: "这里放入你的测试跳转链接"
+    },
+    */
   ]
 };
 
-const skillIcons = [TrendingUp, Cpu, Lightbulb, Rocket];
-const projIcons = [MapPin, Palette, Video, Folder];
+// --- ========================================== ---
+// ---            数据维护区域结束                ---
+// --- ========================================== ---
+
 
 export default function App() {
   const [isFaqOpen, setIsFaqOpen] = useState(false);
@@ -488,29 +523,14 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [showUndergrad, setShowUndergrad] = useState(false);
   
+  // 强制使用 FULL_FALLBACK 数据以保证完美的视觉呈现，不再对外请求数据
   const [data, setData] = useState(FULL_FALLBACK);
   const containerRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
-    
-    // 如果 Notion 没有配置完全或读取失败，保留 FULL_FALLBACK 以呈现完美视觉
-    fetch('/api/notion')
-      .then(res => res.json())
-      .then(resData => {
-        if (resData.success && resData.data) {
-          setData(prev => ({
-            skills: resData.data.skills?.length > 0 ? resData.data.skills.map((s:any, i:number) => ({...s, icon: skillIcons[i%4]})) : prev.skills,
-            // 这里我们优先信任静态的精排数据，如果 Notion 没有更新正确的详情格式，依然使用备用的完美格式
-            timeline: resData.data.timeline?.length > 0 ? resData.data.timeline : prev.timeline,
-            projects: resData.data.projects?.length > 0 ? resData.data.projects.map((p:any, i:number) => ({...p, icon: projIcons[i%4]})) : prev.projects,
-            aiLab: resData.data.aiLab?.length > 0 ? resData.data.aiLab : prev.aiLab,
-          }));
-        }
-      })
-      .catch(() => console.log("加载数据中...使用静态高保真内容"));
-
+    // 这里不再进行 fetch('/api/notion') 请求，彻底改为代码维护
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -718,7 +738,8 @@ export default function App() {
                 title={item.title} 
                 bgColor={item.bgColor || ["bg-[#F3F4F6]", "bg-[#EEF2FF]", "bg-[#FEF2F2]"][idx % 3]}
                 desc={item.desc} 
-                mockup={<VideoMockup src={item.media} fallbackImg="" rotateClass={idx % 2 === 0 ? "-rotate-3" : "rotate-2"} />} 
+                mockup={<VideoMockup src={item.media} fallbackImg="" rotateClass={idx % 2 === 0 ? "-rotate-3" : "rotate-2"} />}
+                link={item.link} // 传入链接
               />
             ))}
           </div>
