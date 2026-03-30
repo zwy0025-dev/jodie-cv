@@ -492,7 +492,7 @@ const FULL_FALLBACK = {
     { 
       title: "向往的offer", 
       tag: "AI Agent", 
-      desc: "基于大语言模型开发的 AI 面试助手，帮助求职者快速提升面试表现与职业规划。", 
+      desc: "基于大语言模型开发的AI简历助手，帮助求职者进行简历评估与匹配JD的简历优化。", 
       bgColor: "bg-[#F3F4F6]", 
       media: "/cv tool.mov",
       link: "https://wenying.website/offer-demo"
