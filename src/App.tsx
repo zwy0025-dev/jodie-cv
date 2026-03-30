@@ -59,8 +59,6 @@ const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: R
     <div className="absolute -bottom-6 -right-6 text-rust opacity-[0.04] pointer-events-none group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500">
       <Icon size={140} strokeWidth={1.5} />
     </div>
-    
-    {/* 顶部区域：左侧是 Icon + 标题，右侧是装饰小横线 */}
     <div className="mb-4 flex items-center justify-between opacity-90 relative z-10">
       <div className="flex items-center gap-3 text-rust">
         <Icon size={24} strokeWidth={2} />
@@ -68,8 +66,6 @@ const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: R
       </div>
       <div className="w-8 h-1 bg-rust/10 rounded-full flex-shrink-0" />
     </div>
-    
-    {/* 描述文本内容 */}
     <div className="text-xs text-ink/60 leading-relaxed font-medium relative z-10 mt-1">
       {dataDesc}
     </div>
@@ -78,16 +74,12 @@ const SkillCard = ({ title, dataDesc, icon: Icon }: { title: string, dataDesc: R
 
 // --- 提取高亮渲染函数 (支持冒号分割与数字/符号高亮) ---
 const HighlightedText = ({ text }: { text: string }) => {
-  // 1. 根据中文冒号分割标题和内容
   const parts = text.split('：');
   const title = parts.length > 1 ? parts[0] : '';
   const content = parts.length > 1 ? parts.slice(1).join('：') : text;
 
-  // 2. 替换数据和符号为高亮 HTML
   let formattedContent = content
-    // 高亮数据 (数字+百分号/万/亿/+)
     .replace(/(\d+[\.\d]*[%+万亿]*)/g, '<strong class="text-rust font-black text-[13px] md:text-[14px] bg-rust/5 px-1 rounded mx-0.5">$1</strong>')
-    // 高亮「」内的内容
     .replace(/「(.*?)」/g, '<strong class="text-ink font-bold px-0.5">「$1」</strong>');
 
   return (
@@ -126,7 +118,7 @@ const ExperienceDetailPanel = ({ item }: { item: any }) => (
     {item.details && item.details.content && item.details.content.length > 0 ? (
       <div className="bg-[#F8F9FB] p-6 md:p-8 rounded-2xl border border-ink/5 shadow-sm">
         <h5 className="text-[11px] md:text-xs font-black uppercase tracking-widest text-rust mb-6 flex items-center gap-2">
-          <Briefcase size={14} /> 核心工作与成果
+          <Briefcase size={14} /> 核心工作与成果拆解
         </h5>
         <div className="space-y-6">
           {item.details.content.map((detailText: string, i: number) => (
@@ -313,16 +305,33 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
   </motion.div>
 );
 
-const Card = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode }) => (
-  <motion.div whileHover={{ y: -5 }} className={`${bgColor} rounded-[2rem] p-6 flex flex-col min-h-[180px] relative group border border-ink/5 shadow-sm hover:shadow-md transition-all mt-8 md:mt-10`}>
-    <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">{mockup}</div>
-    <div className="z-10 relative max-w-[65%]">
-      <span className="text-[9px] font-black uppercase tracking-widest text-ink/50 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-3 inline-block">{tag}</span>
-      <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight">{title}</h3>
-      <p className="text-xs text-ink/60 leading-relaxed font-medium line-clamp-3">{desc}</p>
-    </div>
-  </motion.div>
-);
+const AILabCard = ({ title, tag, desc, bgColor, mockup, link }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode, link?: string }) => {
+  const cardContent = (
+    <>
+      <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">{mockup}</div>
+      <div className="z-10 relative max-w-[65%]">
+        <span className="text-[9px] font-black uppercase tracking-widest text-ink/50 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-3 inline-block">{tag}</span>
+        <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight flex items-center gap-2">
+          {title}
+          {link && <ArrowUpRight size={14} className="text-ink/30 group-hover:text-rust transition-colors" />}
+        </h3>
+        <p className="text-xs text-ink/60 leading-relaxed font-medium line-clamp-3 mb-1">{desc}</p>
+        {link && <span className="text-[9px] text-rust font-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">点击测试 &rarr;</span>}
+      </div>
+    </>
+  );
+
+  const baseClassName = `${bgColor} rounded-[2rem] p-6 flex flex-col min-h-[180px] relative group border border-ink/5 shadow-sm hover:shadow-xl transition-all mt-8 md:mt-10 overflow-hidden`;
+
+  if (link) {
+    return (
+      <motion.a href={link} target="_blank" rel="noopener noreferrer" whileHover={{ y: -8, scale: 1.02 }} className={`${baseClassName} cursor-pointer block`}>
+        {cardContent}
+      </motion.a>
+    );
+  }
+  return <motion.div whileHover={{ y: -5 }} className={baseClassName}>{cardContent}</motion.div>;
+};
 
 const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: string, fallbackImg?: string, rotateClass?: string }) => {
   const isVideo = src?.toLowerCase().match(/\.(mp4|webm|mov)$/);
@@ -334,12 +343,7 @@ const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: stri
       {isVideo ? (
         <video src={finalSrc} poster={fallbackImg || placeholder} autoPlay loop muted playsInline className="w-full h-full object-cover" />
       ) : (
-        <img 
-          src={finalSrc} 
-          alt="demo" 
-          className="w-full h-full object-cover" 
-          onError={(e) => { e.currentTarget.src = placeholder; }}
-        />
+        <img src={finalSrc} alt="demo" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = placeholder; }} />
       )}
       <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 pointer-events-none" />
     </div>
@@ -350,8 +354,9 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   const [selectedQ, setSelectedQ] = useState<number | null>(null);
   const [typingText, setTypingText] = useState("");
   const faqs = [
-    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" },
-    { q: "职业发展", a: "基于行业标准与岗位价值，期待一份能体现商业价值与创业精神的合作方案，薪资可面议。" },
+    { q: "离职原因", a: "寻求更广阔的 AI 应用落地场景，将 9 年运营经验与 AIGC 技术深度结合，创造指数级增长。" },
+    { q: "求职期望", a: "基于行业标准与岗位价值，期待一份能体现专业深度与创业精神的合作方案，薪资可面议。" },
+    { q: "个人评价", a: "具备10亿规模平台操盘视角，有0-1的创业实战韧性。AI实践者，擅长输出业务解决方案，能直接为业务结果负责。" }
   ];
 
   useEffect(() => {
@@ -393,29 +398,28 @@ const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   );
 };
 
-// --- 重构后基于 Word 文档的保底数据 ---
-// 这里的 content 数组现在支持 "模块标题：详细内容" 格式，页面组件会自动解析并高亮展示
+// --- 保底数据 (彻底修复与更新的内容) ---
 const FULL_FALLBACK = {
   skills: [
-   { 
+    { 
       title: "增长运营经验", 
       icon: TrendingUp, 
       desc: <>能够围绕平台流量、供给与用户特征，<strong className="text-ink font-bold">输出营销和增长策略</strong>，3年内推动携程直播平台规模<strong className="text-rust font-black mx-0.5">1000万增至10亿+</strong>，6个月内推动视频号矩阵直播GMV实现<strong className="text-rust font-black mx-0.5">0-4000万</strong>。</> 
     },
     { 
-      title: "产品运营思维", 
+      title: "产品思维", 
       icon: Cpu, 
-      desc: <>服务过多家互联网企业，参与初创企业运营，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长业务痛点诊断和产品工具赋能</strong>。</> 
+      desc: <>服务过多家互联网企业，参与初创企业运营，<strong className="text-ink font-bold">长期与算法、产研、设计、销售、业务团队合作，擅长业务痛点诊断和赋能</strong>。</> 
     },
     { 
-      title: "项目落地能力", 
+      title: "0-1项目落地能力", 
       icon: Lightbulb, 
-      desc: <><strong className="text-ink font-bold">多次0-1项目孵化与落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→<strong className="text-ink font-bold">规模化增长的全链路操盘能力</strong>，喜欢挑战、解决复杂问题、能为结果负责。</> 
+      desc: <><strong className="text-ink font-bold">多次0-1项目孵化与落地经验</strong>，具备0-1阶段项目建设→业务体系搭建→<strong className="text-ink font-bold">规模化增长的全链路操盘能力</strong>，喜欢挑战、能为结果负责。</> 
     },
     { 
       title: "业务培训赋能", 
       icon: Rocket, 
-      desc: <><strong className="text-ink font-bold">具备复合运营背景与商业思维</strong>。能将复杂的工具与经验转化为“用户语言”，<strong className="text-ink font-bold">擅长提炼业务SOP与沉淀知识库，具备培训体系搭建与培训赋能的能力</strong>。</> 
+      desc: <><strong className="text-ink font-bold">擅长提炼业务SOP与搭建培训体系</strong>。能将复杂的工具与经验转化为清晰易懂的用户指引，<strong className="text-ink font-bold">兼具幕后体系搭建与台前讲师宣讲的复合能力</strong>。</> 
     }
   ],
   timeline: [
@@ -470,29 +474,32 @@ const FULL_FALLBACK = {
     { title: "一条艺术电商平台", tag: "电商运营", bgImage: "/yitiao.JPG", icon: Palette, desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系，降低消费者线上购买门槛。", detail: "负责艺术电商平台产品运营，运营艺术品线上展厅、直播、拍卖、线上销售板块的产品规划与内容生态建设；同艺术品BD、内容编辑团队共同搭建从艺术家到艺术作品的完整基础知识体系，降低艺术品消费者线上购买门槛。" },
     { title: "携程直播青训营", tag: "校企合作", bgImage: "/qingxunying.jpg", icon: Video, desc: "通过搭建视频号直播矩阵，6个月实现项目收入从0到4000万的突破，累计孵化200+学员，获集团Superhero称号。", detail: "负责该项目前期的孵化与规模建设，主导校企合作方案、商务拓展、学员培训、运营策略等全链路落地。具备单场百万直播GMV操盘及个人直播带货能力。" }
   ],
-aiLab: [
+  aiLab: [
     { 
       title: "向往的offer", 
       tag: "AI Agent", 
       desc: "基于大语言模型开发的 AI 面试助手，帮助求职者快速提升面试表现与职业规划。", 
       bgColor: "bg-[#F3F4F6]", 
-      media: "/cv tool.mov" // 指向 public 文件夹下的 cv tool.mov
+      media: "/cv tool.mov",
+      link: "https://wenying.website/offer-demo"
     },
     { 
       title: "婴幼儿AI服务产品", 
       tag: "AI Product", 
       desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", 
       bgColor: "bg-[#EEF2FF]", 
-      media: "/aitoy.mp4"   // 指向 public 文件夹下的 aitoy.mp4
+      media: "/aitoy.mp4" 
     },
     { 
       title: "AI虚拟形象直播", 
       tag: "Live Stream", 
       desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", 
       bgColor: "bg-[#FEF2F2]", 
-      media: "/xiaozhang.mp4" // 指向 public 文件夹下的 xiaozhang.mp4
+      media: "/xiaozhang.mp4",
+      link: "https://wenying.website/live-demo"
     }
   ]
+};
 
 const skillIcons = [TrendingUp, Cpu, Lightbulb, Rocket];
 const projIcons = [MapPin, Palette, Video, Folder];
@@ -512,22 +519,9 @@ export default function App() {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     
-    // 如果 Notion 没有配置完全或读取失败，保留 FULL_FALLBACK 以呈现完美视觉
-    fetch('/api/notion')
-      .then(res => res.json())
-      .then(resData => {
-        if (resData.success && resData.data) {
-          setData(prev => ({
-            skills: resData.data.skills?.length > 0 ? resData.data.skills.map((s:any, i:number) => ({...s, icon: skillIcons[i%4]})) : prev.skills,
-            // 这里我们优先信任静态的精排数据，如果 Notion 没有更新正确的详情格式，依然使用备用的完美格式
-            timeline: resData.data.timeline?.length > 0 ? resData.data.timeline : prev.timeline,
-            projects: resData.data.projects?.length > 0 ? resData.data.projects.map((p:any, i:number) => ({...p, icon: projIcons[i%4]})) : prev.projects,
-            aiLab: resData.data.aiLab?.length > 0 ? resData.data.aiLab : prev.aiLab,
-          }));
-        }
-      })
-      .catch(() => console.log("加载数据中...使用静态高保真内容"));
-
+    // 只保留保底数据逻辑，放弃读取有残缺的 Notion 数据
+    // fetch('/api/notion') 已移除，完全依赖本地精确配置
+    
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -569,218 +563,4 @@ export default function App() {
             <NavItem zh="AI 实验室" en="AI Lab" href="#ai-lab" icon={Sparkles} />
           </div>
           
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-ink hover:text-rust transition-colors relative z-50">
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -20 }} 
-              className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border-b border-ink/10 shadow-2xl md:hidden flex flex-col py-2 px-6 z-40"
-            >
-              {[
-                { zh: "关于我", en: "About Me", href: "#about", icon: User },
-                { zh: "核心技能", en: "Core Skills", href: "#skills", icon: Star },
-                { zh: "个人经历", en: "Experience", href: "#experience", icon: Briefcase },
-                { zh: "项目经历", en: "Projects", href: "#projects", icon: Folder },
-                { zh: "AI 实验室", en: "AI Lab", href: "#ai-lab", icon: Sparkles }
-              ].map((link, idx) => (
-                <a 
-                  key={idx} 
-                  href={link.href} 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-4 text-ink/80 hover:text-rust font-bold text-sm py-4 border-b border-ink/5 last:border-0 group"
-                >
-                  <link.icon size={18} className="text-rust/70 group-hover:text-rust transition-colors" />
-                  <span>{link.zh}</span>
-                  <span className="text-[10px] text-ink/30 uppercase tracking-widest ml-auto">{link.en}</span>
-                </a>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
-
-      <motion.div style={{ y: parallaxY }} className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
-        <div className="absolute top-[15%] right-[-10%] w-[40vw] h-[40vw] bg-rust/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[20%] left-[-5%] w-[30vw] h-[30vw] bg-ink/5 rotate-45 blur-[80px]" />
-      </motion.div>
-
-      <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-20">
-        
-        <section id="about" className="relative flex flex-col items-center justify-center pt-8 pb-4 overflow-hidden mb-12">
-          <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
-            
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="relative w-40 md:w-48 aspect-[3/4] z-10 mb-8 mt-4"
-            >
-              <img 
-                src="/touxiang-1.png" 
-                alt="Jodie Zhu" 
-                className="w-full h-full object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.15)] pointer-events-none relative z-10" 
-              />
-              <div className="absolute inset-0 bg-rust/10 rounded-full blur-[60px] pointer-events-none z-0" />
-              
-              <BreathingTag text="创新业务先锋 🚀" delay={0.2} className="top-[10%] -left-[70%] md:-left-[90%]" />
-              <BreathingTag text="0-1项目建设者 🧱" delay={0.5} className="top-[45%] -left-[80%] md:-left-[100%]" />
-              <BreathingTag text="10年运营经验 💼" delay={2.1} className="top-[80%] -left-[60%] md:-left-[80%]" />
-
-              <BreathingTag text="AI工具重度用户 🛠️" delay={1.2} className="top-[15%] -right-[60%] md:-right-[80%]" />
-              <BreathingTag text="校企合作直播培训讲师 🏫" delay={1.5} className="top-[50%] -right-[70%] md:-right-[100%]" />
-              <BreathingTag text="做过主播，累计带货500万+ 💰" delay={0.8} className="top-[85%] -right-[50%] md:-right-[70%]" />
-            </motion.div>
-
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-5xl md:text-6xl font-black text-rust tracking-tighter uppercase mb-6 text-center"
-            >
-              ZHU WENYING
-            </motion.h1>
-            
-            <p className="text-xs md:text-[14px] text-ink/70 font-medium leading-relaxed mb-10 max-w-2xl text-center px-4">
-              9年互联网运营和产品经验、1年创业项目经验。深耕互联网行业多年，擅长从 0 到 1 搭建业务体系与合作伙伴赋能。持续研究AI与业务场景深度融合的解决方案，探索AI Agent、自动化工作流及人机协同的商业化机会。
-            </p>
-
-            <div className="flex flex-row items-center justify-center gap-3 w-full px-4 sm:px-0">
-              <a href="mailto:zwy0025@gmail.com" className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-white border border-ink/10 text-ink py-3.5 rounded-full font-bold text-[11px] sm:text-[12px] tracking-widest hover:border-rust hover:text-rust transition-all shadow-sm sm:w-44 whitespace-nowrap">
-                <Mail size={16} /> 发送邮件
-              </a>
-              <button onClick={() => setIsWeChatOpen(true)} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-ink text-white py-3.5 rounded-full font-bold text-[11px] sm:text-[12px] tracking-widest hover:bg-rust transition-all shadow-xl sm:w-44 whitespace-nowrap">
-                <QrCode size={16} /> 添加微信
-              </button>
-            </div>
-            
-          </div>
-        </section>
-
-        <section id="skills" className="mb-24">
-          <SectionHeader zh="核心技能" en="Core Skills" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {data.skills.map((s:any, idx:number) => (
-              <SkillCard key={idx} title={s.title} dataDesc={s.desc} icon={s.icon || skillIcons[idx%4]} />
-            ))}
-          </div>
-        </section>
-
-        <section id="experience" className="mb-24">
-          <SectionHeader zh="个人经历" en="Experience" />
-          
-          <div className="w-full hidden md:block">
-            <ExperienceCurve items={desktopTimeline} />
-          </div>
-
-          <div className="md:hidden mt-8">
-            <h3 className="text-xs font-bold text-ink/40 uppercase tracking-widest mb-10 flex items-center gap-2"><Briefcase size={14} className="text-rust"/> 个人履历</h3>
-            <div className="relative pl-2 border-l-2 border-rust/10 ml-2">
-              {mobileTimeline.map((item:any, idx:number) => {
-                const isUndergrad = item.company.includes('本科') || item.title.includes('本科');
-                if (isUndergrad) return null; 
-                return <TimelineItem key={idx} item={item} />;
-              })}
-
-              {mobileTimeline.filter((i:any) => i.company.includes('本科') || i.title.includes('本科')).map((item:any, idx:number) => (
-                <div key={`ug-${idx}`} className="relative">
-                  <div 
-                    className="relative -left-[2.5px] -mt-6 mb-6 z-20 opacity-40 hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-2 w-fit group" 
-                    onClick={() => setShowUndergrad(!showUndergrad)}
-                  >
-                    <div className={`w-[7px] h-[7px] rounded-full ${showUndergrad ? 'bg-rust' : 'bg-ink/30'} group-hover:bg-rust transition-colors`} />
-                    <span className="text-[10px] text-ink/40 tracking-widest uppercase origin-left">
-                      {showUndergrad ? '收起早期经历' : '查看更早经历...'}
-                    </span>
-                  </div>
-                  <AnimatePresence>
-                    {showUndergrad && (
-                      <motion.div 
-                        initial={{ height: 0, opacity: 0 }} 
-                        animate={{ height: 'auto', opacity: 1 }} 
-                        exit={{ height: 0, opacity: 0 }} 
-                        className="overflow-hidden relative"
-                      >
-                         <TimelineItem item={item} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="projects" className="mb-24">
-          <SectionHeader zh="项目经历" en="Projects" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {data.projects.map((p:any, idx:number) => (
-              <ProjectCard key={idx} project={p} onClick={() => setSelectedProject(p)} />
-            ))}
-          </div>
-          <ProjectModal project={selectedProject?.bgImage ? selectedProject : null} onClose={() => setSelectedProject(null)} />
-        </section>
-        
-        <section id="ai-lab" className="mb-24">
-          <SectionHeader zh="AI 实验室" en="AI Lab" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pt-8">
-             {data.aiLab.map((item:any, idx:number) => (
-              <AILabCard 
-                key={idx}
-                tag={item.tag} 
-                title={item.title} 
-                bgColor={item.bgColor || ["bg-[#F3F4F6]", "bg-[#EEF2FF]", "bg-[#FEF2F2]"][idx % 3]}
-                desc={item.desc} 
-                mockup={<VideoMockup src={item.media} fallbackImg="" rotateClass={idx % 2 === 0 ? "-rotate-3" : "rotate-2"} />} 
-              />
-            ))}
-          </div>
-        </section>
-
-        <footer className="pt-20 pb-12 border-t border-ink/10 flex flex-col items-center">
-          <motion.button whileHover={{ y: -5 }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="mb-12 flex flex-col items-center gap-2 group">
-            <div className="w-10 h-10 rounded-full border border-ink/10 flex items-center justify-center group-hover:border-rust transition-colors">
-              <ArrowUpRight className="rotate-[-135deg] text-ink/40 group-hover:text-rust transition-colors" size={18} />
-            </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ink/30 group-hover:text-rust transition-colors">Back to Top</span>
-          </motion.button>
-
-          <div className="w-full flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="text-center md:text-left">
-              <h2 className="font-display font-black text-2xl tracking-tighter mb-2">wenying<span className="text-rust">.website</span></h2>
-              <p className="text-ink/30 text-[10px] uppercase tracking-[0.3em]">Building Business with AI © 2026</p>
-            </div>
-            <div className="flex items-center justify-center gap-4">
-              <a href="mailto:zwy0025@gmail.com" className="flex items-center justify-center gap-2 bg-white border border-ink/10 text-ink px-6 py-2.5 rounded-full font-bold text-[11px] tracking-widest hover:border-rust hover:text-rust transition-all shadow-sm">
-                <Mail size={14} /> 邮件联系
-              </a>
-              <button onClick={() => setIsWeChatOpen(true)} className="flex items-center justify-center gap-2 bg-ink text-white px-6 py-2.5 rounded-full font-bold text-[11px] tracking-widest hover:bg-rust transition-all shadow-md">
-                <QrCode size={14} /> 添加微信
-              </button>
-            </div>
-          </div>
-        </footer>
-
-      </main>
-
-      <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
-        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setIsFaqOpen(!isFaqOpen)} className="w-14 h-14 bg-rust/90 backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-[0_10px_30px_rgba(179,58,45,0.4)] relative group border border-white/20 p-1">
-          <div className="w-full h-full rounded-full relative z-10 overflow-hidden border border-white/50">
-            {isFaqOpen ? <div className="w-full h-full bg-rust/20 flex items-center justify-center"><X size={18} /></div> : (
-              <>
-                <img src="/fenshen-4.jpg" className="w-full h-full object-cover scale-[1.3] translate-y-0" alt="Avatar" />
-              </>
-            )}
-          </div>
-        </motion.button>
-        <FAQDialog isOpen={isFaqOpen} onClose={() => setIsFaqOpen(false)} />
-      </div>
-
-      <WeChatModal isOpen={isWeChatOpen} onClose={() => setIsWeChatOpen(false)} />
-    </div>
-  );
-}
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-ink
