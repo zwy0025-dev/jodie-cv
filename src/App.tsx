@@ -313,7 +313,7 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
   </motion.div>
 );
 
-const AILabCard = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode }) => (
+const Card = ({ title, tag, desc, bgColor, mockup }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode }) => (
   <motion.div whileHover={{ y: -5 }} className={`${bgColor} rounded-[2rem] p-6 flex flex-col min-h-[180px] relative group border border-ink/5 shadow-sm hover:shadow-md transition-all mt-8 md:mt-10`}>
     <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">{mockup}</div>
     <div className="z-10 relative max-w-[65%]">
@@ -470,12 +470,29 @@ const FULL_FALLBACK = {
     { title: "一条艺术电商平台", tag: "电商运营", bgImage: "/yitiao.JPG", icon: Palette, desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系，降低消费者线上购买门槛。", detail: "负责艺术电商平台产品运营，运营艺术品线上展厅、直播、拍卖、线上销售板块的产品规划与内容生态建设；同艺术品BD、内容编辑团队共同搭建从艺术家到艺术作品的完整基础知识体系，降低艺术品消费者线上购买门槛。" },
     { title: "携程直播青训营", tag: "校企合作", bgImage: "/qingxunying.jpg", icon: Video, desc: "通过搭建视频号直播矩阵，6个月实现项目收入从0到4000万的突破，累计孵化200+学员，获集团Superhero称号。", detail: "负责该项目前期的孵化与规模建设，主导校企合作方案、商务拓展、学员培训、运营策略等全链路落地。具备单场百万直播GMV操盘及个人直播带货能力。" }
   ],
-  aiLab: [
-    { title: "向往的offer", tag: "AI Agent", desc: "基于大语言模型开发的 AI 面试助手，帮助求职者快速提升面试表现与职业规划。", bgColor: "bg-[#F3F4F6]", media: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" },
-    { title: "婴幼儿AI服务产品", tag: "AI Product", desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", bgColor: "bg-[#EEF2FF]", media: "https://media.giphy.com/media/mguPrVJAnEHIY/giphy.gif" },
-    { title: "AI虚拟形象直播", tag: "Live Stream", desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", bgColor: "bg-[#FEF2F2]", media: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif" }
+aiLab: [
+    { 
+      title: "向往的offer", 
+      tag: "AI Agent", 
+      desc: "基于大语言模型开发的 AI 面试助手，帮助求职者快速提升面试表现与职业规划。", 
+      bgColor: "bg-[#F3F4F6]", 
+      media: "/cv tool.mov" // 指向 public 文件夹下的 cv tool.mov
+    },
+    { 
+      title: "婴幼儿AI服务产品", 
+      tag: "AI Product", 
+      desc: "结合多模态交互、AI硬件技术，为婴幼儿提供情感陪伴与早教互动场景。", 
+      bgColor: "bg-[#EEF2FF]", 
+      media: "/aitoy.mp4"   // 指向 public 文件夹下的 aitoy.mp4
+    },
+    { 
+      title: "AI虚拟形象直播", 
+      tag: "Live Stream", 
+      desc: "重构直播间场景，实现 24 小时无人直播与实时互动，大幅降低企业直播成本。", 
+      bgColor: "bg-[#FEF2F2]", 
+      media: "/xiaozhang.mp4" // 指向 public 文件夹下的 xiaozhang.mp4
+    }
   ]
-};
 
 const skillIcons = [TrendingUp, Cpu, Lightbulb, Rocket];
 const projIcons = [MapPin, Palette, Video, Folder];
