@@ -121,7 +121,7 @@ const ExperienceDetailPanel = ({ item }: { item: any }) => (
     {item.details && item.details.content && item.details.content.length > 0 ? (
       <div className="bg-[#F8F9FB] p-6 md:p-8 rounded-2xl border border-ink/5 shadow-sm">
         <h5 className="text-[11px] md:text-xs font-black uppercase tracking-widest text-rust mb-6 flex items-center gap-2">
-          <Briefcase size={14} /> 核心工作与成果
+          <Briefcase size={14} /> 核心工作与成果拆解
         </h5>
         <div className="space-y-6">
           {item.details.content.map((detailText: string, i: number) => (
@@ -308,24 +308,27 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
   </motion.div>
 );
 
-// --- 支持点击跳转的 AI 实验室卡片 (修复了 3D 破框效果) ---
-const AILabCard = ({ title, tag, desc, bgColor, mockup, link }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode; link?: string }) => {
+// --- 深度视觉优化后的 AI 实验室卡片 ---
+const AILabCard = ({ title, tag, desc, bgColor, mockup, link }: { title: string; tag: string; desc: string; bgColor: string; mockup: React.ReactNode, link?: string }) => {
   const cardContent = (
     <>
-      <div className="absolute -top-10 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">{mockup}</div>
+      {/* 【优化】：配合卡片变矮，定位稍微往上提 */}
+      <div className="absolute -top-12 -right-2 w-28 h-36 md:w-32 md:h-40 group-hover:scale-105 group-hover:-translate-y-2 transition-transform duration-500 z-20 drop-shadow-xl pointer-events-none">{mockup}</div>
       <div className="z-10 relative max-w-[65%]">
-        <span className="text-[9px] font-black uppercase tracking-widest text-ink/50 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-3 inline-block">{tag}</span>
-        <h3 className="text-lg font-bold mb-2 tracking-tight text-ink leading-tight flex items-center gap-2">
+        <span className="text-[9px] font-black uppercase tracking-widest text-ink/50 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/60 mb-2.5 inline-block">{tag}</span>
+        <h3 className="text-lg font-bold mb-1.5 tracking-tight text-ink leading-tight flex items-center gap-2">
           {title}
           {link && <ArrowUpRight size={14} className="text-ink/30 group-hover:text-rust transition-colors" />}
         </h3>
-        <p className="text-xs text-ink/60 leading-relaxed font-medium line-clamp-3 mb-1">{desc}</p>
+        {/* 【优化】：描述行数减少到 2 行，更紧凑 */}
+        <p className="text-xs text-ink/60 leading-relaxed font-medium line-clamp-2 mb-1">{desc}</p>
         {link && <span className="text-[9px] text-rust font-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">点击测试 &rarr;</span>}
       </div>
     </>
   );
 
-  const baseClassName = `${bgColor} rounded-[2rem] p-6 flex flex-col min-h-[180px] relative group border border-ink/5 shadow-sm hover:shadow-md transition-all mt-8 md:mt-10`;
+  // 【核心修改】：去掉了结尾的 overflow-hidden 恢复破框效果，并设置 min-h 为 155px，内边距也缩小了。
+  const baseClassName = `${bgColor} rounded-[2rem] pt-4 pb-3 px-5 flex flex-col min-h-[155px] relative group border border-ink/5 shadow-sm hover:shadow-xl transition-all mt-8 md:mt-10`;
 
   if (link) {
     return (
@@ -337,7 +340,7 @@ const AILabCard = ({ title, tag, desc, bgColor, mockup, link }: { title: string;
   return <motion.div whileHover={{ y: -5 }} className={baseClassName}>{cardContent}</motion.div>;
 };
 
-// --- 视频展示小组件 (修复了裁剪问题，改为完整展示 object-contain) ---
+// --- 【核心修改】：彻底铲除白边，视频素材 object-cover 填满悬浮框 ---
 const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: string, fallbackImg?: string, rotateClass?: string }) => {
   const isVideo = src?.toLowerCase().match(/\.(mp4|webm|mov)$/);
   const placeholder = "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=600&auto=format&fit=crop";
@@ -346,12 +349,14 @@ const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: stri
   return (
     <div className={`w-full h-full rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] border-[4px] border-white/90 bg-white ${rotateClass} transition-transform duration-500`}>
       {isVideo ? (
-        <video src={finalSrc} poster={fallbackImg || placeholder} autoPlay loop muted playsInline className="w-full h-full object-contain bg-white" />
+        // 【核心修改】：object-cover 填满框，不裁剪 UI，看起来都是一样大的框，不留白边
+        <video src={finalSrc} poster={fallbackImg || placeholder} autoPlay loop muted playsInline className="w-full h-full object-cover bg-white" />
       ) : (
+        // 【核心修改】：图片也是一样，object-cover
         <img 
           src={finalSrc} 
           alt="demo" 
-          className="w-full h-full object-contain bg-white" 
+          className="w-full h-full object-cover bg-white" 
           onError={(e) => { e.currentTarget.src = placeholder; }}
         />
       )}
@@ -481,7 +486,7 @@ const FULL_FALLBACK = {
   projects: [
     { title: "饿了么下沉市场外卖配送提效", tag: "系统调优", bgImage: "/taobaoshangou.jpg", icon: MapPin, desc: "主导饿了么下沉市场智能调度系统覆盖率从30%提升至98%，提升平台整体配送效率和履约质量。", detail: "该项目为公司战略级项目，作为业务方主导，产研和算法团队紧密配合，通过系统赋能与宣讲培训，帮助全国 1800 个城市代理商实现降本增效。" },
     { title: "一条艺术电商平台", tag: "电商运营", bgImage: "/yitiao.JPG", icon: Palette, desc: "从0-1搭建艺术品电商平台，构建从艺术家到艺术作品的完整知识体系，降低消费者线上购买门槛。", detail: "负责艺术电商平台产品运营，运营艺术品线上展厅、直播、拍卖、线上销售板块的产品规划与内容生态建设；同艺术品BD、内容编辑团队共同搭建从艺术家到艺术作品的完整基础知识体系，降低艺术品消费者线上购买门槛。" },
-    { title: "携程直播青训营", tag: "校企合作", bgImage: "/qingxunying.jpg", icon: Video, desc: "通过搭建视频号直播矩阵，6个月实现项目收入从0到4000万的突破，累计孵化200+学员，获集团Superhero称号。", detail: "负责该项目前期的孵化与规模建设，主导校企合作方案、商务拓展、学员培训、运营策略等全链路落地。具备单场百万直播GMV操盘及个人直播带货能力。" }
+    { title: "携程直播青训营", tag: "校企合作", bgImage: "/qingxunying.jpg", icon: Video, desc: "通过搭建视频号直播矩阵，6个月实现项目收入从0到4000万的突破，累计孵化200+学员，获集团Superhero称号。", detail: "负责该项目前期的孵化与规模建设，主导校企合作方案、商务拓展、学员培训、运营策略等全链路落地. 具备单场百万直播GMV操盘及个人直播带货能力。" }
   ],
   aiLab: [
     { 
@@ -758,8 +763,8 @@ export default function App() {
               <a href="mailto:zwy0025@gmail.com" className="flex items-center justify-center gap-2 bg-white border border-ink/10 text-ink px-6 py-2.5 rounded-full font-bold text-[11px] tracking-widest hover:border-rust hover:text-rust transition-all shadow-sm">
                 <Mail size={14} /> 邮件联系
               </a>
-              <button onClick={() => setIsWeChatOpen(true)} className="flex items-center justify-center gap-2 bg-ink text-white px-6 py-2.5 rounded-full font-bold text-[11px] tracking-widest hover:bg-rust transition-all shadow-md">
-                <QrCode size={14} /> 添加微信
+              <button onClick={() => setIsWeChatOpen(true)} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-ink text-white py-3.5 rounded-full font-bold text-[11px] sm:text-[12px] tracking-widest hover:bg-rust transition-all shadow-xl sm:w-44 whitespace-nowrap">
+                <QrCode size={16} /> 添加微信
               </button>
             </div>
           </div>
@@ -780,7 +785,7 @@ export default function App() {
         <FAQDialog isOpen={isFaqOpen} onClose={() => setIsFaqOpen(false)} />
       </div>
 
-      <WeChatModal isOpen={isWeChatOpen} onClose={() => setIsWeChatOpen(false)} />
+      < WeChatModal isOpen={isWeChatOpen} onClose={() => setIsWeChatOpen(false)} />
     </div>
   );
 }
