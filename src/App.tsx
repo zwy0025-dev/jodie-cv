@@ -350,12 +350,14 @@ const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: stri
   return (
     <div className={`w-full h-full rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)] border-[4px] border-white/90 bg-white ${rotateClass} transition-transform duration-500`}>
       {isVideo ? (
-        <video src={finalSrc} poster={fallbackImg || placeholder} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+        // 【核心修改】：将 object-cover 换成了 object-contain，并加了 bg-white 保证白边自然
+        <video src={finalSrc} poster={fallbackImg || placeholder} autoPlay loop muted playsInline className="w-full h-full object-contain bg-white" />
       ) : (
+        // 【核心修改】：将 object-cover 换成了 object-contain
         <img 
           src={finalSrc} 
           alt="demo" 
-          className="w-full h-full object-cover" 
+          className="w-full h-full object-contain bg-white" 
           onError={(e) => { e.currentTarget.src = placeholder; }}
         />
       )}
@@ -363,7 +365,6 @@ const VideoMockup = ({ src, fallbackImg, rotateClass = "rotate-3" }: { src: stri
     </div>
   );
 };
-
 const FAQDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [selectedQ, setSelectedQ] = useState<number | null>(null);
   const [typingText, setTypingText] = useState("");
